@@ -1,0 +1,14 @@
+CatRadio
+
+1.1.0
+	+ AF Gain and Squelch slider
+	+ Tab with CW and FM functions
+	* SWR meter with log scale
+	* CI-V Address entry in hex
+	* Bug: RF Gain slider now correctly updated
+	* Bug: noise filters init settings now correctly updated
+	* Cosmetic adjustement to fit the font for different SO compiler
+
+
+1.0.0
+	First release
