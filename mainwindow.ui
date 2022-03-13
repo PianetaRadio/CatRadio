@@ -299,6 +299,9 @@
        <height>41</height>
       </rect>
      </property>
+     <property name="cursor">
+      <cursorShape>PointingHandCursor</cursorShape>
+     </property>
     </widget>
     <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
@@ -961,6 +964,9 @@
        <height>140</height>
       </rect>
      </property>
+     <property name="cursor">
+      <cursorShape>PointingHandCursor</cursorShape>
+     </property>
      <property name="mouseTracking">
       <bool>false</bool>
      </property>
@@ -1102,6 +1108,9 @@
        <height>80</height>
       </rect>
      </property>
+     <property name="cursor">
+      <cursorShape>PointingHandCursor</cursorShape>
+     </property>
      <property name="maximum">
       <number>100</number>
      </property>
@@ -1126,6 +1135,9 @@
        <width>18</width>
        <height>80</height>
       </rect>
+     </property>
+     <property name="cursor">
+      <cursorShape>PointingHandCursor</cursorShape>
      </property>
      <property name="maximum">
       <number>100</number>
@@ -1152,6 +1164,9 @@
        <height>80</height>
       </rect>
      </property>
+     <property name="cursor">
+      <cursorShape>PointingHandCursor</cursorShape>
+     </property>
      <property name="maximum">
       <number>100</number>
      </property>
@@ -1173,6 +1188,9 @@
        <width>18</width>
        <height>80</height>
       </rect>
+     </property>
+     <property name="cursor">
+      <cursorShape>PointingHandCursor</cursorShape>
      </property>
      <property name="maximum">
       <number>100</number>
