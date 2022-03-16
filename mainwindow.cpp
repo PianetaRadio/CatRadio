@@ -69,7 +69,8 @@ MainWindow::MainWindow(QWidget *parent)
     timer = new QTimer(this);   //timer for rigDaemon thread call
 
     //* Debug
-    rig_set_debug_level(RIG_DEBUG_WARN);
+    rig_set_debug_level(RIG_DEBUG_WARN);  //normal
+    //rig_set_debug_level(RIG_DEBUG_TRACE);   //debug
     rig_set_debug_time_stamp(true);
     if ((debugFile=fopen("debug.log","w+")) == NULL) rig_set_debug_level(RIG_DEBUG_NONE);
     else rig_set_debug_file(debugFile);
@@ -132,7 +133,7 @@ void MainWindow::guiInit()
 {
     ui->statusbar->showMessage(my_rig->caps->model_name);
 
-    if (rig_has_set_func(my_rig, RIG_FUNCTION_SET_POWERSTAT)==0)    //Power pushbutton
+    if (my_rig->caps->set_powerstat == NULL)    //Power pushbutton
     {
         ui->pushButton_Power->setDisabled(true);
         rigCap.onoff = 0;
@@ -143,7 +144,7 @@ void MainWindow::guiInit()
         rigCap.onoff = 1;
     }
 
-    if (rig_has_set_func(my_rig, RIG_FUNCTION_SET_PTT)==0)    //PTT pushbutton
+    if (my_rig->caps->set_ptt == NULL)    //PTT pushbutton
     {
         ui->pushButton_PTT->setDisabled(true);
         rigCap.ptt = 0;
@@ -223,29 +224,29 @@ void MainWindow::guiInit()
     ui->comboBox_toneType->addItem("1750Hz");   //Burst 1750 Hz
     ui->comboBox_toneType->addItem("TONE");     //CTCSS Tx
     ui->comboBox_toneType->addItem("TSQL");     //CTCSS Tx + Rx squelch
-    //ui->comboBox_toneType->addItem("DTONE");    //DCS Tx
-    //ui->comboBox_toneType->addItem("DTSQL");    //DCS Tx + Rx squelch
+    //ui->comboBox_toneType->addItem("DCS");    //DCS
+
+    //check for targetable sub VFO
+    if (my_rig->caps->targetable_vfo == RIG_TARGETABLE_FREQ) rigCap.freqSub = 1;    //targetable frequency
+    else rigCap.freqSub = 0;
+    if (my_rig->caps->targetable_vfo == RIG_TARGETABLE_MODE) rigCap.modeSub = 1;    //targetable mode
+    else rigCap.modeSub = 0;
+    if (my_rig->caps->targetable_vfo == 0)
+    {
+        rigCap.freqSub = 0; //disable get/set freq for subVFO
+        rigCap.modeSub = 0; //disable get/set mode for subVFO
+        ui->radioButton_VFOSub->setCheckable(false);    //disable VFOsub radio button
+    }
 
     rigCmd.rangeList = 1;   //update range list
     rigCmd.antList = 1; //update antenna list
     rigCmd.toneList = 1;    //update tone list
-
-    rigCap.modeSub = 1;    //assume targetable mode for sub VFO, will be checked later
-
-    /*
-    if (my_rig->caps->targetable_vfo)   //check for targetable sub VFO
-        rigCap.modeSub = 1;    //assume also targetable mode for sub VFO, will be checked later
-    else
-    {
-        rigCap.modeSub = 0; //disable get/set mode for subVFO
-        ui->radioButton_VFOSub->setCheckable(false);    //disable VFOsub radio button
-    }*/
 }
 
 void MainWindow::guiUpdate()
 {
     //* Power button
-    if (rigGet.onoff == RIG_POWER_ON) ui->pushButton_Power->setChecked(true);
+    if (rigGet.onoff == RIG_POWER_ON || rigGet.onoff == RIG_POWER_UNKNOWN) ui->pushButton_Power->setChecked(true);
 
     //* VFOs
     ui->lineEdit_vfoMain->setValue(rigGet.freqMain);
@@ -491,7 +492,7 @@ void MainWindow::on_pushButton_Connect_toggled(bool checked)
        {
            rigCom.connected = 1;
            guiInit();
-           if (rigCap.onoff == 0 || rigGet.onoff == RIG_POWER_ON) timer->start(rigCom.rigRefresh);
+           if (rigCap.onoff == 0 || rigGet.onoff == RIG_POWER_ON || rigGet.onoff == RIG_POWER_UNKNOWN) timer->start(rigCom.rigRefresh);
        }
     }
     else if (rigCom.connected)   //Button unchecked

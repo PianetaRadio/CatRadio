@@ -26,7 +26,7 @@
 #define RELEASE_DATE __DATE__
 #define VERSION_MAJ 1
 #define VERSION_MIN 1
-#define VERSION_MIC 0
+#define VERSION_MIC 1
 
 
 QT_BEGIN_NAMESPACE

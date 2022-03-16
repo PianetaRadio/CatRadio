@@ -87,7 +87,8 @@ int RigDaemon::rigConnect()
         if (retcode != RIG_OK) return retcode;  //Rig not connected
         else    //Rig connected
         {
-            rig_get_powerstat(my_rig, &rigGet.onoff);
+            if (my_rig->caps->get_powerstat != NULL) rig_get_powerstat(my_rig, &rigGet.onoff);
+            else rigGet.onoff = RIG_POWER_UNKNOWN;
             return 0;
         }
 
@@ -117,7 +118,7 @@ void RigDaemon::rigUpdate()
         rigCmd.rangeList = 1;
     }
 
-    else if (rigCmd.freqSub)   //VFO Sub
+    else if (rigCmd.freqSub || rigCap.freqSub)   //VFO Sub
     {
         retcode = rig_set_freq(my_rig, rigGet.vfoSub, rigSet.freqSub);
         if (retcode == RIG_OK) rigGet.freqSub = rigSet.freqSub;
@@ -130,11 +131,11 @@ void RigDaemon::rigUpdate()
         freq_t retfreq;
         retcode = rig_get_freq(my_rig, RIG_VFO_CURR, &retfreq); //get VFO Main
         if (retcode == RIG_OK) rigGet.freqMain = retfreq;
-        //if (my_rig->caps->targetable_vfo)   //get VFO Sub if targetable
-        //{
+        if (rigCap.freqSub)   //get sub VFO freq if targetable
+        {
             retcode = rig_get_freq(my_rig, rigGet.vfoSub, &retfreq);
             if (retcode == RIG_OK) rigGet.freqSub = retfreq;
-        //}
+        }
 
         //* PTT
         ptt_t retptt;
@@ -196,23 +197,47 @@ void RigDaemon::rigUpdate()
             //* VFO Exchange
             if (rigCmd.vfoXchange)
             {
-                int tempMode = rigGet.mode;
-                retcode = rig_vfo_op(my_rig, RIG_VFO_CURR, RIG_OP_XCHG);
-                if (retcode == RIG_OK)
+                if (my_rig->caps->vfo_ops == RIG_OP_XCHG)
                 {
-                    if (rigCap.modeSub == 0) rigGet.modeSub = tempMode;
-                    commandPriority = 0;
+                    mode_t tempMode = rigGet.mode;
+                    retcode = rig_vfo_op(my_rig, RIG_VFO_CURR, RIG_OP_XCHG);
+                    if (retcode == RIG_OK)
+                    {
+                        if (rigCap.modeSub == 0) rigGet.modeSub = tempMode; //If mode sub VFO not targettable, use buffer
+                        commandPriority = 0;
+                        rigCmd.bwidthList = 1;
+                    }
+                }
+
+                else if (my_rig->caps->vfo_ops == RIG_OP_TOGGLE)
+                {
+                    freq_t tempFreq = rigGet.freqMain;
+                    mode_t tempMode = rigGet.mode;
+                    retcode = rig_vfo_op(my_rig, RIG_VFO_CURR, RIG_OP_TOGGLE);
+                    if (retcode == RIG_OK)
+                    {
+                        if (rigCap.freqSub == 0) rigGet.freqSub = tempFreq; //If freq sub VFO not targettable, use buffer
+                        if (rigCap.modeSub == 0) rigGet.modeSub = tempMode; //If mode sub VFO not targettable, use buffer
+                        commandPriority = 0;
+                        rigCmd.bwidthList = 1;
+                    }
                 }
                 rigCmd.vfoXchange = 0;
-                rigCmd.bwidthList = 1;
             }
 
             //* VFO Copy
             if (rigCmd.vfoCopy)
             {
-                rig_vfo_op(my_rig, RIG_VFO_CURR, RIG_OP_CPY);
+                if (my_rig->caps->vfo_ops == RIG_OP_CPY)
+                {
+                    retcode = rig_vfo_op(my_rig, RIG_VFO_CURR, RIG_OP_CPY);
+                    if (retcode == RIG_OK)
+                    {
+                        if (rigCap.freqSub == 0) rigGet.freqSub = rigGet.freqMain;
+                        if (rigCap.modeSub == 0) rigGet.modeSub = rigGet.mode;
+                    }
+                }
                 rigCmd.vfoCopy = 0;
-                if (rigCap.modeSub == 0) rigGet.modeSub = rigGet.mode;
             }
 
             //* Band Up
@@ -442,15 +467,7 @@ void RigDaemon::rigUpdate()
             if (rigGet.bwidth == rig_passband_narrow(my_rig, rigGet.mode)) rigGet.bwNarrow = 1;
             else rigGet.bwNarrow = 0;
 
-            if (rigCap.modeSub)
-            {
-                retcode = rig_get_mode(my_rig, rigGet.vfoSub, &rigGet.modeSub, &rigGet.bwidthSub);
-                if (retcode != RIG_OK)
-                {
-                    rigCap.modeSub = 0;    //mode not targetable
-                    rigGet.modeSub = RIG_MODE_NONE;
-                }
-            }
+            if (rigCap.modeSub) rig_get_mode(my_rig, rigGet.vfoSub, &rigGet.modeSub, &rigGet.bwidthSub);
         }
 
         //* Split
