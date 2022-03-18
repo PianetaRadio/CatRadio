@@ -3,7 +3,8 @@ CatRadio
 (+ New, * Updated, - Removed)
 
 1.1.1 -
-	* Sub VFO enhancement for non targetable_vfo rigs
+	* VFO operations: check rig caps before perform VFO operations
+	* Sub VFO: improve sub VFO functions using targetable_vfo caps
 
 1.1.0 - 2022-03-13
 	+ AF Gain and Squelch slider

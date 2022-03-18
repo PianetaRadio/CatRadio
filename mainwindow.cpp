@@ -227,15 +227,23 @@ void MainWindow::guiInit()
     //ui->comboBox_toneType->addItem("DCS");    //DCS
 
     //check for targetable sub VFO
-    if (my_rig->caps->targetable_vfo == RIG_TARGETABLE_FREQ) rigCap.freqSub = 1;    //targetable frequency
-    else rigCap.freqSub = 0;
-    if (my_rig->caps->targetable_vfo == RIG_TARGETABLE_MODE) rigCap.modeSub = 1;    //targetable mode
-    else rigCap.modeSub = 0;
-    if (my_rig->caps->targetable_vfo == 0)
+    if (my_rig->caps->rig_model != 2)   //Hamlib 4.4 has bug for rigctld and targetable_vfo, skip check
     {
+        if (my_rig->caps->targetable_vfo & RIG_TARGETABLE_FREQ) rigCap.freqSub = 1;    //targetable frequency
+        else rigCap.freqSub = 0;
+        if (my_rig->caps->targetable_vfo & RIG_TARGETABLE_MODE) rigCap.modeSub = 1;    //targetable mode
+        else rigCap.modeSub = 0;
+        if (my_rig->caps->targetable_vfo == RIG_TARGETABLE_NONE)
+        {
         rigCap.freqSub = 0; //disable get/set freq for subVFO
         rigCap.modeSub = 0; //disable get/set mode for subVFO
         ui->radioButton_VFOSub->setCheckable(false);    //disable VFOsub radio button
+        }
+    }
+    else    //NET rigctl, assume targetable_vfo
+    {
+        rigCap.freqSub = 1;
+        rigCap.modeSub = 1;
     }
 
     rigCmd.rangeList = 1;   //update range list

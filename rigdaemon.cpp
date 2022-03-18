@@ -67,6 +67,7 @@ int RigDaemon::rigConnect()
         {
             //myport.type.rig = RIG_PORT_NETWORK;
             strncpy(my_rig->state.rigport.pathname, rigCom.rigPort.toLatin1(), HAMLIB_FILPATHLEN - 1);
+            my_rig->state.vfo_opt = 1;
             //strncpy(my_rig->state.rigport.pathname, RIG_FILE, HAMLIB_FILPATHLEN - 1);
         }
         else
@@ -118,7 +119,7 @@ void RigDaemon::rigUpdate()
         rigCmd.rangeList = 1;
     }
 
-    else if (rigCmd.freqSub || rigCap.freqSub)   //VFO Sub
+    else if (rigCmd.freqSub && rigCap.freqSub)   //VFO Sub
     {
         retcode = rig_set_freq(my_rig, rigGet.vfoSub, rigSet.freqSub);
         if (retcode == RIG_OK) rigGet.freqSub = rigSet.freqSub;
@@ -189,10 +190,21 @@ void RigDaemon::rigUpdate()
             //* Split
             if (rigCmd.split)
             {
-                retcode = rig_set_split_vfo(my_rig, RIG_VFO_RX, rigSet.split, RIG_VFO_TX);
-                if (retcode == RIG_OK) rigGet.split = rigSet.split;
+                freq_t tempFreq = rigGet.freqMain;  //temporary save for non targettable sub VFO
+                if (rigSet.split) retcode = rig_set_split_vfo(my_rig, rigGet.vfoMain, rigSet.split, rigGet.vfoSub); //Split on
+                else retcode = rig_set_split_vfo(my_rig, rigGet.vfoMain, rigSet.split, rigGet.vfoMain); //Split off
+                //retcode = rig_set_split_vfo(my_rig, RIG_VFO_RX, rigSet.split, RIG_VFO_TX);
+                if (retcode == RIG_OK)
+                {
+                    rigGet.split = rigSet.split;
+                    if (rigGet.split && (my_rig->caps->targetable_vfo & RIG_TARGETABLE_FREQ) == 0)    //if non targettable sub VFO
+                    {
+                        rig_get_freq(my_rig, RIG_VFO_CURR, &retfreq);
+                        if (retfreq != tempFreq) rigGet.freqSub = tempFreq; //in this case VFOs were toggled, so print out the right sub VFO frequency
+                    }
+                }
                 rigCmd.split = 0;
-            }
+             }
 
             //* VFO Exchange
             if (rigCmd.vfoXchange)
@@ -243,19 +255,31 @@ void RigDaemon::rigUpdate()
             //* Band Up
             if (rigCmd.bandUp)
             {
-                retcode = rig_vfo_op(my_rig, RIG_VFO_CURR, RIG_OP_BAND_UP);
-                if (retcode == RIG_OK) commandPriority = 0;
+                if (my_rig->caps->vfo_ops == RIG_OP_BAND_UP)
+                {
+                    retcode = rig_vfo_op(my_rig, RIG_VFO_CURR, RIG_OP_BAND_UP);
+                    if (retcode == RIG_OK)
+                    {
+                        commandPriority = 0;
+                        rigCmd.bwidthList = 1;
+                    }
+                }
                 rigCmd.bandUp = 0;
-                rigCmd.bwidthList = 1;
             }
 
             //* Band Down
             if (rigCmd.bandDown)
             {
-                retcode = rig_vfo_op(my_rig, RIG_VFO_CURR, RIG_OP_BAND_DOWN);
-                if (retcode == RIG_OK) commandPriority = 0;
+                if (my_rig->caps->vfo_ops == RIG_OP_BAND_DOWN)
+                {
+                    retcode = rig_vfo_op(my_rig, RIG_VFO_CURR, RIG_OP_BAND_DOWN);
+                    if (retcode == RIG_OK)
+                    {
+                        commandPriority = 0;
+                        rigCmd.bwidthList = 1;
+                    }
+                }
                 rigCmd.bandDown = 0;
-                rigCmd.bwidthList = 1;
             }
 
             //* Band change
@@ -470,13 +494,13 @@ void RigDaemon::rigUpdate()
             if (rigCap.modeSub) rig_get_mode(my_rig, rigGet.vfoSub, &rigGet.modeSub, &rigGet.bwidthSub);
         }
 
-        //* Split
+        //* VFO and Split
         if ((commandPriority == 2 && !rigGet.ptt && rigCom.fullPoll) || commandPriority == 0)
         {
-            rig_get_split_vfo(my_rig, RIG_VFO_CURR, &rigGet.split, &rigGet.vfoTx);
-            //else rig_get_split(my_rig, RIG_VFO_CURR, &rigGet.split);
+            rig_get_split_vfo(my_rig, RIG_VFO_CURR, &rigGet.split, &rigGet.vfoTx);            
 
             rig_get_vfo(my_rig, &rigGet.vfoMain);
+            qDebug() << "get - " << "Main:" << rigGet.vfoMain << "Sub:" << rigGet.vfoSub << "Tx:" << rigGet.vfoTx << "Curr:" << RIG_VFO_CURR;
         }
 
         //* Tuner
