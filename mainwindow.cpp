@@ -156,7 +156,7 @@ void MainWindow::guiInit()
     }
 
     //* Mode combobox
-    if (my_rig->state.mode_list==RIG_MODE_NONE)
+    if (my_rig->state.mode_list == RIG_MODE_NONE)
     {
         ui->comboBox_Mode->setDisabled(true);
         ui->comboBox_ModeSub->setDisabled(true);
@@ -240,7 +240,7 @@ void MainWindow::guiInit()
         ui->radioButton_VFOSub->setCheckable(false);    //disable VFOsub radio button
         }
     }
-    else    //NET rigctl, assume targetable_vfo
+    else    //NET rigctl, as workaround assume targetable_vfo
     {
         rigCap.freqSub = 1;
         rigCap.modeSub = 1;

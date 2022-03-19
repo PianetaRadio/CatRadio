@@ -209,7 +209,7 @@ void RigDaemon::rigUpdate()
             //* VFO Exchange
             if (rigCmd.vfoXchange)
             {
-                if (my_rig->caps->vfo_ops == RIG_OP_XCHG)
+                if (my_rig->caps->vfo_ops & RIG_OP_XCHG)
                 {
                     mode_t tempMode = rigGet.mode;
                     retcode = rig_vfo_op(my_rig, RIG_VFO_CURR, RIG_OP_XCHG);
@@ -221,7 +221,7 @@ void RigDaemon::rigUpdate()
                     }
                 }
 
-                else if (my_rig->caps->vfo_ops == RIG_OP_TOGGLE)
+                else if (my_rig->caps->vfo_ops & RIG_OP_TOGGLE)
                 {
                     freq_t tempFreq = rigGet.freqMain;
                     mode_t tempMode = rigGet.mode;
@@ -240,7 +240,7 @@ void RigDaemon::rigUpdate()
             //* VFO Copy
             if (rigCmd.vfoCopy)
             {
-                if (my_rig->caps->vfo_ops == RIG_OP_CPY)
+                if (my_rig->caps->vfo_ops & RIG_OP_CPY)
                 {
                     retcode = rig_vfo_op(my_rig, RIG_VFO_CURR, RIG_OP_CPY);
                     if (retcode == RIG_OK)
@@ -255,7 +255,7 @@ void RigDaemon::rigUpdate()
             //* Band Up
             if (rigCmd.bandUp)
             {
-                if (my_rig->caps->vfo_ops == RIG_OP_BAND_UP)
+                if (my_rig->caps->vfo_ops & RIG_OP_BAND_UP)
                 {
                     retcode = rig_vfo_op(my_rig, RIG_VFO_CURR, RIG_OP_BAND_UP);
                     if (retcode == RIG_OK)
@@ -270,7 +270,7 @@ void RigDaemon::rigUpdate()
             //* Band Down
             if (rigCmd.bandDown)
             {
-                if (my_rig->caps->vfo_ops == RIG_OP_BAND_DOWN)
+                if (my_rig->caps->vfo_ops & RIG_OP_BAND_DOWN)
                 {
                     retcode = rig_vfo_op(my_rig, RIG_VFO_CURR, RIG_OP_BAND_DOWN);
                     if (retcode == RIG_OK)
@@ -290,7 +290,7 @@ void RigDaemon::rigUpdate()
             }
 
             //* Tune
-            if (rigCmd.tune)
+            if (rigCmd.tune && (my_rig->caps->vfo_ops & RIG_OP_TUNE))
             {
                 rig_vfo_op(my_rig, RIG_VFO_CURR, RIG_OP_TUNE);
                 rigCmd.tune = 0;
@@ -500,7 +500,6 @@ void RigDaemon::rigUpdate()
             rig_get_split_vfo(my_rig, RIG_VFO_CURR, &rigGet.split, &rigGet.vfoTx);            
 
             rig_get_vfo(my_rig, &rigGet.vfoMain);
-            qDebug() << "get - " << "Main:" << rigGet.vfoMain << "Sub:" << rigGet.vfoSub << "Tx:" << rigGet.vfoTx << "Curr:" << RIG_VFO_CURR;
         }
 
         //* Tuner
