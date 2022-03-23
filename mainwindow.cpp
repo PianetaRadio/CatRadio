@@ -98,6 +98,7 @@ MainWindow::MainWindow(QWidget *parent)
     rigCom.rigPort = configFile.value("rigPort").toString();
     rigCom.serialSpeed = configFile.value("serialSpeed", 9600).toInt();
     rigCom.civAddr = configFile.value("civAddress", 0).toInt();
+    rigCom.netRigctl = configFile.value("netRigctl", false).toBool();
     rigCom.rigRefresh = configFile.value("rigRefresh", 100).toInt();
     rigCom.fullPoll = configFile.value("fullPolling", true).toBool();
     guiConf.vfoDisplayMode = configFile.value("vfoDisplayMode", 0).toInt();

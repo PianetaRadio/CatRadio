@@ -31,6 +31,7 @@ typedef struct {
     QString rigPort;    //COM port or IP address
     unsigned serialSpeed;   //Serial port baud rate
     int civAddr;  //CI-V address (decimal, Icom radio)
+    bool netRigctl; //TCP NET Rigctl
     unsigned rigRefresh;    //GUI refresh interval (ms)
     int connected;  //connected flag
     bool fullPoll;  //full polling flag

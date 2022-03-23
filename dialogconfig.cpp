@@ -23,6 +23,7 @@
 #include <QSettings>
 #include <QFile>
 #include <QTextStream>
+#include <QSerialPortInfo>
 
 #include "rigdata.h"
 
@@ -59,8 +60,17 @@ DialogConfig::DialogConfig(QWidget *parent) :
     }
     file.close();
 
-    //* serialSpeed comboBox
+    //* COM port
+    ui->comboBox_comPort->clear();
+    ui->comboBox_comPort->addItem("");
+    foreach (const QSerialPortInfo &comPort, QSerialPortInfo::availablePorts())  //search available COM port
+    {
+        ui->comboBox_comPort->addItem(comPort.portName());
+    }
+
+    //* serialSpeed
     ui->comboBox_serialSpeed->clear();
+    ui->comboBox_serialSpeed->addItem("");
     ui->comboBox_serialSpeed->addItem("4800");
     ui->comboBox_serialSpeed->addItem("9600");
     ui->comboBox_serialSpeed->addItem("19200");
@@ -69,10 +79,19 @@ DialogConfig::DialogConfig(QWidget *parent) :
     ui->comboBox_serialSpeed->addItem("115200");
 
     //* Update values in the GUI
-    ui->comboBox_rigModel->setCurrentIndex(ui->comboBox_rigModel->findText(QString::number(rigCom.rigModel),Qt::MatchStartsWith));
-    ui->lineEdit_RigPath->setText(rigCom.rigPort);
-    ui->comboBox_serialSpeed->setCurrentText(QString::number(rigCom.serialSpeed));
-    if (rigCom.civAddr) ui->lineEdit_civAddr->setText(QString::number(rigCom.civAddr,16));
+    if (rigCom.netRigctl)
+    {
+        ui->checkBox_netRigctl->setChecked(rigCom.netRigctl);
+        ui->lineEdit_ip->setText(rigCom.rigPort);
+        ui->comboBox_rigModel->setCurrentIndex(1);
+    }
+    else
+    {
+        ui->comboBox_rigModel->setCurrentIndex(ui->comboBox_rigModel->findText(QString::number(rigCom.rigModel),Qt::MatchStartsWith));
+        ui->comboBox_comPort->setCurrentText(rigCom.rigPort);
+        ui->comboBox_serialSpeed->setCurrentText(QString::number(rigCom.serialSpeed));
+        if (rigCom.civAddr) ui->lineEdit_civAddr->setText(QString::number(rigCom.civAddr,16));
+    }
     ui->spinBox_RefreshRate->setValue(rigCom.rigRefresh);
     ui->checkBox_fullPoll->setChecked(rigCom.fullPoll);
 }
@@ -87,23 +106,33 @@ void DialogConfig::on_buttonBox_accepted()
     bool civAddrConv;
 
     //* Read settings from GUI
+    if (ui->checkBox_netRigctl->isChecked())
+    {
+        rigCom.rigModel = 2;
+        rigCom.netRigctl = true;
+        rigCom.rigPort = ui->lineEdit_ip->text();
+    }
+    else
+    {
     QString rigModel = ui->comboBox_rigModel->currentText();
     QRegularExpression regexp("[0-9]+");
     QRegularExpressionMatch rigNumber = regexp.match(rigModel);
     rigCom.rigModel = rigNumber.captured(0).toInt();
 
-    rigCom.rigPort = ui->lineEdit_RigPath->text();
+    rigCom.rigPort = ui->comboBox_comPort->currentText();
     rigCom.serialSpeed = ui->comboBox_serialSpeed->currentText().toInt();
     rigCom.civAddr = ui->lineEdit_civAddr->text().toInt(&civAddrConv,16);
+    }
     rigCom.rigRefresh = ui->spinBox_RefreshRate->value();
     rigCom.fullPoll = ui->checkBox_fullPoll->isChecked();
 
     //* Save settings in config.ini
     QSettings configFile(QString("config.ini"), QSettings::IniFormat);
     configFile.setValue("rigModel", rigCom.rigModel);
-    configFile.setValue("rigPort", ui->lineEdit_RigPath->text());
+    configFile.setValue("rigPort", rigCom.rigPort);
     configFile.setValue("serialSpeed", ui->comboBox_serialSpeed->currentText());
     configFile.setValue("civAddress", ui->lineEdit_civAddr->text().toInt(&civAddrConv,16));
+    configFile.setValue("netRigctl", ui->checkBox_netRigctl->isChecked());
     configFile.setValue("rigRefresh", ui->spinBox_RefreshRate->value());
     configFile.setValue("fullPolling", ui->checkBox_fullPoll->isChecked());
 }
@@ -114,4 +143,18 @@ int printRigList(const struct rig_caps *rigCaps, void *data)    //Load rig list 
     QTextStream stream(&file);
     stream << rigCaps->rig_model << " " << rigCaps->mfg_name << " " << rigCaps->model_name << "\n";
     return 1;
+}
+
+void DialogConfig::on_checkBox_netRigctl_toggled(bool checked)
+{
+    if (checked)
+    {
+        ui->comboBox_rigModel->setCurrentIndex(1);  //set NET rigctl
+        ui->comboBox_comPort->setCurrentText("");
+    }
+    else
+    {
+        ui->comboBox_rigModel->setCurrentIndex(0);  //set Dummy
+        ui->lineEdit_ip->setText("");   //clear IP address
+    }
 }

@@ -1,4 +1,5 @@
 QT       += core gui
+QT       += serialport
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -46,7 +47,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 LIBS += -L$$PWD/hamlib/ -lhamlib
 INCLUDEPATH += $$PWD/hamlib
 
-VERSION = 1.0.0
+VERSION = 1.2.0
 
 RC_ICONS = catradio.ico
 

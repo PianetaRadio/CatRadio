@@ -2,6 +2,9 @@ CatRadio
 
 (+ New, * Updated, - Removed)
 
+1.2.0 -
+	+ COM port list in the communication config dialog
+
 1.1.1 -	2022-03-19
 	* VFO operations: check rig caps before perform VFO operations
 	* Sub VFO: improve sub VFO functions using targetable_vfo caps

@@ -37,6 +37,8 @@ public:
 private slots:
     void on_buttonBox_accepted();
 
+    void on_checkBox_netRigctl_toggled(bool checked);
+
 private:
     Ui::DialogConfig *ui;
 };
