@@ -65,7 +65,12 @@ DialogConfig::DialogConfig(QWidget *parent) :
     ui->comboBox_comPort->addItem("");
     foreach (const QSerialPortInfo &comPort, QSerialPortInfo::availablePorts())  //search available COM port
     {
+#ifdef Q_OS_WIN
         ui->comboBox_comPort->addItem(comPort.portName());
+#endif
+#ifdef Q_OS_LINUX
+        ui->comboBox_comPort->addItem("/dev/"+comPort.portName());
+#endif
     }
 
     //* serialSpeed
