@@ -3,6 +3,7 @@ CatRadio
 (+ New, * Updated, - Removed)
 
 1.2.0 -
+	+ DCS code and squelch
 	+ COM port list in the communication config dialog
 
 1.1.1 -	2022-03-19

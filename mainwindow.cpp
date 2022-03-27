@@ -221,11 +221,11 @@ void MainWindow::guiInit()
 
     //* Tone
     ui->comboBox_toneType->clear();
-    ui->comboBox_toneType->addItem(" ");        //None
+    ui->comboBox_toneType->addItem("");        //None
     ui->comboBox_toneType->addItem("1750Hz");   //Burst 1750 Hz
     ui->comboBox_toneType->addItem("TONE");     //CTCSS Tx
-    ui->comboBox_toneType->addItem("TSQL");     //CTCSS Tx + Rx squelch
-    //ui->comboBox_toneType->addItem("DCS");    //DCS
+    if (my_rig->caps->set_ctcss_sql) ui->comboBox_toneType->addItem("TSQL");     //CTCSS Tx + Rx squelch
+    if (my_rig->caps->set_dcs_sql) ui->comboBox_toneType->addItem("DCS");    //DCS
 
     //check for targetable sub VFO
     if (my_rig->caps->rig_model != 2)   //Hamlib 4.4 has bug for rigctld and targetable_vfo, skip check
@@ -365,11 +365,14 @@ void MainWindow::guiUpdate()
             }
         }
 
-        //for (i = 0; i < DCS_LIST_SIZE; i++)   //DCS tone
-        //{
-        //    if (my_rig->caps->dcs_list[i] == 0) break;
-        //    ui->comboBox_toneFreq->addItem(QString::number(my_rig->caps->dcs_list[i]));
-        //}
+        if (rigGet.toneType == 4)
+        {
+            for (i = 0; i < DCS_LIST_SIZE; i++)   //DCS code
+            {
+                if (my_rig->caps->dcs_list[i] == 0) break;
+                ui->comboBox_toneFreq->addItem(QString::number(my_rig->caps->dcs_list[i]));
+            }
+        }
 
         rigCmd.toneList = 0;
     }
@@ -890,10 +893,15 @@ void MainWindow::on_comboBox_toneType_activated(int index)
 
 void MainWindow::on_comboBox_toneFreq_activated(int index)
 {
-    QString arg = ui->comboBox_toneFreq->itemText(index);
-    arg = arg.remove(".");  //Remove '.' from CTCSS (as for hamlib CTCSS tone list)
+    if (rigGet.toneType == 2 || rigGet.toneType == 3)   //CTCSS
+    {
+        QString arg = ui->comboBox_toneFreq->itemText(index);
+        arg = arg.remove(".");  //Remove '.' from CTCSS (as for hamlib CTCSS tone list)
+        rigSet.tone = arg.toUInt();
+    }
+    else if (rigGet.toneType == 4) rigSet.tone = ui->comboBox_toneFreq->itemText(index).toInt();  //DCS
+    else return;
 
-    if (rigGet.toneType == 2 || rigGet.toneType == 3) rigSet.tone = arg.toUInt();
     rigCmd.tone = 1;
 }
 

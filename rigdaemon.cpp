@@ -435,23 +435,29 @@ void RigDaemon::rigUpdate()
             {
                 switch (rigSet.toneType)
                 {
-                case 1:
+                case 1: //Burst 1750 Hz
                     retcode = rig_set_func(my_rig, RIG_VFO_CURR, RIG_FUNC_TBURST, true);
                     break;
-                case 2:
+                case 2: //CTCSS tone
                     retcode = rig_set_func(my_rig, RIG_VFO_CURR, RIG_FUNC_TONE, true);
                     if (rigSet.tone) rig_set_ctcss_tone(my_rig, RIG_VFO_CURR, rigSet.tone);
                     else rig_get_ctcss_tone(my_rig, RIG_VFO_CURR, &rigSet.tone);
                     break;
-                case 3:
+                case 3: //CTCSS tone + squelch
                     retcode = rig_set_func(my_rig, RIG_VFO_CURR, RIG_FUNC_TSQL, true);
                     if (rigSet.tone) rig_set_ctcss_tone(my_rig, RIG_VFO_CURR, rigSet.tone);
                     else rig_get_ctcss_tone(my_rig, RIG_VFO_CURR, &rigSet.tone);
+                    break;
+                case 4: //DCS tone + squelch
+                    retcode = rig_set_func(my_rig, RIG_VFO_CURR, RIG_FUNC_CSQL, true);
+                    if (rigSet.tone) rig_set_dcs_code(my_rig, RIG_VFO_CURR, rigSet.tone);
+                    else rig_get_dcs_code(my_rig, RIG_VFO_CURR, &rigSet.tone);
                     break;
                  default:
                     rig_set_func(my_rig, RIG_VFO_CURR, RIG_FUNC_TBURST, false);
                     rig_set_func(my_rig, RIG_VFO_CURR, RIG_FUNC_TONE, false);
                     rig_set_func(my_rig, RIG_VFO_CURR, RIG_FUNC_TSQL, false);
+                    rig_set_func(my_rig, RIG_VFO_CURR, RIG_FUNC_CSQL, false);
                     retcode = RIG_OK;
                     break;
                 }
@@ -593,6 +599,7 @@ void RigDaemon::rigUpdate()
             rig_get_rptr_shift(my_rig, RIG_VFO_CURR, &rigGet.rptShift);     //Repeater Shift
 
             int status = false;
+            if (!my_rig->caps->get_ctcss_sql) status = 1;   //If get cap is not available skip
             if (!status)
             {
                 rig_get_func(my_rig, RIG_VFO_CURR, RIG_FUNC_TBURST, &status);   //1750 Hz Tone burst
@@ -608,21 +615,23 @@ void RigDaemon::rigUpdate()
                 rig_get_func(my_rig, RIG_VFO_CURR, RIG_FUNC_TSQL, &status);     //CTCSS Tone Tx and Rx Squelch
                 if (status) rigGet.toneType = 3;
             }
+            if (!status)
+            {
+                rig_get_func(my_rig, RIG_VFO_CURR, RIG_FUNC_CSQL, &status);     //DCS Code
+                if (status) rigGet.toneType = 4;
+            }
             if (!status) rigGet.toneType = 0;
 
-            if (rigGet.toneType == 2 || rigGet.toneType == 3) rig_get_ctcss_tone(my_rig, RIG_VFO_CURR, &rigGet.tone);
-            else if (rigGet.toneType == 4 || rigGet.toneType == 5) rig_get_dcs_code(my_rig, RIG_VFO_CURR, &rigGet.tone);
+            if ((rigGet.toneType == 2 || rigGet.toneType == 3) && my_rig->caps->get_ctcss_tone) rig_get_ctcss_tone(my_rig, RIG_VFO_CURR, &rigGet.tone);
+            else if (rigGet.toneType == 4 && my_rig->caps->get_dcs_code) rig_get_dcs_code(my_rig, RIG_VFO_CURR, &rigGet.tone);
 
-            if (rigGet.toneType && rigGet.tone == 0)
+            /*if (rigGet.toneType && rigGet.tone == 0)
             {
                 rigSet.toneType = 0;
                 rigCmd.tone = 1;
-            }
+            }*/
 
             if (rigGet.toneType != rigSet.toneType) rigCmd.toneList = 1;    //update tone list
-
-            //rig_get_func(my_rig, RIG_VFO_CURR, RIG_FUNC_CSQL, &status);
-            //rig_get_func(my_rig, RIG_VFO_CURR, RIG_FUNC_DSQL, &status);
         }
 
         commandPriority ++;
