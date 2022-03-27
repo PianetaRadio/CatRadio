@@ -599,7 +599,7 @@ void RigDaemon::rigUpdate()
             rig_get_rptr_shift(my_rig, RIG_VFO_CURR, &rigGet.rptShift);     //Repeater Shift
 
             int status = false;
-            if (!my_rig->caps->get_ctcss_sql) status = 1;   //If get cap is not available skip
+            if (!(my_rig->caps->has_get_func & RIG_FUNC_TONE)) status = 1;   //If get cap is not available skip
             if (!status)
             {
                 rig_get_func(my_rig, RIG_VFO_CURR, RIG_FUNC_TBURST, &status);   //1750 Hz Tone burst
