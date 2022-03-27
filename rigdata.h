@@ -39,7 +39,7 @@ typedef struct {
 
 typedef struct {
     powerstat_t onoff;  //on/off status
-    freq_t freqMain, freqSub;    //Frequency
+    freq_t freqMain, freqSub;    //Frequency (Hz)
     rmode_t mode, modeSub;  //Mode
     pbwidth_t bwidth, bwidthSub;    //IF filter bandwidth
     int bwNarrow;   //IF narrow filter
@@ -69,7 +69,8 @@ typedef struct {
     int notchFilter;
     int ifShift;
     rptr_shift_t rptShift;  //Repeater shift
-    int toneType;   //0 none, 1 burst 1750, 2 CTCSS, 3 CTCSS SQL, 4 DCS, 5 DCS SQL
+    shortfreq_t rptOffset;  //Repeater offset (Hz)
+    int toneType;   //0 none, 1 burst 1750, 2 CTCSS, 3 CTCSS SQL, 4 DCS
     tone_t tone;    //CTCSS or DCS tone
 } rigSettings;
 
@@ -104,7 +105,7 @@ typedef struct {
     int noiseReduction, noiseReductionLevel;
     int notchFilter;
     int ifShift;
-    int rptShift;
+    int rptShift, rptOffset;
     int tone;
     int antList;
     int rangeList;

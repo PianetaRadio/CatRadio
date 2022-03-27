@@ -430,6 +430,13 @@ void RigDaemon::rigUpdate()
                 if (retcode == RIG_OK) rigGet.rptShift = rigSet.rptShift;
                 rigCmd.rptShift = 0;
             }
+            //* Repeater offset
+            if (rigCmd.rptOffset)
+            {
+                retcode = rig_set_rptr_offs(my_rig, RIG_VFO_CURR, rigSet.rptOffset);
+                if (retcode == RIG_OK) rigGet.rptOffset = rigSet.rptOffset;
+                rigCmd.rptOffset = 0;
+            }
             //* Tone
             if (rigCmd.tone)
             {
@@ -597,6 +604,7 @@ void RigDaemon::rigUpdate()
         if ((commandPriority == 17 && !rigGet.ptt && rigCom.fullPoll) || commandPriority == 0) //&& mode=FM
         {
             rig_get_rptr_shift(my_rig, RIG_VFO_CURR, &rigGet.rptShift);     //Repeater Shift
+            rig_get_rptr_offs(my_rig, RIG_VFO_CURR, &rigGet.rptOffset);     //Repeater Offset
 
             int status = false;
             if (!(my_rig->caps->has_get_func & RIG_FUNC_TONE)) status = 1;   //If get cap is not available skip

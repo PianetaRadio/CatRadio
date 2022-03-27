@@ -447,6 +447,7 @@ void MainWindow::guiUpdate()
     if (rigGet.rptShift == RIG_RPT_SHIFT_MINUS) ui->radioButton_RPTshiftMinus->setChecked(true);    //-
     else if (rigGet.rptShift == RIG_RPT_SHIFT_PLUS) ui->radioButton_RPTshiftPlus->setChecked(true); //+
     else ui->radioButton_RPTshiftSimplex->setChecked(true); //Simplex
+    ui->spinBox_RPToffset->setValue(rigGet.rptOffset/1000);  //Offset (kHz)
 
     ui->comboBox_toneType->setCurrentIndex(rigGet.toneType);
     if (rigGet.toneType == 2 || rigGet.toneType ==3) ui->comboBox_toneFreq->setCurrentText(QString::number(rigGet.tone/10.0));  //CTCSS
@@ -920,6 +921,11 @@ void MainWindow::on_spinBox_WPM_valueChanged(int arg1)
     rigCmd.wpm = 1;
 }
 
+void MainWindow::on_spinBox_RPToffset_valueChanged(int arg1)
+{
+    rigSet.rptOffset = arg1*1000;
+    rigCmd.rptOffset = 1;
+}
 
 //***** Slider *****
 

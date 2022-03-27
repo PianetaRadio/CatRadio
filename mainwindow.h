@@ -156,6 +156,8 @@ private slots:
 
     void on_comboBox_toneFreq_activated(int index);
 
+    void on_spinBox_RPToffset_valueChanged(int arg1);
+
 private:
     Ui::MainWindow *ui;
     QTimer *timer;
