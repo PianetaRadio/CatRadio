@@ -131,8 +131,8 @@ void DialogConfig::on_buttonBox_accepted()
     rigCom.rigRefresh = ui->spinBox_RefreshRate->value();
     rigCom.fullPoll = ui->checkBox_fullPoll->isChecked();
 
-    //* Save settings in config.ini
-    QSettings configFile(QString("config.ini"), QSettings::IniFormat);
+    //* Save settings in catradio.ini
+    QSettings configFile(QString("catradio.ini"), QSettings::IniFormat);
     configFile.setValue("rigModel", rigCom.rigModel);
     configFile.setValue("rigPort", rigCom.rigPort);
     configFile.setValue("serialSpeed", ui->comboBox_serialSpeed->currentText());

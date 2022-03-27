@@ -36,8 +36,8 @@ void DialogSetup::on_radioButton_vfoDispMode_UD_toggled(bool checked)
 
 void DialogSetup::on_buttonBox_accepted()
 {
-    //* Save settings in config.ini
-    QSettings configFile(QString("config.ini"), QSettings::IniFormat);
+    //* Save settings in catradio.ini
+    QSettings configFile(QString("catradio.ini"), QSettings::IniFormat);
     configFile.setValue("vfoDisplayMode", guiConf.vfoDisplayMode);
 }
 

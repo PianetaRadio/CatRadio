@@ -72,7 +72,7 @@ MainWindow::MainWindow(QWidget *parent)
     rig_set_debug_level(RIG_DEBUG_WARN);  //normal
     //rig_set_debug_level(RIG_DEBUG_TRACE);   //debug
     rig_set_debug_time_stamp(true);
-    if ((debugFile=fopen("debug.log","w+")) == NULL) rig_set_debug_level(RIG_DEBUG_NONE);
+    if ((debugFile=fopen("catradio.log","w+")) == NULL) rig_set_debug_level(RIG_DEBUG_NONE);
     else rig_set_debug_file(debugFile);
 
     //* Signal and Slot connection for Slider and associated Label
@@ -92,8 +92,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(rigDaemon, &RigDaemon::resultReady, this, &MainWindow::on_rigDaemonResultReady);
     workerThread.start();
 
-    //* Load settings from config.ini
-    QSettings configFile(QString("config.ini"), QSettings::IniFormat);
+    //* Load settings from catradio.ini
+    QSettings configFile(QString("catradio.ini"), QSettings::IniFormat);
     rigCom.rigModel = configFile.value("rigModel", 0).toInt();
     rigCom.rigPort = configFile.value("rigPort").toString();
     rigCom.serialSpeed = configFile.value("serialSpeed", 9600).toInt();
