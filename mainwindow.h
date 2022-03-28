@@ -158,6 +158,10 @@ private slots:
 
     void on_spinBox_RPToffset_valueChanged(int arg1);
 
+    void on_pushButton_left_clicked();
+
+    void on_pushButton_right_clicked();
+
 private:
     Ui::MainWindow *ui;
     QTimer *timer;

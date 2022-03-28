@@ -252,6 +252,20 @@ void RigDaemon::rigUpdate()
                 rigCmd.vfoCopy = 0;
             }
 
+            //* VFO Down
+            if (rigCmd.vfoDown)
+            {
+                rig_vfo_op(my_rig, RIG_VFO_CURR, RIG_OP_DOWN);
+                rigCmd.vfoDown = 0;
+            }
+
+            //* VFO Up
+            if (rigCmd.vfoUp)
+            {
+                rig_vfo_op(my_rig, RIG_VFO_CURR, RIG_OP_UP);
+                rigCmd.vfoUp = 0;
+            }
+
             //* Band Up
             if (rigCmd.bandUp)
             {
@@ -290,9 +304,9 @@ void RigDaemon::rigUpdate()
             }
 
             //* Tune
-            if (rigCmd.tune && (my_rig->caps->vfo_ops & RIG_OP_TUNE))
+            if (rigCmd.tune)
             {
-                rig_vfo_op(my_rig, RIG_VFO_CURR, RIG_OP_TUNE);
+                if (my_rig->caps->vfo_ops & RIG_OP_TUNE) rig_vfo_op(my_rig, RIG_VFO_CURR, RIG_OP_TUNE);
                 rigCmd.tune = 0;
             }
 
@@ -426,15 +440,21 @@ void RigDaemon::rigUpdate()
             //* Repeater shift
             if (rigCmd.rptShift)
             {
-                retcode = rig_set_rptr_shift(my_rig, RIG_VFO_CURR, rigSet.rptShift);
-                if (retcode == RIG_OK) rigGet.rptShift = rigSet.rptShift;
+                if (my_rig->caps->set_rptr_shift)
+                {
+                    retcode = rig_set_rptr_shift(my_rig, RIG_VFO_CURR, rigSet.rptShift);
+                    if (retcode == RIG_OK) rigGet.rptShift = rigSet.rptShift;
+                }
                 rigCmd.rptShift = 0;
             }
             //* Repeater offset
             if (rigCmd.rptOffset)
             {
-                retcode = rig_set_rptr_offs(my_rig, RIG_VFO_CURR, rigSet.rptOffset);
-                if (retcode == RIG_OK) rigGet.rptOffset = rigSet.rptOffset;
+                if (my_rig->caps->set_rptr_offs)
+                {
+                    retcode = rig_set_rptr_offs(my_rig, RIG_VFO_CURR, rigSet.rptOffset);
+                    if (retcode == RIG_OK) rigGet.rptOffset = rigSet.rptOffset;
+                }
                 rigCmd.rptOffset = 0;
             }
             //* Tone

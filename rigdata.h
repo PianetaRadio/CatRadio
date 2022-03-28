@@ -82,8 +82,8 @@ typedef struct {
     int bwidthList;
     int vfo;
     int split;
-    int vfoXchange;
-    int vfoCopy;
+    int vfoXchange, vfoCopy;
+    int vfoDown, vfoUp;
     int ptt;
     int rfPower;
     int rfGain;
@@ -95,8 +95,7 @@ typedef struct {
     int ant;
     int tuner;
     int tune;
-    int bandUp;
-    int bandDown;
+    int bandUp, bandDown;
     int bandChange;
     int bkin;
     int wpm;

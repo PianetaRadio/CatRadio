@@ -222,10 +222,10 @@ void MainWindow::guiInit()
     //* Tone
     ui->comboBox_toneType->clear();
     ui->comboBox_toneType->addItem("");        //None
-    ui->comboBox_toneType->addItem("1750Hz");   //Burst 1750 Hz
-    ui->comboBox_toneType->addItem("TONE");     //CTCSS Tx
-    if (my_rig->caps->set_ctcss_sql) ui->comboBox_toneType->addItem("TSQL");     //CTCSS Tx + Rx squelch
-    if (my_rig->caps->set_dcs_sql) ui->comboBox_toneType->addItem("DCS");    //DCS
+    if (rig_has_set_func(my_rig, RIG_FUNC_TBURST)) ui->comboBox_toneType->addItem("1750Hz");   //Burst 1750 Hz
+    if (rig_has_set_func(my_rig, RIG_FUNC_TONE)) ui->comboBox_toneType->addItem("TONE");     //CTCSS Tx
+    if (rig_has_set_func(my_rig, RIG_FUNC_TSQL)) ui->comboBox_toneType->addItem("TSQL");     //CTCSS Tx + Rx squelch
+    if (rig_has_set_func(my_rig, RIG_FUNC_CSQL)) ui->comboBox_toneType->addItem("DCS");    //DCS
 
     //check for targetable sub VFO
     if (my_rig->caps->rig_model != 2)   //Hamlib 4.4 has bug for rigctld and targetable_vfo, skip check
@@ -589,6 +589,17 @@ void MainWindow::on_pushButton_Fast_toggled(bool checked)
     else fastDial = 0;
 }
 
+void MainWindow::on_pushButton_left_clicked()
+{
+    rigCmd.vfoDown = 1;
+}
+
+
+void MainWindow::on_pushButton_right_clicked()
+{
+    rigCmd.vfoUp = 1;
+}
+
 void MainWindow::on_pushButton_Tune_clicked()
 {
     rigCmd.tune = 1;
@@ -887,7 +898,13 @@ void MainWindow::on_comboBox_Meter_activated(int index)
 
 void MainWindow::on_comboBox_toneType_activated(int index)
 {
-    rigSet.toneType = index;
+    QString toneType = ui->comboBox_toneType->itemText(index);
+    if (toneType == "1750Hz") rigSet.toneType = 1;
+    else if (toneType == "TONE") rigSet.toneType = 2;
+    else if (toneType == "TSQL") rigSet.toneType = 3;
+    else if (toneType == "DCS") rigSet.toneType = 4;
+    else rigSet.toneType = 0;
+
     rigCmd.toneList = 1;    //update tone list
     rigCmd.tone = 1;
 }
