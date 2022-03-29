@@ -53,6 +53,7 @@ DialogConfig::DialogConfig(QWidget *parent) :
     else file.open(QIODevice::ReadOnly);    //Open file rig.lst and populate the combobox
     file.seek(0);
     ui->comboBox_rigModel->clear();
+    ui->comboBox_rigModel->addItem("");
     while(!file.atEnd())
     {
         QString line = file.readLine();
@@ -88,7 +89,7 @@ DialogConfig::DialogConfig(QWidget *parent) :
     {
         ui->checkBox_netRigctl->setChecked(rigCom.netRigctl);
         ui->lineEdit_ip->setText(rigCom.rigPort);
-        ui->comboBox_rigModel->setCurrentIndex(1);
+        ui->comboBox_rigModel->setCurrentIndex(0);
     }
     else
     {
@@ -154,12 +155,12 @@ void DialogConfig::on_checkBox_netRigctl_toggled(bool checked)
 {
     if (checked)
     {
-        ui->comboBox_rigModel->setCurrentIndex(1);  //set NET rigctl
+        ui->comboBox_rigModel->setCurrentIndex(2);  //set NET rigctl
         ui->comboBox_comPort->setCurrentText("");
     }
     else
     {
-        ui->comboBox_rigModel->setCurrentIndex(0);  //set Dummy
+        ui->comboBox_rigModel->setCurrentIndex(0);  //set void
         ui->lineEdit_ip->setText("");   //clear IP address
     }
 }
