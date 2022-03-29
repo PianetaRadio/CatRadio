@@ -344,7 +344,7 @@ void MainWindow::guiUpdate()
                 case 4: ui->comboBox_Ant->addItem("ANT5"); break;   //RIG_ANT_5
                 case 30: ui->comboBox_Ant->addItem("UNK"); break;   //RIG_ANT_UNKNOWN
                 case 31: ui->comboBox_Ant->addItem("CURR"); break;  //RIG_ANT_CURR
-                default: ui->comboBox_Ant->addItem("UNK"); break;
+                default: ui->comboBox_Ant->addItem(""); break;
                 }
             }
         }
@@ -449,9 +449,17 @@ void MainWindow::guiUpdate()
     else ui->radioButton_RPTshiftSimplex->setChecked(true); //Simplex
     ui->spinBox_RPToffset->setValue(rigGet.rptOffset/1000);  //Offset (kHz)
 
-    ui->comboBox_toneType->setCurrentIndex(rigGet.toneType);
+    switch (rigGet.toneType)
+    {
+    case (1): ui->comboBox_toneType->setCurrentText("1750Hz"); break;
+    case (2): ui->comboBox_toneType->setCurrentText("TONE"); break;
+    case (3): ui->comboBox_toneType->setCurrentText("TSQL"); break;
+    case (4): ui->comboBox_toneType->setCurrentText("DCS"); break;
+    default: ui->comboBox_toneType->setCurrentText(""); break;
+    }
+
     if (rigGet.toneType == 2 || rigGet.toneType ==3) ui->comboBox_toneFreq->setCurrentText(QString::number(rigGet.tone/10.0));  //CTCSS
-    else if (rigGet.toneType == 4 || rigGet.toneType ==5) ui->comboBox_toneFreq->setCurrentText(QString::number(rigGet.tone));  //DCS
+    else if (rigGet.toneType == 4) ui->comboBox_toneFreq->setCurrentText(QString::number(rigGet.tone));  //DCS
 }
 
 
