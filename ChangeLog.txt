@@ -4,6 +4,7 @@ CatRadio
 
 1.2.0 -
 	+ Up/Down VFO buttons
+	+ Repeater shift offset
 	+ DCS code and squelch
 	+ COM port list in the communication config dialog
 
