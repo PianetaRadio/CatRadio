@@ -9,6 +9,7 @@ CatRadio
 	+ DCS code and squelch
 	+ COM port list in the communication config dialog
 	* Bug correction: IF shift slider now correctly updated
+	* Bug correction: CW/FM tab autofocus freeze
 
 1.1.1 -	2022-03-19
 	* VFO operations: check rig caps before perform VFO operations
@@ -27,7 +28,6 @@ CatRadio
 	* Bug correction: subVFO mode
 	* Bug correction: VFO dial now with pointer tracking 
 	* Cosmetic adjustement to fit the font for different SO compiler
-
 
 1.0.0 - 2022-02-13
 	First release
