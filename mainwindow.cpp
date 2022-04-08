@@ -45,6 +45,7 @@ extern rigSettings rigSet;
 extern rigCommand rigCmd;
 extern rigCommand rigCap;
 extern guiConfig guiConf;
+extern guiCommand guiCmd;
 
 int retcode;    //Return code from function
 int i;  //Index
@@ -80,6 +81,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->verticalSlider_RFgain, &QAbstractSlider::valueChanged, ui->label_RFgainValue, QOverload<int>::of(&QLabel::setNum));
     connect(ui->verticalSlider_AFGain, &QAbstractSlider::valueChanged, ui->label_AFGainValue, QOverload<int>::of(&QLabel::setNum));
     connect(ui->verticalSlider_Squelch, &QAbstractSlider::valueChanged, ui->label_SquelchValue, QOverload<int>::of(&QLabel::setNum));
+    connect(ui->horizontalSlider_clar, &QAbstractSlider::valueChanged, ui->label_clar, QOverload<int>::of(&QLabel::setNum));
     connect(ui->horizontalSlider_IFshift, &QAbstractSlider::valueChanged, ui->label_IFshiftValue,QOverload<int>::of(&QLabel::setNum));
 
     //* Signal and Slot connection for vfoDisplay
@@ -175,7 +177,7 @@ void MainWindow::guiInit()
             }
         }
         ui->comboBox_ModeSub->addItem(rig_strrmode(RIG_MODE_NONE)); //add None mode in the modeSub list, used in case mode sub vfo is not targetable
-        rigCmd.bwidthList = 1;  //Command to populate BW combobox in guiUpdate()
+        guiCmd.bwidthList = 1;  //Command to populate BW combobox in guiUpdate()
     }
 
     //* AGC level comboBox
@@ -219,6 +221,10 @@ void MainWindow::guiInit()
         ui->comboBox_Preamp->addItem(QString::number(my_rig->state.preamp[i]));
     }
 
+    //* Clarifier
+    rigSet.rit = 1;
+    if (!rig_has_get_func(my_rig, RIG_FUNC_XIT)) ui->radioButton_clarXIT->setCheckable(false);
+
     //* Tone
     ui->comboBox_toneType->clear();
     ui->comboBox_toneType->addItem("");        //None
@@ -247,9 +253,10 @@ void MainWindow::guiInit()
         rigCap.modeSub = 1;
     }
 
-    rigCmd.rangeList = 1;   //update range list
-    rigCmd.antList = 1; //update antenna list
-    rigCmd.toneList = 1;    //update tone list
+    guiCmd.rangeList = 1;   //update range list
+    guiCmd.antList = 1; //update antenna list
+    guiCmd.toneList = 1;    //update tone list
+    guiCmd.tabList = 1; //select tab
 }
 
 void MainWindow::guiUpdate()
@@ -275,11 +282,16 @@ void MainWindow::guiUpdate()
     ui->comboBox_Mode->setCurrentText(rig_strrmode(rigGet.mode));
     ui->comboBox_ModeSub->setCurrentText(rig_strrmode(rigGet.modeSub));
 
-    if (rigGet.mode == RIG_MODE_CW || rigGet.mode == RIG_MODE_CWR || rigGet.mode == RIG_MODE_CWN) ui->tabWidget->setCurrentIndex(0);    //CW tab
-    if (rigGet.mode == RIG_MODE_FM || rigGet.mode == RIG_MODE_FMN || rigGet.mode == RIG_MODE_PKTFM || rigGet.mode == RIG_MODE_PKTFMN || rigGet.mode == RIG_MODE_C4FM || rigGet.mode == RIG_MODE_DSTAR) ui->tabWidget->setCurrentIndex(1);   //FM tab
+    if (guiCmd.tabList)
+    {
+        if (rigGet.mode == RIG_MODE_SSB || rigGet.mode == RIG_MODE_USB || rigGet.mode == RIG_MODE_LSB) ui->tabWidget->setCurrentIndex(0); //Clarifier tab
+        if (rigGet.mode == RIG_MODE_CW || rigGet.mode == RIG_MODE_CWR || rigGet.mode == RIG_MODE_CWN) ui->tabWidget->setCurrentIndex(1);    //CW tab
+        if (rigGet.mode == RIG_MODE_FM || rigGet.mode == RIG_MODE_FMN || rigGet.mode == RIG_MODE_PKTFM || rigGet.mode == RIG_MODE_PKTFMN || rigGet.mode == RIG_MODE_C4FM || rigGet.mode == RIG_MODE_DSTAR) ui->tabWidget->setCurrentIndex(2);   //FM tab
+        guiCmd.tabList = 0;
+    }
 
     //* BW combobox
-    if (rigCmd.bwidthList)
+    if (guiCmd.bwidthList)
     {
         ui->comboBox_BW->clear();
         filter_list bwidth_list;    //IF filter bandwidth per mode
@@ -301,14 +313,14 @@ void MainWindow::guiUpdate()
             //else qDebug() << "vuoto" << rigGet.mode;
        }
        ui->comboBox_BW->model()->sort(0, Qt::DescendingOrder);
-       rigCmd.bwidthList = 0;
+       guiCmd.bwidthList = 0;
     }
 
     ui->comboBox_BW->setCurrentText(QString::number(rigGet.bwidth));
     ui->checkBox_NAR->setChecked(rigGet.bwNarrow);
 
     //* Range list
-    if (rigCmd.rangeList)
+    if (guiCmd.rangeList)
     {
         for (i=0; i<HAMLIB_FRQRANGESIZ; i++)    //Tx range list
         {
@@ -320,14 +332,14 @@ void MainWindow::guiUpdate()
         {
             if (rigGet.freqMain >= my_rig->state.rx_range_list[i].startf && rigGet.freqMain <= my_rig->state.rx_range_list[i].endf) break;
         }
-        if (rigGet.rangeListRxIndex != i) rigCmd.antList = 1;
+        if (rigGet.rangeListRxIndex != i) guiCmd.antList = 1;
         rigGet.rangeListRxIndex = i;
 
-        rigCmd.rangeList = 0;
+        guiCmd.rangeList = 0;
     }
 
     //* Antenna list
-    if (rigCmd.antList)
+    if (guiCmd.antList)
     {
         ui->comboBox_Ant->clear();
         if (my_rig->state.tx_range_list[rigGet.rangeListRxIndex].ant == RIG_ANT_NONE) ui->comboBox_Ant->addItem("NONE");  //RIG_ANT_NONE
@@ -348,11 +360,11 @@ void MainWindow::guiUpdate()
                 }
             }
         }
-        rigCmd.antList = 0;
+        guiCmd.antList = 0;
     }
 
     //* Tone list
-    if (rigCmd.toneList)
+    if (guiCmd.toneList)
     {
         ui->comboBox_toneFreq->clear();
 
@@ -374,7 +386,7 @@ void MainWindow::guiUpdate()
             }
         }
 
-        rigCmd.toneList = 0;
+        guiCmd.toneList = 0;
     }
 
     //* RF
@@ -437,6 +449,20 @@ void MainWindow::guiUpdate()
     ui->checkBox_NR->setChecked(rigGet.noiseReduction);
     ui->spinBox_NR->setValue(rigGet.noiseReductionLevel);
     ui->checkBox_NF->setChecked(rigGet.notchFilter);
+    if (!ui->horizontalSlider_IFshift->isSliderDown()) ui->horizontalSlider_IFshift->setValue(rigGet.ifShift);
+
+    //* Clarifier
+    ui->checkBox_clar->setChecked(rigGet.clar);
+    if (rigSet.xit)
+    {
+        ui->radioButton_clarXIT->setChecked(true);
+        if (!ui->horizontalSlider_clar->isSliderDown()) ui->horizontalSlider_clar->setValue(rigGet.xitOffset);
+    }
+    else    //rigSet.rit
+    {
+        ui->radioButton_clarRIT->setChecked(true);
+        if (!ui->horizontalSlider_clar->isSliderDown()) ui->horizontalSlider_clar->setValue(rigGet.ritOffset);
+    }
 
     //* CW
     ui->checkBox_BKIN->setChecked(rigGet.bkin);
@@ -613,6 +639,13 @@ void MainWindow::on_pushButton_Tune_clicked()
     rigCmd.tune = 1;
 }
 
+void MainWindow::on_pushButton_clarClear_clicked()
+{
+    if (rigSet.rit) rigSet.ritOffset = 0;
+    else rigSet.xitOffset = 0;  //rigSet.xit
+    rigCmd.clar = 1;
+}
+
 void MainWindow::on_pushButton_Band160_clicked()
 {
     set_band(160);
@@ -765,6 +798,20 @@ void MainWindow::on_checkBox_NF_toggled(bool checked)
     }
 }
 
+void MainWindow::on_checkBox_clar_toggled(bool checked)
+{
+    if (checked && !rigGet.clar)
+    {
+        rigSet.clar = 1;
+        rigCmd.clar = 1;
+    }
+    else if (!checked && rigGet.clar)
+    {
+        rigSet.clar = 0;
+        rigCmd.clar = 1;
+    }
+}
+
 void MainWindow::on_checkBox_APF_toggled(bool checked)
 {
     if (checked && !rigGet.apf)
@@ -794,6 +841,26 @@ void MainWindow::on_radioButton_Tuner_toggled(bool checked)
        rigSet.tuner = 0;
        rigCmd.tuner = 1;
    }
+}
+
+void MainWindow::on_radioButton_clarRIT_toggled(bool checked)
+{
+    if (checked)
+    {
+        rigSet.rit = 1;
+        rigSet.xit = 0;
+        rigCmd.clar = 1;
+    }
+}
+
+void MainWindow::on_radioButton_clarXIT_toggled(bool checked)
+{
+    if (checked)
+    {
+        rigSet.rit = 0;
+        rigSet.xit = 1;
+        rigCmd.clar = 1;
+    }
 }
 
 void MainWindow::on_radioButton_RPTshiftSimplex_toggled(bool checked)
@@ -859,6 +926,7 @@ void MainWindow::on_vfoDisplayValueChanged(int value)
 void MainWindow::on_comboBox_Mode_activated(int index)
 {
     rigSet.mode = rig_parse_mode(ui->comboBox_Mode->itemText(index).toLatin1());
+    guiCmd.tabList = 1; //update tab
     rigCmd.mode = 1;
 }
 
@@ -913,7 +981,7 @@ void MainWindow::on_comboBox_toneType_activated(int index)
     else if (toneType == "DCS") rigSet.toneType = 4;
     else rigSet.toneType = 0;
 
-    rigCmd.toneList = 1;    //update tone list
+    guiCmd.toneList = 1;    //update tone list
     rigCmd.tone = 1;
 }
 
@@ -1001,6 +1069,22 @@ void MainWindow::on_horizontalSlider_IFshift_valueChanged(int value)
     }
 }
 
+void MainWindow::on_horizontalSlider_clar_valueChanged(int value)
+{
+    if (!rigCmd.clar)
+    {
+        if (rigSet.rit)
+        {
+            rigSet.ritOffset = value;
+            if (rigSet.ritOffset != rigGet.ritOffset) rigCmd.clar = 1;
+        }
+        else    //rigSet.xit
+        {
+            rigSet.xitOffset = value;
+            if (rigSet.xitOffset != rigGet.xitOffset) rigCmd.clar = 1;
+        }
+     }
+}
 
 //***** Menu *****
 

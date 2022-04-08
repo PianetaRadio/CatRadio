@@ -20,3 +20,4 @@
 #include "guidata.h"
 
 guiConfig guiConf;
+guiCommand guiCmd;

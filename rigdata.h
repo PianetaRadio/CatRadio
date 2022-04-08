@@ -68,6 +68,8 @@ typedef struct {
     int noiseReduction, noiseReductionLevel;
     int notchFilter;
     int ifShift;
+    int clar, rit, xit;   //Clarifier Rx or Tx
+    shortfreq_t ritOffset, xitOffset;   //Clarifier offset (Hz)
     rptr_shift_t rptShift;  //Repeater shift
     shortfreq_t rptOffset;  //Repeater offset (Hz)
     int toneType;   //0 none, 1 burst 1750, 2 CTCSS, 3 CTCSS SQL, 4 DCS
@@ -79,7 +81,6 @@ typedef struct {
     int freqMain, freqSub;
     int mode, modeSub;
     int bwidth;
-    int bwidthList;
     int vfo;
     int split;
     int vfoXchange, vfoCopy;
@@ -104,9 +105,7 @@ typedef struct {
     int noiseReduction, noiseReductionLevel;
     int notchFilter;
     int ifShift;
+    int clar;
     int rptShift, rptOffset;
     int tone;
-    int antList;
-    int rangeList;
-    int toneList;
 } rigCommand;

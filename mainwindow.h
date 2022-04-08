@@ -162,6 +162,16 @@ private slots:
 
     void on_pushButton_right_clicked();
 
+    void on_checkBox_clar_toggled(bool checked);
+
+    void on_pushButton_clarClear_clicked();
+
+    void on_horizontalSlider_clar_valueChanged(int value);
+
+    void on_radioButton_clarRIT_toggled(bool checked);
+
+    void on_radioButton_clarXIT_toggled(bool checked);
+
 private:
     Ui::MainWindow *ui;
     QTimer *timer;
