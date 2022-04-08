@@ -421,16 +421,20 @@ void MainWindow::guiUpdate()
     if (rigGet.ptt == RIG_PTT_ON)
     {
         ui->pushButton_PTT->setChecked(true);
-        ui->label_vfoMain->setStyleSheet("QLabel {background-color: red}");
+
+        if (rigGet.vfoTx == rigGet.vfoSub) ui->label_vfoSub->setStyleSheet("QLabel {background-color: red}");
+        else ui->label_vfoMain->setStyleSheet("QLabel {background-color: red}");
 
         ui->progressBar_Smeter->setTx(true);
         ui->progressBar_Smeter->setValue(rigGet.powerMeter.f*100);
         ui->progressBar_subMeter->setValue(rigGet.subMeter.f);
     }
-    else
+    else    //RIG_PTT_OFF
     {
         ui->pushButton_PTT->setChecked(false);
-        ui->label_vfoMain->setStyleSheet("QLabel {}");
+
+        if (rigGet.vfoTx == rigGet.vfoSub) ui->label_vfoSub->setStyleSheet("QLabel {}");
+        else ui->label_vfoMain->setStyleSheet("QLabel {}");
 
         ui->progressBar_Smeter->setTx(false);
         ui->progressBar_Smeter->setValue(rigGet.sMeter.i);
