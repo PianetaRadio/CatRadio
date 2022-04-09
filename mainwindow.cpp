@@ -420,7 +420,7 @@ void MainWindow::guiUpdate()
     //* PTT & Meter
     if (rigGet.ptt == RIG_PTT_ON)
     {
-        ui->pushButton_PTT->setChecked(true);
+        //ui->pushButton_PTT->setChecked(true);
 
         if (rigGet.vfoTx == rigGet.vfoSub) ui->label_vfoSub->setStyleSheet("QLabel {background-color: red}");
         else ui->label_vfoMain->setStyleSheet("QLabel {background-color: red}");
@@ -431,7 +431,7 @@ void MainWindow::guiUpdate()
     }
     else    //RIG_PTT_OFF
     {
-        ui->pushButton_PTT->setChecked(false);
+        //ui->pushButton_PTT->setChecked(false);
 
         if (rigGet.vfoTx == rigGet.vfoSub) ui->label_vfoSub->setStyleSheet("QLabel {}");
         else ui->label_vfoMain->setStyleSheet("QLabel {}");
@@ -580,12 +580,12 @@ void MainWindow::on_pushButton_Power_toggled(bool checked)
 
 void MainWindow::on_pushButton_PTT_toggled(bool checked)
 {
-    if (checked && !rigGet.ptt)
+    if (checked)
     {
         rigSet.ptt = RIG_PTT_ON;
         rigCmd.ptt = 1;
     }
-    else if (!checked && rigGet.ptt)
+    else    //!checked
     {
         rigSet.ptt = RIG_PTT_OFF;
         rigCmd.ptt = 1;
