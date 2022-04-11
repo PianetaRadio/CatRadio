@@ -39,6 +39,10 @@ private slots:
 
     void on_checkBox_netRigctl_toggled(bool checked);
 
+    void on_comboBox_rigModel_currentIndexChanged(int index);
+
+    void on_comboBox_comPort_currentIndexChanged(int index);
+
 private:
     Ui::DialogConfig *ui;
 };

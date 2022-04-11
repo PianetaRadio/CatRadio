@@ -7,7 +7,8 @@ CatRadio
 	+ Up/Down VFO buttons
 	+ Repeater shift offset
 	+ DCS code and squelch
-	+ COM port list in the communication config dialog
+	+ COM port list in the Radio Config Dialog
+	* Improved Radio Config Dialog
 	* Bug fix: address the proper VFO red during Tx
 	* Bug correction: IF shift slider now correctly updated
 	* Bug fix: CW/FM tab autofocus freeze

@@ -24,6 +24,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QSerialPortInfo>
+#include <QMessageBox>
 
 #include "rigdata.h"
 
@@ -85,15 +86,14 @@ DialogConfig::DialogConfig(QWidget *parent) :
     ui->comboBox_serialSpeed->addItem("115200");
 
     //* Update values in the GUI
+    ui->comboBox_rigModel->setCurrentIndex(ui->comboBox_rigModel->findText(QString::number(rigCom.rigModel),Qt::MatchStartsWith));
     if (rigCom.netRigctl)
     {
         ui->checkBox_netRigctl->setChecked(rigCom.netRigctl);
         ui->lineEdit_ip->setText(rigCom.rigPort);
-        ui->comboBox_rigModel->setCurrentIndex(0);
     }
     else
     {
-        ui->comboBox_rigModel->setCurrentIndex(ui->comboBox_rigModel->findText(QString::number(rigCom.rigModel),Qt::MatchStartsWith));
         ui->comboBox_comPort->setCurrentText(rigCom.rigPort);
         ui->comboBox_serialSpeed->setCurrentText(QString::number(rigCom.serialSpeed));
         if (rigCom.civAddr) ui->lineEdit_civAddr->setText(QString::number(rigCom.civAddr,16));
@@ -112,23 +112,56 @@ void DialogConfig::on_buttonBox_accepted()
     bool civAddrConv;
 
     //* Read settings from GUI
-    if (ui->checkBox_netRigctl->isChecked())
+    if (ui->comboBox_rigModel->currentText() == "") //No backend selected
     {
-        rigCom.rigModel = 2;
-        rigCom.netRigctl = true;
-        rigCom.rigPort = ui->lineEdit_ip->text();
+        QMessageBox msgBox; //Show error MessageBox
+        msgBox.setWindowTitle("Warning");
+        msgBox.setText("Rig model not selected");
+        msgBox.setIcon(QMessageBox::Warning);
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.exec();
     }
     else
     {
-    QString rigModel = ui->comboBox_rigModel->currentText();
-    QRegularExpression regexp("[0-9]+");
-    QRegularExpressionMatch rigNumber = regexp.match(rigModel);
-    rigCom.rigModel = rigNumber.captured(0).toInt();
+        QString rigModel = ui->comboBox_rigModel->currentText();
+        QRegularExpression regexp("[0-9]+");
+        QRegularExpressionMatch rigNumber = regexp.match(rigModel);
+        rigCom.rigModel = rigNumber.captured(0).toInt();
 
-    rigCom.rigPort = ui->comboBox_comPort->currentText();
-    rigCom.serialSpeed = ui->comboBox_serialSpeed->currentText().toInt();
-    rigCom.civAddr = ui->lineEdit_civAddr->text().toInt(&civAddrConv,16);
+        if (ui->checkBox_netRigctl->isChecked())   //TCP port
+        {
+            rigCom.netRigctl = true;
+            rigCom.rigPort = ui->lineEdit_ip->text();
+
+            if (rigCom.rigPort == "")
+            {
+                QMessageBox msgBox; //Show error MessageBox
+                msgBox.setWindowTitle("Warning");
+                msgBox.setText(rigModel + "\nIP address not valid");
+                msgBox.setIcon(QMessageBox::Warning);
+                msgBox.setStandardButtons(QMessageBox::Ok);
+                msgBox.exec();
+            }
+        }
+        else    //COM port
+        {
+            rigCom.netRigctl = false;
+            rigCom.rigPort = ui->comboBox_comPort->currentText();
+            rigCom.serialSpeed = ui->comboBox_serialSpeed->currentText().toInt();
+            rigCom.civAddr = ui->lineEdit_civAddr->text().toInt(&civAddrConv,16);
+
+            if (rigCom.rigPort == "" && rigCom.rigModel != 1 && rigCom.rigModel != 6)
+            {
+                QMessageBox msgBox; //Show error MessageBox
+                msgBox.setWindowTitle("Warning");
+                msgBox.setText(rigModel + "\nCOM port not valid");
+                msgBox.setIcon(QMessageBox::Warning);
+                msgBox.setStandardButtons(QMessageBox::Ok);
+                msgBox.exec();
+            }
+        }
     }
+
     rigCom.rigRefresh = ui->spinBox_RefreshRate->value();
     rigCom.fullPoll = ui->checkBox_fullPoll->isChecked();
 
@@ -153,14 +186,26 @@ int printRigList(const struct rig_caps *rigCaps, void *data)    //Load rig list 
 
 void DialogConfig::on_checkBox_netRigctl_toggled(bool checked)
 {
-    if (checked)
+    if (checked)    //TCP port
     {
-        ui->comboBox_rigModel->setCurrentIndex(2);  //set NET rigctl
-        ui->comboBox_comPort->setCurrentText("");
+        ui->comboBox_comPort->setCurrentText("");   //clear COM port
     }
-    else
+    else    //COM port
     {
-        ui->comboBox_rigModel->setCurrentIndex(0);  //set void
         ui->lineEdit_ip->setText("");   //clear IP address
     }
+}
+
+void DialogConfig::on_comboBox_rigModel_currentIndexChanged(int index)
+{
+    if (index == 2 || index == 3 || index == 4)
+    {
+        ui->checkBox_netRigctl->setChecked(true);
+        ui->tabWidget_Config->setCurrentIndex(1);
+    }
+}
+
+void DialogConfig::on_comboBox_comPort_currentIndexChanged(int index)
+{
+    if (index) ui->checkBox_netRigctl->setChecked(false);   //uncheck TCP
 }

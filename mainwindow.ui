@@ -1723,7 +1723,7 @@
   <widget class="QStatusBar" name="statusbar"/>
   <action name="action_Connection">
    <property name="text">
-    <string>Connection</string>
+    <string>Radio</string>
    </property>
   </action>
   <action name="action_AboutCatRadio">
