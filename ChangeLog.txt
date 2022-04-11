@@ -3,6 +3,7 @@ CatRadio
 (+ New, * Updated, - Removed)
 
 1.2.0 -
+	+ VFO Display on Sub VFO
 	+ Clarifier RIT/XIT commands
 	+ Up/Down VFO buttons
 	+ Repeater shift offset

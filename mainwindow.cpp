@@ -85,7 +85,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->horizontalSlider_IFshift, &QAbstractSlider::valueChanged, ui->label_IFshiftValue,QOverload<int>::of(&QLabel::setNum));
 
     //* Signal and Slot connection for vfoDisplay
-    connect(ui->lineEdit_vfoMain, &vfoDisplay::on_valueChanged, this, &MainWindow::on_vfoDisplayValueChanged);
+    connect(ui->lineEdit_vfoMain, &vfoDisplay::on_valueChanged, this, &MainWindow::on_vfoDisplayMainValueChanged);
+    connect(ui->lineEdit_vfoSub, &vfoDisplay::on_valueChanged, this, &MainWindow::on_vfoDisplaySubValueChanged);
 
     //* Thread for RigDaemon
     rigDaemon->moveToThread(&workerThread); //
@@ -266,7 +267,7 @@ void MainWindow::guiUpdate()
 
     //* VFOs
     ui->lineEdit_vfoMain->setValue(rigGet.freqMain);
-    ui->lineEdit_vfoSub->setText(QString::number(rigGet.freqSub/1000,'f',2));
+    ui->lineEdit_vfoSub->setValue(rigGet.freqSub);
 
     ui->label_vfoMain->setText(rig_strvfo(rigGet.vfoMain));
     switch (rigGet.vfoMain)
@@ -919,10 +920,16 @@ void MainWindow::on_dial_valueChanged(int value)
     }
 }
 
-void MainWindow::on_vfoDisplayValueChanged(int value)
+void MainWindow::on_vfoDisplayMainValueChanged(int value)
 {
     rigSet.freqMain = value;
     rigCmd.freqMain = 1;
+}
+
+void MainWindow::on_vfoDisplaySubValueChanged(int value)
+{
+    rigSet.freqSub = value;
+    rigCmd.freqSub = 1;
 }
 
 //***** ComboBox *****

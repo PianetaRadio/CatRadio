@@ -45,7 +45,8 @@ public:
 public slots:
     void guiUpdate();
     void on_rigDaemonResultReady();    //Slot for rigDaemon resultReady
-    void on_vfoDisplayValueChanged(int value); //Slot for vfoDisplay valueChanged
+    void on_vfoDisplayMainValueChanged(int value); //Slot for vfoDisplay Main valueChanged
+    void on_vfoDisplaySubValueChanged(int value); //Slot for vfoDisplay Sub valueChanged
 
 signals:
 

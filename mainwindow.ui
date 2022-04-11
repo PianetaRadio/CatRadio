@@ -265,39 +265,6 @@
       <string>RX TX</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="lineEdit_vfoSub">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>280</x>
-       <y>10</y>
-       <width>140</width>
-       <height>40</height>
-      </rect>
-     </property>
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>18</pointsize>
-      </font>
-     </property>
-     <property name="layoutDirection">
-      <enum>Qt::RightToLeft</enum>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-    </widget>
     <widget class="QComboBox" name="comboBox_ModeSub">
      <property name="enabled">
       <bool>true</bool>
@@ -318,9 +285,9 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>9</y>
-       <width>181</width>
-       <height>41</height>
+       <y>10</y>
+       <width>180</width>
+       <height>40</height>
       </rect>
      </property>
      <property name="cursor">
@@ -369,6 +336,16 @@
        </widget>
       </item>
      </layout>
+    </widget>
+    <widget class="vfoDisplay" name="lineEdit_vfoSub" native="true">
+     <property name="geometry">
+      <rect>
+       <x>280</x>
+       <y>15</y>
+       <width>140</width>
+       <height>35</height>
+      </rect>
+     </property>
     </widget>
    </widget>
    <widget class="QGroupBox" name="groupBox_Band">
