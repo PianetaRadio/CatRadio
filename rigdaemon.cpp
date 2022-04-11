@@ -146,7 +146,7 @@ void RigDaemon::rigUpdate()
         if (retcode == RIG_OK) rigGet.ptt = retptt;
 
         //* Meter
-        if (rigGet.ptt==1)
+        if (rigGet.ptt == 1 || rigSet.ptt == 1)
         {
             rig_get_level(my_rig, RIG_VFO_CURR, RIG_LEVEL_RFPOWER_METER, &rigGet.powerMeter);
             rig_get_level(my_rig, RIG_VFO_CURR, rigSet.meter, &rigGet.subMeter);
@@ -158,7 +158,7 @@ void RigDaemon::rigUpdate()
         }
 
         //***** Command execution *****
-        if (!rigGet.ptt)
+        if (!rigGet.ptt && !rigSet.ptt)
         {
             //* Mode
             if (rigCmd.mode && rigSet.mode != RIG_MODE_NONE)    //VFO Main
