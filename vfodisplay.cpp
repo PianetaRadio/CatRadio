@@ -141,7 +141,11 @@ void vfoDisplay::wheelEvent(QWheelEvent *event)
 {
     event->accept();
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
     QPointF pointerPos = event->position();
+#else
+    QPointF pointerPos = event->pos();
+#endif
 
     for (int i = 1; i < 10; i ++)
     {
