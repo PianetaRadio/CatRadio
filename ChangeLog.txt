@@ -10,8 +10,9 @@ CatRadio
 	+ DCS code and squelch
 	+ COM port list in the Radio Config Dialog
 	* Improved Radio Config Dialog
+	* Bug fix: Quick Split button
 	* Bug fix: address the proper VFO red during Tx
-	* Bug correction: IF shift slider now correctly updated
+	* Bug fix: IF shift slider now correctly updated
 	* Bug fix: CW/FM tab autofocus freeze
 
 1.1.1 -	2022-03-19

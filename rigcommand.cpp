@@ -58,18 +58,11 @@ void set_band (int band)
 
 void quick_split ()
 {
-    if (rigGet.vfoMain == RIG_VFO_A)
-    {
-        rigSet.freqSub = rigGet.freqMain + 5000;
-        //rigSet.modeSub = rigGet.modeMain;
-        rigCmd.freqSub = 1;
-        //rigCmd.modeSub = 1;
-    }
-    else
-    {
-        rigSet.freqMain = rigGet.freqSub + 5000;
-        rigCmd.freqMain = 1;
-    }
+    rigSet.freqSub = rigGet.freqMain + 5000;
+    rigSet.modeSub = rigGet.mode;
+    rigSet.split = RIG_SPLIT_ON;
+    rigCmd.freqSub = 1;
+    rigCmd.modeSub = 1;
     rigCmd.split = 1;
 }
 
