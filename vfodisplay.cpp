@@ -18,7 +18,6 @@
 
 
 #include "vfodisplay.h"
-#include "guidata.h"
 
 #include <QPainter>
 #include <QInputEvent>
@@ -27,14 +26,13 @@
 #include <math.h>
 
 
-extern guiConfig guiConf;
-
-
 vfoDisplay::vfoDisplay(QWidget *parent) : QWidget(parent)
 {
     lineColor = QColor(Qt::black);
     bgColor = QColor(Qt::white);
     textColor = QColor(Qt::black);
+
+    vfoDisplayMode = 0;
 }
 
 void vfoDisplay::paintEvent(QPaintEvent *)
@@ -103,6 +101,11 @@ void vfoDisplay::setValue(unsigned long value)
     update();
 }
 
+void vfoDisplay::setMode(int mode)
+{
+    vfoDisplayMode = mode;
+}
+
 //* Tuning using mouse buttons
 void vfoDisplay::mousePressEvent(QMouseEvent *event)
 {
@@ -114,12 +117,12 @@ void vfoDisplay::mousePressEvent(QMouseEvent *event)
     {
         if (pointerPos.x() > (width()-3-(textWidth+2)*i+1) && pointerPos.x() < (width()-3-(textWidth+2)*(i-1)-1))
         {
-            if (guiConf.vfoDisplayMode && event->button() == Qt::LeftButton)    //Up/Down mode
+            if (vfoDisplayMode && event->button() == Qt::LeftButton)    //Up/Down mode
             {
                 if (pointerPos.y() < height()/2) currentValue = currentValue + pow(10,i);   //Up
                 else if (currentValue - pow(10,i) > 0) currentValue = currentValue - pow(10,i);   //Down
             }
-            else if (!guiConf.vfoDisplayMode)   //Left/Right mode
+            else if (!vfoDisplayMode)   //Left/Right mode
             {
                 if (event->button() == Qt::LeftButton) currentValue = currentValue + pow(10,i);    //LeftButton
                 else if (currentValue - pow(10,i) > 0) currentValue = currentValue - pow(10,i);   //RightButton

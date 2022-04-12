@@ -234,6 +234,10 @@ void MainWindow::guiInit()
     if (rig_has_set_func(my_rig, RIG_FUNC_TSQL)) ui->comboBox_toneType->addItem("TSQL");     //CTCSS Tx + Rx squelch
     if (rig_has_set_func(my_rig, RIG_FUNC_CSQL)) ui->comboBox_toneType->addItem("DCS");    //DCS
 
+    //* VFO
+    ui->lineEdit_vfoMain->setMode(guiConf.vfoDisplayMode);
+    ui->lineEdit_vfoSub->setMode(guiConf.vfoDisplayMode);
+
     //check for targetable sub VFO
     if (my_rig->caps->rig_model != 2)   //Hamlib 4.4 has bug for rigctld and targetable_vfo, skip check
     {
@@ -1111,6 +1115,9 @@ void MainWindow::on_action_Setup_triggered()
     DialogSetup setup;
     setup.setModal(true);
     setup.exec();
+
+    ui->lineEdit_vfoMain->setMode(guiConf.vfoDisplayMode);
+    ui->lineEdit_vfoSub->setMode(guiConf.vfoDisplayMode);
 }
 
 void MainWindow::on_action_AboutCatRadio_triggered()

@@ -12,6 +12,7 @@ public:
 
 public slots:
     void setValue(unsigned long value);
+    void setMode(int mode);
 
 signals:
     void on_valueChanged(int value);
@@ -30,6 +31,8 @@ private:
 
     unsigned long currentValue;  //current frequency value (Hz)
     unsigned long value; //target value
+
+    int vfoDisplayMode; //0: use Left/Right mouse button, 1: click digit Up or Down
 
     int textWidth;  //number width
 };

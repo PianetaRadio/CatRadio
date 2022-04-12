@@ -346,6 +346,9 @@
        <height>35</height>
       </rect>
      </property>
+     <property name="cursor">
+      <cursorShape>PointingHandCursor</cursorShape>
+     </property>
     </widget>
    </widget>
    <widget class="QGroupBox" name="groupBox_Band">
