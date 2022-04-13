@@ -2,7 +2,7 @@ CatRadio
 
 (+ New, * Updated, - Removed)
 
-1.2.0 -
+1.2.0 - 2022-04-13
 	+ VFO Display on Sub VFO
 	+ Clarifier RIT/XIT commands
 	+ Up/Down VFO buttons
