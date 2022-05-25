@@ -105,6 +105,9 @@ MainWindow::MainWindow(QWidget *parent)
     rigCom.rigRefresh = configFile.value("rigRefresh", 100).toInt();
     rigCom.fullPoll = configFile.value("fullPolling", true).toBool();
     guiConf.vfoDisplayMode = configFile.value("vfoDisplayMode", 0).toInt();
+    //Window settings
+    restoreGeometry(configFile.value("WindowSettings/geometry").toByteArray());
+    restoreState(configFile.value("WindowSettings/state").toByteArray());
 
     //* Style
     //ui->pushButton_PTT->setStyleSheet("QPushButton::checked {font: bold; color: red;}");
@@ -126,6 +129,11 @@ MainWindow::~MainWindow()
     rig_cleanup(my_rig);    //Release rig handle and free associated memory
 
     fclose(debugFile);  //Close debug.log
+
+    //* Save window settings
+    QSettings configFile(QString("catradio.ini"), QSettings::IniFormat);
+    configFile.setValue("WindowSettings/geometry", saveGeometry());
+    configFile.setValue("WindowSettings/state", saveState());
 
     delete ui;
 }
