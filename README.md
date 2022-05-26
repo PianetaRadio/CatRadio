@@ -1,5 +1,5 @@
 # CatRadio
-![GitHub release (latest by date)](https://img.shields.io/github/downloads/PianetaRadio/CatRadio/latest/total)
+[![GitHub release (latest by date)](https://img.shields.io/github/downloads/PianetaRadio/CatRadio/latest/total)](https://github.com/PianetaRadio/CatRadio/releases)
 
 Radio control software<br/>
 More info https://www.pianetaradio.it/blog/catradio/
