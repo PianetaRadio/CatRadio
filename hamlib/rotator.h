@@ -453,6 +453,7 @@ struct rot_caps {
     int (*get_status)(ROT *rot, rot_status_t *status); /*!< Pointer to backend implementation of ::rot_get_status(). */
 
     const char *macro_name;                    /*!< Rotator model macro name. */
+    int (*get_conf2)(ROT *rot, token_t token, char *val, int val_len);       /*!< Pointer to backend implementation of ::rot_get_conf2(). */
 };
 //! @cond Doxygen_Suppress
 #define ROT_MODEL(arg) .rot_model=arg,.macro_name=#arg
@@ -496,15 +497,16 @@ struct rot_state {
     /*
      * non overridable fields, internal use
      */
-    hamlib_port_t rotport;  /*!< Rotator port (internal use). */
-    hamlib_port_t rotport2;  /*!< 2nd Rotator port (internal use). */
+    hamlib_port_t_deprecated rotport_deprecated;  /*!< Rotator port (internal use). Deprecated */
+    hamlib_port_t_deprecated rotport2_deprecated;  /*!< 2nd Rotator port (internal use). Deprecated */
 
     int comm_state;         /*!< Comm port state, i.e. opened or closed. */
     rig_ptr_t priv;         /*!< Pointer to private rotator state data. */
     rig_ptr_t obj;          /*!< Internal use by hamlib++ for event handling. */
 
     int current_speed;      /*!< Current speed 1-100, to be used when no change to speed is requested. */
-    /* etc... */
+    hamlib_port_t rotport;  /*!< Rotator port (internal use). */
+    hamlib_port_t rotport2;  /*!< 2nd Rotator port (internal use). */
 };
 
 
@@ -548,6 +550,12 @@ extern HAMLIB_EXPORT(int)
 rot_get_conf HAMLIB_PARAMS((ROT *rot,
                             token_t token,
                             char *val));
+
+extern HAMLIB_EXPORT(int)
+rot_get_conf2 HAMLIB_PARAMS((ROT *rot,
+                            token_t token,
+                            char *val,
+                            int val_len));
 
 /*
  *  General API commands, from most primitive to least.. )
@@ -743,6 +751,7 @@ distance_long_path HAMLIB_PARAMS((double distance));
 extern HAMLIB_EXPORT(double)
 azimuth_long_path HAMLIB_PARAMS((double azimuth));
 
+#if 0
 extern HAMLIB_EXPORT(int)
 longlat2locator HAMLIB_PARAMS((double longitude,
                                double latitude,
@@ -753,6 +762,7 @@ extern HAMLIB_EXPORT(int)
 locator2longlat HAMLIB_PARAMS((double *longitude,
                                double *latitude,
                                const char *locator));
+#endif
 
 extern HAMLIB_EXPORT(double)
 dms2dec HAMLIB_PARAMS((int degrees,

@@ -176,6 +176,13 @@
  * The RT21 backend can be used with rotators that support the DCU command set
  * by Green Heron (currently the RT-21).
  */
+/**
+ * \brief A macro that returns the model number of the YRC-1 backend.
+ *
+ * \def ROT_MODEL_YRC1
+ *
+ * The YRC1 backend can be used with rotators that support the DCU 2/3 command set
+ */
 //! @cond Doxygen_Suppress
 #define ROT_ROTOREZ 4
 #define ROT_BACKEND_ROTOREZ "rotorez"
@@ -184,6 +191,8 @@
 #define ROT_MODEL_ROTORCARD ROT_MAKE_MODEL(ROT_ROTOREZ, 2)
 #define ROT_MODEL_DCU ROT_MAKE_MODEL(ROT_ROTOREZ, 3)
 #define ROT_MODEL_ERC ROT_MAKE_MODEL(ROT_ROTOREZ, 4)
+#define ROT_MODEL_RT21 ROT_MAKE_MODEL(ROT_ROTOREZ, 5)
+#define ROT_MODEL_YRC1 ROT_MAKE_MODEL(ROT_ROTOREZ, 6)
 #define ROT_MODEL_RT21 ROT_MAKE_MODEL(ROT_ROTOREZ, 5)
 
 
@@ -314,6 +323,7 @@
 #define ROT_MODEL_GS232A_EL ROT_MAKE_MODEL(ROT_GS232A, 10)
 #define ROT_MODEL_GS232B_AZ ROT_MAKE_MODEL(ROT_GS232A, 11)
 #define ROT_MODEL_GS232B_EL ROT_MAKE_MODEL(ROT_GS232A, 12)
+#define ROT_MODEL_GS23_AZ ROT_MAKE_MODEL(ROT_GS232A, 13)
 
 
 /**
@@ -623,6 +633,20 @@
 #define ROT_BACKEND_ANDROIDSENSOR "androidsensor"
 #define ROT_MODEL_ANDROIDSENSOR ROT_MAKE_MODEL(ROT_ANDROIDSENSOR, 1)
 
+/**
+ * \brief A macro that returns the model number of the GRBLTRK backend.
+ *
+ * \def ROT_MODEL_GRBLTRK
+ *
+ * The GRBLTRK backend can be used with rotators that support the GRBL
+ * protocol.
+ */
+//! @cond Doxygen_Suppress
+#define ROT_GRBLTRK 24
+#define ROT_BACKEND_GRBLTRK "grbltrk"
+//! @endcond
+#define ROT_MODEL_GRBLTRK_SER ROT_MAKE_MODEL(ROT_GRBLTRK, 1)
+#define ROT_MODEL_GRBLTRK_NET ROT_MAKE_MODEL(ROT_GRBLTRK, 2)
 
 /**
  * \brief Convenience type definition for a rotator model.
