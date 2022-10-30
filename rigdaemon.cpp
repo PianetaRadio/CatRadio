@@ -77,6 +77,10 @@ int RigDaemon::rigConnect()
             //myport.type.rig = RIG_PORT_SERIAL;
             strncpy(my_rig->state.rigport.pathname, rigCom.rigPort.toLatin1(), HAMLIB_FILPATHLEN - 1);
             my_rig->state.rigport.parm.serial.rate = rigCom.serialSpeed;
+            //qDebug() << my_rig->state.rigport.parm.serial.stop_bits << my_rig->caps->serial_stop_bits;
+            //qDebug() << my_rig->state.rigport.parm.serial.parity << my_rig->caps->serial_parity;
+            //qDebug() << my_rig->state.rigport.parm.serial.handshake << my_rig->caps->serial_handshake;
+
             if (rigCom.civAddr) //CI-V address Icom
             {
                 std::string civaddrS = std::to_string(rigCom.civAddr);  //Convert int to string
@@ -301,8 +305,17 @@ void RigDaemon::rigUpdate()
             //* Band change
             if (rigCmd.bandChange)
             {
+                if (rigCap.bandChange)
+                {
+                    retvalue.i = rigSet.band;
+                    retcode = rig_set_level(my_rig, RIG_VFO_CURR, RIG_LEVEL_BAND_SELECT, retvalue);
+                    if (retcode == RIG_OK) rigGet.band = rigSet.band;
+                    qDebug() << retcode << rigCap.bandChange << rigSet.band;
+                }
+
+                rigCmd.bandChange = 0;
                 commandPriority = 0;
-                guiCmd.bwidthList = 1;
+                //guiCmd.bwidthList = 1;
             }
 
             //* Tune

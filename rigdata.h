@@ -40,6 +40,7 @@ typedef struct {
 typedef struct {
     powerstat_t onoff;  //on/off status
     freq_t freqMain, freqSub;    //Frequency (Hz)
+    int band;    //Band
     rmode_t mode, modeSub;  //Mode
     pbwidth_t bwidth, bwidthSub;    //IF filter bandwidth
     int bwNarrow;   //IF narrow filter
@@ -74,6 +75,8 @@ typedef struct {
     shortfreq_t rptOffset;  //Repeater offset (Hz)
     int toneType;   //0 none, 1 burst 1750, 2 CTCSS, 3 CTCSS SQL, 4 DCS
     tone_t tone;    //CTCSS or DCS tone
+    int micComp, micMon;    //Flag MIC Compressor, MIC Monitor
+    float micGain, micMonLevel;  //Level MIC Gain, MIC Monitor
 } rigSettings;
 
 typedef struct {
@@ -108,4 +111,6 @@ typedef struct {
     int clar;
     int rptShift, rptOffset;
     int tone;
+    int micComp, micMon;
+    int micGain, micMonLevel;
 } rigCommand;

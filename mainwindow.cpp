@@ -145,9 +145,11 @@ void MainWindow::guiInit()
 {
     ui->statusbar->showMessage(my_rig->caps->model_name);
 
-    if (my_rig->caps->set_powerstat == NULL)    //Power pushbutton
+    //* Power on/off cap
+    //if (rig_has_set_func(my_rig, RIG_FUNCTION_SET_POWERSTAT)==0)
+    if (my_rig->caps->set_powerstat == NULL)
     {
-        ui->pushButton_Power->setDisabled(true);
+        ui->pushButton_Power->setDisabled(true);    //Power pushbutton disabled
         rigCap.onoff = 0;
     }
     else
@@ -156,9 +158,11 @@ void MainWindow::guiInit()
         rigCap.onoff = 1;
     }
 
-    if (my_rig->caps->set_ptt == NULL)    //PTT pushbutton
+    //* PTT cap
+    //if (rig_has_set_func(my_rig, RIG_FUNCTION_SET_PTT)==0)
+    if (my_rig->caps->set_ptt == NULL)
     {
-        ui->pushButton_PTT->setDisabled(true);
+        ui->pushButton_PTT->setDisabled(true);  //PTT pushbutton disabled
         rigCap.ptt = 0;
     }
     else
@@ -166,6 +170,10 @@ void MainWindow::guiInit()
         ui->pushButton_PTT->setDisabled(false);
         rigCap.ptt = 1;
     }
+
+    //* Band select cap
+    if (rig_has_set_level(my_rig, RIG_LEVEL_BAND_SELECT)) rigCap.bandChange = 1;
+    else rigCap.bandChange = 0;
 
     //* Mode combobox
     if (my_rig->state.mode_list == RIG_MODE_NONE)

@@ -31,29 +31,57 @@ extern rigCommand rigCap;
 
 void set_band (int band)
 {
-    freq_t freq;
-
-    switch (band)
+    if (rigCap.bandChange==0)
     {
-    case 160: freq = 1840000; break;
-    case 80: freq = 3600000; break;
-    case 60: freq = 5355000; break;
-    case 40: freq = 7100000; break;
-    case 30: freq = 10130000; break;
-    case 20: freq = 14100000; break;
-    case 17: freq = 18120000; break;
-    case 15: freq = 21150000; break;
-    case 12: freq = 24940000; break;
-    case 10: freq = 28320000; break;
-    case 6: freq = 50150000; break;
-    case 2: freq = 144300000; break;
-    case 70: freq = 432200000; break;
-    default: freq = rigSet.freqMain; break;
-    }
+        freq_t freq;
 
-    rigSet.freqMain = freq;
-    rigCmd.freqMain = 1;
-    rigCmd.bandChange = 1;
+        switch (band)
+        {
+        case 160: freq = 1840000; break;
+        case 80: freq = 3600000; break;
+        case 60: freq = 5355000; break;
+        case 40: freq = 7100000; break;
+        case 30: freq = 10130000; break;
+        case 20: freq = 14100000; break;
+        case 17: freq = 18120000; break;
+        case 15: freq = 21150000; break;
+        case 12: freq = 24940000; break;
+        case 10: freq = 28320000; break;
+        case 6: freq = 50150000; break;
+        case 2: freq = 144300000; break;
+        case 70: freq = 432200000; break;
+        case 1: freq = 5000000; break;  //General
+        default: freq = rigSet.freqMain; break;
+        }
+
+        rigSet.freqMain = freq;
+        rigCmd.freqMain = 1;
+    }
+    else
+    {
+        int bandt;
+        switch (band)
+        {
+        case 160: bandt = RIG_BAND_160M; break;
+        case 80: bandt = RIG_BAND_80M; break;
+        case 60: bandt = RIG_BAND_60M; break;
+        case 40: bandt = RIG_BAND_40M; break;
+        case 30: bandt = RIG_BAND_30M; break;
+        case 20: bandt = RIG_BAND_20M; break;
+        case 17: bandt = RIG_BAND_17M; break;
+        case 15: bandt = RIG_BAND_15M; break;
+        case 12: bandt = RIG_BAND_12M; break;
+        case 10: bandt = RIG_BAND_10M; break;
+        case 6: bandt = RIG_BAND_6M; break;
+        case 2: bandt = RIG_BAND_144MHZ; break;
+        case 70: bandt = RIG_BAND_430MHZ; break;
+        case 1: bandt = RIG_BAND_GEN; break;
+        default: bandt = RIG_BAND_20M; break;
+        }
+
+        rigSet.band = bandt;
+        rigCmd.bandChange = 1;
+    }
 }
 
 void quick_split ()
