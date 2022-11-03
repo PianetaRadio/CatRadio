@@ -467,10 +467,10 @@ void MainWindow::guiUpdate()
     }
 
     //* Sliders
-    if (!ui->verticalSlider_RFpower->isSliderDown()) ui->verticalSlider_RFpower->setValue((int)(rigGet.rfPower*100));
-    if (!ui->verticalSlider_RFgain->isSliderDown()) ui->verticalSlider_RFgain->setValue((int)(rigGet.rfGain*100));
-    if (!ui->verticalSlider_AFGain->isSliderDown()) ui->verticalSlider_AFGain->setValue((int)(rigGet.afGain*100));
-    if (!ui->verticalSlider_Squelch->isSliderDown()) ui->verticalSlider_Squelch->setValue((int)(rigGet.squelch*100));
+    if (!ui->verticalSlider_RFpower->isSliderDown() && !rigCmd.rfPower) ui->verticalSlider_RFpower->setValue((int)(rigGet.rfPower*100));
+    if (!ui->verticalSlider_RFgain->isSliderDown() && !rigCmd.rfGain) ui->verticalSlider_RFgain->setValue((int)(rigGet.rfGain*100));
+    if (!ui->verticalSlider_AFGain->isSliderDown() && !rigCmd.afGain) ui->verticalSlider_AFGain->setValue((int)(rigGet.afGain*100));
+    if (!ui->verticalSlider_Squelch->isSliderDown() && !rigCmd.squelch) ui->verticalSlider_Squelch->setValue((int)(rigGet.squelch*100));
 
     //* Filter
     ui->checkBox_NB->setChecked(rigGet.noiseBlanker);
