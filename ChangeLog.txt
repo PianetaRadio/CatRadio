@@ -3,6 +3,7 @@ CatRadio
 (+ New, * Updated, - Removed)
 
 1.3.0 - 2022-xx-xx
+	+ Sub meter COMP, ID, VDD
 	+ Band stack for supported Yaesu radios
 	* Updated to library Hamlib 4.5
 	+ Save/restore window settings
