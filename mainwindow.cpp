@@ -219,6 +219,9 @@ void MainWindow::guiInit()
     ui->comboBox_Meter->clear();
     if (rig_has_get_level(my_rig, RIG_METER_SWR)) ui->comboBox_Meter->addItem("SWR");
     if (rig_has_get_level(my_rig, RIG_METER_ALC)) ui->comboBox_Meter->addItem("ALC");
+    if (rig_has_get_level(my_rig, RIG_METER_COMP)) ui->comboBox_Meter->addItem("COMP");
+    if (rig_has_get_level(my_rig, RIG_METER_IC)) ui->comboBox_Meter->addItem("ID");
+    if (rig_has_get_level(my_rig, RIG_METER_VDD)) ui->comboBox_Meter->addItem("VDD");
     rigSet.meter = levelmeterstr (ui->comboBox_Meter->currentText());
     setSubMeter();
 

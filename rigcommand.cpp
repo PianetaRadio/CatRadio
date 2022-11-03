@@ -160,15 +160,15 @@ ant_t antstr (QString antString)
     return ant;
 }
 
-unsigned levelmeterstr (QString meterString)
+unsigned long long levelmeterstr (QString meterString)
 {
-    unsigned levelMeter;
+    unsigned long long levelMeter;
 
     if (meterString == "SWR") levelMeter = RIG_LEVEL_SWR;
-    else if (meterString == "COMP") levelMeter = RIG_LEVEL_COMP;
     else if (meterString == "ALC") levelMeter = RIG_LEVEL_ALC;
-    //...
+    else if (meterString == "COMP") levelMeter = RIG_LEVEL_COMP;
+    else if (meterString == "ID") levelMeter = RIG_LEVEL_ID_METER;
+    else if (meterString == "VDD") levelMeter = RIG_LEVEL_VD_METER;
     else levelMeter = RIG_METER_NONE;
-
     return levelMeter;
 }
