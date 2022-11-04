@@ -535,6 +535,28 @@ void MainWindow::setSubMeter()
         ui->progressBar_subMeter->setShortStep(0.1);
         ui->progressBar_subMeter->setValue(1.0);
     }
+    else if (rigSet.meter == RIG_LEVEL_ID_METER)
+    {
+        ui->progressBar_subMeter->setMeterSWR(false);
+        ui->progressBar_subMeter->setMaxValue(25.0);
+        ui->progressBar_subMeter->setMinValue(0.0);
+        ui->progressBar_subMeter->setGateValue(20.0);
+        ui->progressBar_subMeter->setPrecision(0);
+        ui->progressBar_subMeter->setLongStep(5.0);
+        ui->progressBar_subMeter->setShortStep(1.0);
+        ui->progressBar_subMeter->setValue(0);
+    }
+    else if (rigSet.meter == RIG_LEVEL_VD_METER)
+    {
+        ui->progressBar_subMeter->setMeterSWR(false);
+        ui->progressBar_subMeter->setMaxValue(15.0);
+        ui->progressBar_subMeter->setMinValue(0.0);
+        ui->progressBar_subMeter->setGateValue(13.8);
+        ui->progressBar_subMeter->setPrecision(1);
+        ui->progressBar_subMeter->setLongStep(5.0);
+        ui->progressBar_subMeter->setShortStep(1.0);
+        ui->progressBar_subMeter->setValue(0);
+    }
     else
     {
         ui->progressBar_subMeter->setMeterSWR(false);
