@@ -477,19 +477,19 @@ void MainWindow::guiUpdate()
     ui->checkBox_NR->setChecked(rigGet.noiseReduction);
     ui->spinBox_NR->setValue(rigGet.noiseReductionLevel);
     ui->checkBox_NF->setChecked(rigGet.notchFilter);
-    if (!ui->horizontalSlider_IFshift->isSliderDown()) ui->horizontalSlider_IFshift->setValue(rigGet.ifShift);
+    if (!ui->horizontalSlider_IFshift->isSliderDown() && !rigCmd.ifShift) ui->horizontalSlider_IFshift->setValue(rigGet.ifShift);
 
     //* Clarifier
     ui->checkBox_clar->setChecked(rigGet.clar);
     if (rigSet.xit)
     {
         ui->radioButton_clarXIT->setChecked(true);
-        if (!ui->horizontalSlider_clar->isSliderDown()) ui->horizontalSlider_clar->setValue(rigGet.xitOffset);
+        if (!ui->horizontalSlider_clar->isSliderDown() && !rigCmd.clar) ui->horizontalSlider_clar->setValue(rigGet.xitOffset);
     }
     else    //rigSet.rit
     {
         ui->radioButton_clarRIT->setChecked(true);
-        if (!ui->horizontalSlider_clar->isSliderDown()) ui->horizontalSlider_clar->setValue(rigGet.ritOffset);
+        if (!ui->horizontalSlider_clar->isSliderDown() && !rigCmd.clar) ui->horizontalSlider_clar->setValue(rigGet.ritOffset);
     }
 
     //* CW
