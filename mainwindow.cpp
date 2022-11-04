@@ -34,6 +34,7 @@
 #include <QtGlobal>
 #include <QDesktopServices>
 #include <QUrl>
+#include <QApplication>
 
 #include <rig.h>    //Hamlib
 
@@ -111,6 +112,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     //* Style
     //ui->pushButton_PTT->setStyleSheet("QPushButton::checked {font: bold; color: red;}");
+
+    QApplication::setWheelScrollLines(10);  //Mouse wheel scroll step
 }
 
 MainWindow::~MainWindow()
