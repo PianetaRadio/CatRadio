@@ -1081,56 +1081,105 @@ void MainWindow::on_spinBox_RPToffset_valueChanged(int arg1)
 
 //***** Slider *****
 
-void MainWindow::on_verticalSlider_RFpower_valueChanged(int value)
-{
-    if (!rigCmd.rfPower)
-    {
-        if (value < 5) value = 5;
-        rigSet.rfPower = (float)(value)/100;
-        if (rigSet.rfPower != rigGet.rfPower) rigCmd.rfPower = 1;
-    }
-}
-
 void MainWindow::on_verticalSlider_RFgain_valueChanged(int value)
 {
-    if (!rigCmd.rfGain)
+    if (!rigCmd.rfGain && !ui->verticalSlider_RFgain->isSliderDown())
     {
         rigSet.rfGain = (float)(value)/100;
         if (rigSet.rfGain != rigGet.rfGain) rigCmd.rfGain = 1;
     }
 }
 
+void MainWindow::on_verticalSlider_RFgain_sliderReleased()
+{
+    if (!rigCmd.rfGain)
+    {
+        rigSet.rfGain = (float)(ui->verticalSlider_RFgain->value())/100;
+        rigCmd.rfGain = 1;
+    }
+}
+
+
+void MainWindow::on_verticalSlider_RFpower_valueChanged(int value)
+{
+    if (!rigCmd.rfPower && !ui->verticalSlider_RFpower->isSliderDown())
+    {
+        if (value < 5) value = 5;   //to be fixed
+        rigSet.rfPower = (float)(value)/100;
+        if (rigSet.rfPower != rigGet.rfPower) rigCmd.rfPower = 1;
+    }
+}
+
+void MainWindow::on_verticalSlider_RFpower_sliderReleased()
+{
+    if (!rigCmd.rfPower)
+    {
+        rigSet.rfPower = (float)(ui->verticalSlider_RFpower->value())/100;
+        rigCmd.rfPower = 1;
+    }
+}
+
+
 void MainWindow::on_verticalSlider_AFGain_valueChanged(int value)
 {
-    if (!rigCmd.afGain)
+    if (!rigCmd.afGain && !ui->verticalSlider_AFGain->isSliderDown())
     {
         rigSet.afGain = (float)(value)/100;
         if (rigSet.afGain != rigGet.afGain) rigCmd.afGain = 1;
     }
 }
 
+void MainWindow::on_verticalSlider_AFGain_sliderReleased()
+{
+    if (!rigCmd.afGain)
+    {
+        rigSet.afGain = (float)(ui->verticalSlider_AFGain->value())/100;
+        rigCmd.afGain = 1;
+    }
+}
+
 
 void MainWindow::on_verticalSlider_Squelch_valueChanged(int value)
 {
-    if (!rigCmd.squelch)
+    if (!rigCmd.squelch && !ui->verticalSlider_Squelch->isSliderDown())
     {
         rigSet.squelch = (float)(value)/100;
         if (rigSet.squelch != rigGet.squelch) rigCmd.squelch = 1;
     }
 }
 
+void MainWindow::on_verticalSlider_Squelch_sliderReleased()
+{
+    if (!rigCmd.squelch)
+    {
+        rigSet.squelch = (float)(ui->verticalSlider_Squelch->value())/100;
+        rigCmd.squelch = 1;
+    }
+}
+
+
 void MainWindow::on_horizontalSlider_IFshift_valueChanged(int value)
 {
-    if (!rigCmd.ifShift)
+    if (!rigCmd.ifShift && !ui->horizontalSlider_IFshift->isSliderDown())
     {
         rigSet.ifShift = value;
         if (rigSet.ifShift != rigGet.ifShift) rigCmd.ifShift = 1;
     }
 }
 
+void MainWindow::on_horizontalSlider_IFshift_sliderReleased()
+{
+    if (!rigCmd.ifShift)
+    {
+        rigSet.ifShift = ui->horizontalSlider_IFshift->value();
+        rigCmd.ifShift = 1;
+    }
+}
+
+
 void MainWindow::on_horizontalSlider_clar_valueChanged(int value)
 {
-    if (!rigCmd.clar)
+    if (!rigCmd.clar && !ui->horizontalSlider_clar->isSliderDown())
     {
         if (rigSet.rit)
         {
@@ -1144,6 +1193,24 @@ void MainWindow::on_horizontalSlider_clar_valueChanged(int value)
         }
      }
 }
+
+void MainWindow::on_horizontalSlider_clar_sliderReleased()
+{
+    if (!rigCmd.clar)
+    {
+        if (rigSet.rit)
+        {
+            rigSet.ritOffset = ui->horizontalSlider_clar->value();
+            rigCmd.clar = 1;
+        }
+        else
+        {
+            rigSet.xitOffset = ui->horizontalSlider_clar->value();
+            rigCmd.clar = 1;
+        }
+     }
+}
+
 
 //***** Menu *****
 

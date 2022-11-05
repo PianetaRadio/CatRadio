@@ -25,7 +25,7 @@
 
 #define RELEASE_DATE __DATE__
 #define VERSION_MAJ 1
-#define VERSION_MIN 2
+#define VERSION_MIN 3
 #define VERSION_MIC 0
 
 
@@ -172,6 +172,18 @@ private slots:
     void on_radioButton_clarRIT_toggled(bool checked);
 
     void on_radioButton_clarXIT_toggled(bool checked);
+
+    void on_verticalSlider_RFpower_sliderReleased();
+
+    void on_verticalSlider_RFgain_sliderReleased();
+
+    void on_verticalSlider_AFGain_sliderReleased();
+
+    void on_verticalSlider_Squelch_sliderReleased();
+
+    void on_horizontalSlider_IFshift_sliderReleased();
+
+    void on_horizontalSlider_clar_sliderReleased();
 
 private:
     Ui::MainWindow *ui;
