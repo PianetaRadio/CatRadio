@@ -185,6 +185,8 @@ private slots:
 
     void on_horizontalSlider_clar_sliderReleased();
 
+    void on_checkBox_NB2_toggled(bool checked);
+
 private:
     Ui::MainWindow *ui;
     QTimer *timer;

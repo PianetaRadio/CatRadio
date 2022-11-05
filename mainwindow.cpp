@@ -246,7 +246,13 @@ void MainWindow::guiInit()
 
     //* Clarifier
     rigSet.rit = 1;
-    if (!rig_has_get_func(my_rig, RIG_FUNC_XIT)) ui->radioButton_clarXIT->setCheckable(false);
+    if (!rig_has_set_func(my_rig, RIG_FUNC_XIT)) ui->radioButton_clarXIT->setEnabled(false);
+
+    //* Filter
+    if (!rig_has_set_func(my_rig, RIG_FUNC_NB)) ui->checkBox_NB->setEnabled(false);
+    if (!rig_has_set_func(my_rig, RIG_FUNC_NB2)) ui->checkBox_NB2->setEnabled(false);
+    if (!rig_has_set_func(my_rig, RIG_FUNC_NR)) {ui->checkBox_NR->setEnabled(false); ui->spinBox_NR->setEnabled(false);}
+    if (!rig_has_set_func(my_rig, RIG_FUNC_ANF)) ui->checkBox_NF->setEnabled(false);
 
     //* Tone
     ui->comboBox_toneType->clear();
@@ -477,6 +483,7 @@ void MainWindow::guiUpdate()
 
     //* Filter
     ui->checkBox_NB->setChecked(rigGet.noiseBlanker);
+    ui->checkBox_NB2->setChecked(rigGet.noiseBlanker2);
     ui->checkBox_NR->setChecked(rigGet.noiseReduction);
     ui->spinBox_NR->setValue(rigGet.noiseReductionLevel);
     ui->checkBox_NF->setChecked(rigGet.notchFilter);
@@ -820,6 +827,20 @@ void MainWindow::on_checkBox_NB_toggled(bool checked)
     {
         rigSet.noiseBlanker = 0;
         rigCmd.noiseBlanker = 1;
+    }
+}
+
+void MainWindow::on_checkBox_NB2_toggled(bool checked)
+{
+    if (checked && !rigGet.noiseBlanker2)
+    {
+        rigSet.noiseBlanker2 = 1;
+        rigCmd.noiseBlanker2 = 1;
+    }
+    else if (!checked && rigGet.noiseBlanker2)
+    {
+        rigSet.noiseBlanker2 = 0;
+        rigCmd.noiseBlanker2 = 1;
     }
 }
 

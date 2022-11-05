@@ -65,9 +65,9 @@ typedef struct {
     int bkin;   //CW Break-in
     int wpm;    //CW Keyer speed WPM
     int apf;    //Audio Peak Filter
-    int noiseBlanker;
-    int noiseReduction, noiseReductionLevel;
-    int notchFilter;
+    int noiseBlanker, noiseBlanker2;    //NB
+    int noiseReduction, noiseReductionLevel;    //NR
+    int notchFilter;    //NF
     int ifShift;
     int clar, rit, xit;   //Clarifier Rx or Tx
     shortfreq_t ritOffset, xitOffset;   //Clarifier offset (Hz)
@@ -104,7 +104,7 @@ typedef struct {
     int bkin;
     int wpm;
     int apf;
-    int noiseBlanker;
+    int noiseBlanker, noiseBlanker2;
     int noiseReduction, noiseReductionLevel;
     int notchFilter;
     int ifShift;

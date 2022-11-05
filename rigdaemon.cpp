@@ -393,6 +393,12 @@ void RigDaemon::rigUpdate()
                 if (retcode == RIG_OK) rigGet.noiseBlanker = rigSet.noiseBlanker;
                 rigCmd.noiseBlanker = 0;
             }
+            if (rigCmd.noiseBlanker2)
+            {
+                retcode = rig_set_func(my_rig, RIG_VFO_CURR, RIG_FUNC_NB2, rigSet.noiseBlanker2);
+                if (retcode == RIG_OK) rigGet.noiseBlanker2 = rigSet.noiseBlanker2;
+                rigCmd.noiseBlanker2 = 0;
+            }
 
             //* NR noise reduction
             if (rigCmd.noiseReduction)
@@ -645,24 +651,37 @@ void RigDaemon::rigUpdate()
         }
 
         //* NB noise blanker
-        if ((commandPriority == 12 && !rigGet.ptt && rigCom.fullPoll) || commandPriority == 0) rig_get_func(my_rig, RIG_VFO_CURR, RIG_FUNC_NB, &rigGet.noiseBlanker);
+        if ((commandPriority == 12 && !rigGet.ptt && rigCom.fullPoll) || commandPriority == 0)
+        {
+            if (rig_has_get_func(my_rig, RIG_FUNC_NB)) rig_get_func(my_rig, RIG_VFO_CURR, RIG_FUNC_NB, &rigGet.noiseBlanker);
+            if (rig_has_get_func(my_rig, RIG_FUNC_NB2)) rig_get_func(my_rig, RIG_VFO_CURR, RIG_FUNC_NB2, &rigGet.noiseBlanker2);
+        }
 
         //* NR noise reduction
         if ((commandPriority == 13 && !rigGet.ptt && rigCom.fullPoll) || commandPriority == 0)
         {
-            rig_get_func(my_rig, RIG_VFO_CURR, RIG_FUNC_NR, &rigGet.noiseReduction);
-            rig_get_level(my_rig, RIG_VFO_CURR, RIG_LEVEL_NR, &retvalue);
-            rigGet.noiseReductionLevel = retvalue.i;
+            if (rig_has_get_func(my_rig, RIG_FUNC_NR)) rig_get_func(my_rig, RIG_VFO_CURR, RIG_FUNC_NR, &rigGet.noiseReduction);
+            if (rig_has_get_level(my_rig, RIG_LEVEL_NR))
+            {
+                rig_get_level(my_rig, RIG_VFO_CURR, RIG_LEVEL_NR, &retvalue);
+                rigGet.noiseReductionLevel = retvalue.i;
+            }
         }
 
         //* NF notch filter
-        if ((commandPriority == 14 && !rigGet.ptt && rigCom.fullPoll) || commandPriority == 0) rig_get_func(my_rig, RIG_VFO_CURR, RIG_FUNC_ANF, &rigGet.notchFilter);
+        if ((commandPriority == 14 && !rigGet.ptt && rigCom.fullPoll) || commandPriority == 0)
+        {
+            if (rig_has_get_func(my_rig, RIG_FUNC_ANF)) rig_get_func(my_rig, RIG_VFO_CURR, RIG_FUNC_ANF, &rigGet.notchFilter);
+        }
 
         //* IF Shift
         if ((commandPriority == 15 && !rigGet.ptt && rigCom.fullPoll) || commandPriority == 0)
         {
-            rig_get_level(my_rig, RIG_VFO_CURR, RIG_LEVEL_IF, &retvalue);
-            rigGet.ifShift = retvalue.i;
+            if (rig_has_get_level(my_rig, RIG_LEVEL_NR))
+            {
+                rig_get_level(my_rig, RIG_VFO_CURR, RIG_LEVEL_IF, &retvalue);
+                rigGet.ifShift = retvalue.i;
+            }
         }
 
         //* Clarifier
