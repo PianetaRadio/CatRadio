@@ -298,8 +298,8 @@ void MainWindow::guiUpdate()
     if (rigGet.onoff == RIG_POWER_ON || rigGet.onoff == RIG_POWER_UNKNOWN) ui->pushButton_Power->setChecked(true);
 
     //* VFOs
-    ui->lineEdit_vfoMain->setValue(rigGet.freqMain);
-    ui->lineEdit_vfoSub->setValue(rigGet.freqSub);
+    if (!rigCmd.freqMain) ui->lineEdit_vfoMain->setValue(rigGet.freqMain);
+    if (!rigCmd.freqSub) ui->lineEdit_vfoSub->setValue(rigGet.freqSub);
 
     ui->label_vfoMain->setText(rig_strvfo(rigGet.vfoMain));
     switch (rigGet.vfoMain)

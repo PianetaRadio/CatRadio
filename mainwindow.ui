@@ -769,9 +769,9 @@
    <widget class="QGroupBox" name="groupBox_filter">
     <property name="geometry">
      <rect>
-      <x>472</x>
+      <x>462</x>
       <y>220</y>
-      <width>131</width>
+      <width>141</width>
       <height>204</height>
      </rect>
     </property>
@@ -889,7 +889,7 @@
    <widget class="QFrame" name="frame_2">
     <property name="geometry">
      <rect>
-      <x>280</x>
+      <x>270</x>
       <y>220</y>
       <width>191</width>
       <height>191</height>
@@ -1657,7 +1657,7 @@
        <rect>
         <x>13</x>
         <y>10</y>
-        <width>291</width>
+        <width>301</width>
         <height>81</height>
        </rect>
       </property>
