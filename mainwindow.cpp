@@ -146,8 +146,6 @@ MainWindow::~MainWindow()
 
 void MainWindow::guiInit()
 {
-    ui->statusbar->showMessage(my_rig->caps->model_name);
-
     //* Power on/off cap
     //if (rig_has_set_func(my_rig, RIG_FUNCTION_SET_POWERSTAT)==0)
     if (my_rig->caps->set_powerstat == NULL)
@@ -596,6 +594,8 @@ void MainWindow::setSubMeter()
 
 void MainWindow::on_pushButton_Connect_toggled(bool checked)
 {
+    QString connectMsg;
+
     if (checked && rigCom.connected == 0)
     {
        retcode = rigDaemon->rigConnect();   //Open Rig connection
@@ -603,13 +603,16 @@ void MainWindow::on_pushButton_Connect_toggled(bool checked)
        if (retcode != RIG_OK)   //Connection error
        {
            rigCom.connected = 0;
-           ui->statusbar->showMessage(rigerror(retcode));
+           connectMsg = "Connection error: ";
+           connectMsg.append(rigerror(retcode));
            ui->pushButton_Connect->setChecked(false);  //Uncheck the button
        }
        else    //Rig connected
        {
            rigCom.connected = 1;
            guiInit();
+           connectMsg = "Connected to ";
+           connectMsg.append(my_rig->caps->model_name);
            if (rigCap.onoff == 0 || rigGet.onoff == RIG_POWER_ON || rigGet.onoff == RIG_POWER_UNKNOWN) timer->start(rigCom.rigRefresh);
        }
     }
@@ -618,8 +621,11 @@ void MainWindow::on_pushButton_Connect_toggled(bool checked)
         rigCom.connected = 0;
         timer->stop();
         rig_close(my_rig);  //Close the communication to the rig
+        connectMsg = "Disconnected";
         //rig_cleanup(my_rig);    //Release rig handle and free associated memory
     }
+
+    ui->statusbar->showMessage(connectMsg);
 }
 
 void MainWindow::on_pushButton_Power_toggled(bool checked)
