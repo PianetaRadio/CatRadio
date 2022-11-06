@@ -242,17 +242,22 @@ void MainWindow::guiInit()
         ui->comboBox_Preamp->addItem(QString::number(my_rig->state.preamp[i]));
     }
 
-    //* Clarifier
-    rigSet.rit = 1;
-    if (!rig_has_set_func(my_rig, RIG_FUNC_XIT)) ui->radioButton_clarXIT->setEnabled(false);
-
     //* Filter
     if (!rig_has_set_func(my_rig, RIG_FUNC_NB)) ui->checkBox_NB->setEnabled(false);
     if (!rig_has_set_func(my_rig, RIG_FUNC_NB2)) ui->checkBox_NB2->setEnabled(false);
     if (!rig_has_set_func(my_rig, RIG_FUNC_NR)) {ui->checkBox_NR->setEnabled(false); ui->spinBox_NR->setEnabled(false);}
     if (!rig_has_set_func(my_rig, RIG_FUNC_ANF)) ui->checkBox_NF->setEnabled(false);
 
-    //* Tone
+    //* Clarifier
+    rigSet.rit = 1;
+    if (!rig_has_set_func(my_rig, RIG_FUNC_XIT)) ui->radioButton_clarXIT->setEnabled(false);
+
+    //* CW
+    if (!rig_has_set_func(my_rig, RIG_FUNC_FBKIN)) ui->checkBox_BKIN->setEnabled(false);
+    if (!rig_has_set_func(my_rig, RIG_FUNC_APF)) ui->checkBox_APF->setEnabled(false);
+    if (!rig_has_set_level(my_rig, RIG_LEVEL_KEYSPD)) ui->spinBox_WPM->setEnabled(false);
+
+    //* FM
     ui->comboBox_toneType->clear();
     ui->comboBox_toneType->addItem("");        //None
     if (rig_has_set_func(my_rig, RIG_FUNC_TBURST)) ui->comboBox_toneType->addItem("1750Hz");   //Burst 1750 Hz

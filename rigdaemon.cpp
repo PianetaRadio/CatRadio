@@ -699,9 +699,9 @@ void RigDaemon::rigUpdate()
         //* CW
         if ((commandPriority == 17 && !rigGet.ptt && rigCom.fullPoll) || commandPriority == 0) //&& mode=CW
         {
-            rig_get_func(my_rig, RIG_VFO_CURR, RIG_FUNC_FBKIN, &rigGet.bkin);   //Break-in
-            rig_get_func(my_rig, RIG_VFO_CURR, RIG_FUNC_APF, &rigGet.apf);      //Audio Peak Filter
-            rig_get_level(my_rig, RIG_VFO_CURR, RIG_LEVEL_KEYSPD, &retvalue);   //Keyer speed WPM
+            if (rig_has_get_func(my_rig, RIG_FUNC_FBKIN)) rig_get_func(my_rig, RIG_VFO_CURR, RIG_FUNC_FBKIN, &rigGet.bkin);   //Break-in
+            if (rig_has_get_func(my_rig, RIG_FUNC_APF)) rig_get_func(my_rig, RIG_VFO_CURR, RIG_FUNC_APF, &rigGet.apf);      //Audio Peak Filter
+            if (rig_has_get_level(my_rig, RIG_LEVEL_KEYSPD)) rig_get_level(my_rig, RIG_VFO_CURR, RIG_LEVEL_KEYSPD, &retvalue);   //Keyer speed WPM
             rigGet.wpm = retvalue.i;
         }
 
