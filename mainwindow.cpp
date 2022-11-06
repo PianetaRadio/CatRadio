@@ -200,7 +200,6 @@ void MainWindow::guiInit()
 
     //* AGC level comboBox
     ui->comboBox_AGC->clear();
-    /* It seems that has_set_level or has_get_level is not well implemented in Hamlib, at the moment it is skipped in favour of fix values entry
     agc_level_e agcLevel;
     for (i = 0; i < 7; i++)
     {
@@ -209,12 +208,13 @@ void MainWindow::guiInit()
         {
             ui->comboBox_AGC->addItem(rig_stragclevel(agcLevel));
         }
-    }*/
-    ui->comboBox_AGC->addItem(rig_stragclevel(RIG_AGC_OFF));
-    ui->comboBox_AGC->addItem(rig_stragclevel(RIG_AGC_AUTO));
-    ui->comboBox_AGC->addItem(rig_stragclevel(RIG_AGC_FAST));
-    ui->comboBox_AGC->addItem(rig_stragclevel(RIG_AGC_MEDIUM));
-    ui->comboBox_AGC->addItem(rig_stragclevel(RIG_AGC_SLOW));
+    }
+    //It seems that has_set_level or has_get_level is not well implemented in Hamlib, at the moment it is skipped in favour of fix values entry
+    //ui->comboBox_AGC->addItem(rig_stragclevel(RIG_AGC_OFF));
+    //ui->comboBox_AGC->addItem(rig_stragclevel(RIG_AGC_AUTO));
+    //ui->comboBox_AGC->addItem(rig_stragclevel(RIG_AGC_FAST));
+    //ui->comboBox_AGC->addItem(rig_stragclevel(RIG_AGC_MEDIUM));
+    //ui->comboBox_AGC->addItem(rig_stragclevel(RIG_AGC_SLOW));
 
     //* Meter comboBox
     ui->comboBox_Meter->clear();
