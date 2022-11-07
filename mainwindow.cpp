@@ -35,6 +35,8 @@
 #include <QDesktopServices>
 #include <QUrl>
 #include <QApplication>
+#include <QCoreApplication>
+#include <QDir>
 
 #include <rig.h>    //Hamlib
 
@@ -67,6 +69,8 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    QDir::setCurrent(QCoreApplication::applicationDirPath());   //set current path = application path
 
     timer = new QTimer(this);   //timer for rigDaemon thread call
 
