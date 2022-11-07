@@ -35,7 +35,7 @@ extern rigConnect rigCom;
 
 
 QString rigListFile = "rig.lst";    //Text file containing the list of rig supported by hamlib
-QFile file(rigListFile);
+QFile rigFile(rigListFile);
 
 
 DialogConfig::DialogConfig(QWidget *parent) :
@@ -45,22 +45,30 @@ DialogConfig::DialogConfig(QWidget *parent) :
     ui->setupUi(this);
 
     //* rigModel comboBox
-    if (!file.exists()) //Create file rig.lst if not exists
+    if (!rigFile.exists()) //Create file rig.lst if not exists
     {
-        file.open(QIODevice::ReadWrite);
-        rig_load_all_backends();    //Load all backends information
-        rig_list_foreach(printRigList, NULL);   //Create the rig list
+        createRigFile();
     }
-    else file.open(QIODevice::ReadOnly);    //Open file rig.lst and populate the combobox
-    file.seek(0);
+    else rigFile.open(QIODevice::ReadOnly);    //Open file rig.lst and populate the combobox
+    rigFile.seek(0);
+
+    QString versionFile = rigFile.readLine();   //Update rigFile if old version
+    if (versionFile.trimmed() != hamlib_version)
+    {
+        rigFile.remove();
+        createRigFile();
+        rigFile.seek(0);
+        rigFile.readLine();
+    }
+
     ui->comboBox_rigModel->clear();
     ui->comboBox_rigModel->addItem("");
-    while(!file.atEnd())
+    while(!rigFile.atEnd())
     {
-        QString line = file.readLine();
+        QString line = rigFile.readLine();
         ui->comboBox_rigModel->addItem(line.trimmed());
     }
-    file.close();
+    rigFile.close();
 
     //* COM port
     ui->comboBox_comPort->clear();
@@ -179,9 +187,19 @@ void DialogConfig::on_buttonBox_accepted()
 int printRigList(const struct rig_caps *rigCaps, void *data)    //Load rig list from hamlib and save into file rig.lst
 {
     if (data) return 0;
-    QTextStream stream(&file);
+    QTextStream stream(&rigFile);
     stream << rigCaps->rig_model << " " << rigCaps->mfg_name << " " << rigCaps->model_name << "\n";
     return 1;
+}
+
+bool createRigFile()
+{
+    bool ret = rigFile.open(QIODevice::ReadWrite);
+    rigFile.write(hamlib_version);  //Write current Hamlib version in the file header
+    rigFile.write("\n");
+    rig_load_all_backends();    //Load all backends information
+    rig_list_foreach(printRigList, NULL);   //Create and write the rig list
+    return ret;
 }
 
 void DialogConfig::on_checkBox_netRigctl_toggled(bool checked)

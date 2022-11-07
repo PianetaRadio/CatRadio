@@ -47,6 +47,7 @@ private:
     Ui::DialogConfig *ui;
 };
 
-int printRigList(const struct rig_caps *rigCaps, void *data);
+int printRigList(const struct rig_caps *rigCaps, void *data);   //Retrives rig list from Hamlib and write to file
+bool createRigFile();    //Create the rig list file
 
 #endif // DIALOGCONFIG_H
