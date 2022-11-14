@@ -86,6 +86,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->verticalSlider_RFgain, &QAbstractSlider::valueChanged, ui->label_RFgainValue, QOverload<int>::of(&QLabel::setNum));
     connect(ui->verticalSlider_AFGain, &QAbstractSlider::valueChanged, ui->label_AFGainValue, QOverload<int>::of(&QLabel::setNum));
     connect(ui->verticalSlider_Squelch, &QAbstractSlider::valueChanged, ui->label_SquelchValue, QOverload<int>::of(&QLabel::setNum));
+    connect(ui->verticalSlider_micGain, &QAbstractSlider::valueChanged, ui->label_micGainLevel, QOverload<int>::of(&QLabel::setNum));
+    connect(ui->verticalSlider_micMonitor, &QAbstractSlider::valueChanged, ui->label_micMonitorLevel, QOverload<int>::of(&QLabel::setNum));
+    connect(ui->verticalSlider_micCompressor, &QAbstractSlider::valueChanged, ui->label_micCompressorLevel, QOverload<int>::of(&QLabel::setNum));
     connect(ui->horizontalSlider_clar, &QAbstractSlider::valueChanged, ui->label_clar, QOverload<int>::of(&QLabel::setNum));
     connect(ui->horizontalSlider_IFshift, &QAbstractSlider::valueChanged, ui->label_IFshiftValue,QOverload<int>::of(&QLabel::setNum));
 
@@ -245,6 +248,18 @@ void MainWindow::guiInit()
     {
         ui->comboBox_Preamp->addItem(QString::number(my_rig->state.preamp[i]));
     }
+
+    //* Levels
+    if (!rig_has_set_level(my_rig, RIG_LEVEL_RFPOWER)) ui->verticalSlider_RFpower->setEnabled(false);
+    if (!rig_has_set_level(my_rig, RIG_LEVEL_RF)) ui->verticalSlider_RFgain->setEnabled(false);
+    if (!rig_has_set_level(my_rig, RIG_LEVEL_AF)) ui->verticalSlider_AFGain->setEnabled(false);
+    if (!rig_has_set_level(my_rig, RIG_LEVEL_SQL)) ui->verticalSlider_Squelch->setEnabled(false);
+    if (!rig_has_set_level(my_rig, RIG_LEVEL_MICGAIN)) ui->verticalSlider_micGain->setEnabled(false);
+    if (!rig_has_set_level(my_rig, RIG_LEVEL_MONITOR_GAIN)) ui->verticalSlider_micMonitor->setEnabled(false);
+    if (!rig_has_set_level(my_rig, RIG_LEVEL_COMP)) ui->verticalSlider_micCompressor->setEnabled(false);
+
+    if (!rig_has_set_func(my_rig, RIG_FUNC_COMP)) ui->checkBox_micCompressor->setEnabled(false);
+    if (!rig_has_set_func(my_rig, RIG_FUNC_MON)) ui->checkBox_micMonitor->setEnabled(false);
 
     //* Filter
     if (!rig_has_set_func(my_rig, RIG_FUNC_NB)) ui->checkBox_NB->setEnabled(false);
@@ -482,11 +497,18 @@ void MainWindow::guiUpdate()
         else ui->progressBar_subMeter->setValue(0.0);
     }
 
-    //* Sliders
+    //* Levels
     if (!ui->verticalSlider_RFpower->isSliderDown() && !rigCmd.rfPower) ui->verticalSlider_RFpower->setValue((int)(rigGet.rfPower*100));
     if (!ui->verticalSlider_RFgain->isSliderDown() && !rigCmd.rfGain) ui->verticalSlider_RFgain->setValue((int)(rigGet.rfGain*100));
     if (!ui->verticalSlider_AFGain->isSliderDown() && !rigCmd.afGain) ui->verticalSlider_AFGain->setValue((int)(rigGet.afGain*100));
     if (!ui->verticalSlider_Squelch->isSliderDown() && !rigCmd.squelch) ui->verticalSlider_Squelch->setValue((int)(rigGet.squelch*100));
+
+    //* MIC
+    if (!ui->verticalSlider_micGain->isSliderDown() && !rigCmd.micGain) ui->verticalSlider_micGain->setValue((int)(rigGet.micGain*100));
+    if (!ui->verticalSlider_micMonitor->isSliderDown() && !rigCmd.micMonLevel) ui->verticalSlider_micMonitor->setValue((int)(rigGet.micMonLevel*100));
+    if (!ui->verticalSlider_micCompressor->isSliderDown() && !rigCmd.micCompLevel) ui->verticalSlider_micCompressor->setValue((int)(rigGet.micCompLevel*100));
+    ui->checkBox_micCompressor->setChecked(rigGet.micComp);
+    ui->checkBox_micMonitor->setChecked(rigGet.micMon);
 
     //* Filter
     ui->checkBox_NB->setChecked(rigGet.noiseBlanker);
@@ -813,6 +835,33 @@ void MainWindow::on_pushButton_BandUp_clicked()
 }
 
 //***** CheckBox *****
+void MainWindow::on_checkBox_micCompressor_toggled(bool checked)
+{
+    if (checked && !rigGet.micComp)
+    {
+        rigSet.micComp = 1;
+        rigCmd.micComp = 1;
+    }
+    else if (!checked && rigGet.micComp)
+    {
+        rigSet.micComp = 0;
+        rigCmd.micComp = 1;
+    }
+}
+
+void MainWindow::on_checkBox_micMonitor_toggled(bool checked)
+{
+    if (checked && !rigGet.micMon)
+    {
+        rigSet.micMon = 1;
+        rigCmd.micMon = 1;
+    }
+    else if (!checked && rigGet.micMon)
+    {
+        rigSet.micMon = 0;
+        rigCmd.micMon = 1;
+    }
+}
 
 void MainWindow::on_checkBox_NAR_toggled(bool checked)
 {
@@ -1201,6 +1250,63 @@ void MainWindow::on_verticalSlider_Squelch_sliderReleased()
     {
         rigSet.squelch = (float)(ui->verticalSlider_Squelch->value())/100;
         rigCmd.squelch = 1;
+    }
+}
+
+
+void MainWindow::on_verticalSlider_micGain_valueChanged(int value)
+{
+    if (!rigCmd.micGain && !ui->verticalSlider_micGain->isSliderDown())
+    {
+        rigSet.micGain = (float)(value)/100;
+        if (rigSet.micGain != rigGet.micGain) rigCmd.micGain = 1;
+    }
+}
+
+void MainWindow::on_verticalSlider_micGain_sliderReleased()
+{
+    if (!rigCmd.micGain)
+    {
+        rigSet.micGain = (float)(ui->verticalSlider_micGain->value())/100;
+        rigCmd.micGain = 1;
+    }
+}
+
+
+void MainWindow::on_verticalSlider_micCompressor_valueChanged(int value)
+{
+    if (!rigCmd.micCompLevel && !ui->verticalSlider_micCompressor->isSliderDown())
+    {
+        rigSet.micCompLevel = (float)(value)/100;
+        if (rigSet.micCompLevel != rigGet.micCompLevel) rigCmd.micCompLevel = 1;
+    }
+}
+
+void MainWindow::on_verticalSlider_micCompressor_sliderReleased()
+{
+    if (!rigCmd.micCompLevel)
+    {
+        rigSet.micCompLevel = (float)(ui->verticalSlider_micCompressor->value())/100;
+        rigCmd.micCompLevel = 1;
+    }
+}
+
+
+void MainWindow::on_verticalSlider_micMonitor_valueChanged(int value)
+{
+    if (!rigCmd.micMonLevel && !ui->verticalSlider_micMonitor->isSliderDown())
+    {
+        rigSet.micMonLevel = (float)(value)/100;
+        if (rigSet.micMonLevel != rigGet.micMonLevel) rigCmd.micMonLevel = 1;
+    }
+}
+
+void MainWindow::on_verticalSlider_micMonitor_sliderReleased()
+{
+    if (!rigCmd.micMonLevel)
+    {
+        rigSet.micMonLevel = (float)(ui->verticalSlider_micMonitor->value())/100;
+        rigCmd.micMonLevel = 1;
     }
 }
 

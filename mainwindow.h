@@ -187,6 +187,22 @@ private slots:
 
     void on_checkBox_NB2_toggled(bool checked);
 
+    void on_verticalSlider_micGain_valueChanged(int value);
+
+    void on_verticalSlider_micGain_sliderReleased();
+
+    void on_verticalSlider_micCompressor_valueChanged(int value);
+
+    void on_verticalSlider_micCompressor_sliderReleased();
+
+    void on_verticalSlider_micMonitor_valueChanged(int value);
+
+    void on_verticalSlider_micMonitor_sliderReleased();
+
+    void on_checkBox_micCompressor_toggled(bool checked);
+
+    void on_checkBox_micMonitor_toggled(bool checked);
+
 private:
     Ui::MainWindow *ui;
     QTimer *timer;

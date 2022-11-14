@@ -76,7 +76,7 @@ typedef struct {
     int toneType;   //0 none, 1 burst 1750, 2 CTCSS, 3 CTCSS SQL, 4 DCS
     tone_t tone;    //CTCSS or DCS tone
     int micComp, micMon;    //Flag MIC Compressor, MIC Monitor
-    float micGain, micMonLevel;  //Level MIC Gain, MIC Monitor
+    float micGain, micMonLevel, micCompLevel;  //Level MIC Gain, MIC Monitor, MIC Compressor
 } rigSettings;
 
 typedef struct {
@@ -112,5 +112,5 @@ typedef struct {
     int rptShift, rptOffset;
     int tone;
     int micComp, micMon;
-    int micGain, micMonLevel;
+    int micGain, micMonLevel, micCompLevel;
 } rigCommand;
