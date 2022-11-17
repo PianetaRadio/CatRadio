@@ -361,13 +361,28 @@ void MainWindow::guiUpdate()
             mode = rig_strrmode(rigGet.mode);
             if (mode != "")
             {
+                int j = 0;
                 //qDebug() << modes << mode << bwidth_list.width;
                 QRegularExpression rx("\\b"+mode+"?\\s");
-                if (modes.contains (rx) && bwidth_list.width != RIG_FLT_ANY) ui->comboBox_BW->addItem(QString::number(bwidth_list.width));
+                if (modes.contains (rx) && bwidth_list.width != RIG_FLT_ANY)
+                {   //sort the BW list
+                    if (ui->comboBox_BW->count() == 0) ui->comboBox_BW->addItem(QString::number(bwidth_list.width));    //first line
+                    else while (j <= ui->comboBox_BW->count()) //sort descending by filter width
+                    {
+                        ui->comboBox_BW->setCurrentIndex(j);
+                        QString bwidthCurrent = ui->comboBox_BW->currentText();
+                        if (bwidth_list.width > bwidthCurrent.toLong())
+                        {
+                            ui->comboBox_BW->insertItem(j, QString::number(bwidth_list.width));
+                            break;
+                        }
+                        else j++;
+                    }
+                }
             }
             //else qDebug() << "vuoto" << rigGet.mode;
        }
-       ui->comboBox_BW->model()->sort(0, Qt::DescendingOrder);
+       //ui->comboBox_BW->model()->sort(0, Qt::DescendingOrder);
        guiCmd.bwidthList = 0;
     }
 
