@@ -3,6 +3,8 @@ CatRadio
 (+ New, * Updated, - Removed)
 
 1.3.0 - 2022-xx-xx
+	+ MIC levels
+	* Bug fix: Sort bandwidth list
 	* General improvements
 	+ NB2
 	* Bug fix: Sliders
