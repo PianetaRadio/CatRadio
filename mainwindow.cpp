@@ -337,7 +337,7 @@ void MainWindow::guiUpdate()
     ui->comboBox_Mode->setCurrentText(rig_strrmode(rigGet.mode));
     ui->comboBox_ModeSub->setCurrentText(rig_strrmode(rigGet.modeSub));
 
-    if (guiCmd.tabList)
+    if (guiCmd.tabList) //Select appropriate mode function tab
     {
         if (rigGet.mode == RIG_MODE_SSB || rigGet.mode == RIG_MODE_USB || rigGet.mode == RIG_MODE_LSB) ui->tabWidget->setCurrentIndex(0); //Clarifier tab
         if (rigGet.mode == RIG_MODE_CW || rigGet.mode == RIG_MODE_CWR || rigGet.mode == RIG_MODE_CWN) ui->tabWidget->setCurrentIndex(1);    //CW tab
@@ -1096,7 +1096,6 @@ void MainWindow::on_vfoDisplaySubValueChanged(int value)
 void MainWindow::on_comboBox_Mode_activated(int index)
 {
     rigSet.mode = rig_parse_mode(ui->comboBox_Mode->itemText(index).toLatin1());
-    guiCmd.tabList = 1; //update tab
     rigCmd.mode = 1;
 }
 

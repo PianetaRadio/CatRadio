@@ -170,7 +170,8 @@ void RigDaemon::rigUpdate()
                 retcode = rig_set_mode(my_rig, RIG_VFO_CURR, rigSet.mode, RIG_PASSBAND_NOCHANGE);
                 if (retcode == RIG_OK)
                 {
-                    guiCmd.bwidthList = 1;   //Update BWidth list
+                    guiCmd.bwidthList = 1;  //Command update of BW list
+                    guiCmd.tabList = 1;     //Command selection of appropriate mode function tab
                     commandPriority = 0;
                     //rig_get_mode(my_rig, RIG_VFO_CURR, &rigGet.mode, &rigGet.bwidth);   //Get BW
                 }
@@ -280,8 +281,11 @@ void RigDaemon::rigUpdate()
                     retcode = rig_vfo_op(my_rig, RIG_VFO_CURR, RIG_OP_BAND_UP);
                     if (retcode == RIG_OK)
                     {
-                        commandPriority = 0;
-                        guiCmd.bwidthList = 1;
+                        freq_t retfreq;
+                        retcode = rig_get_freq(my_rig, RIG_VFO_CURR, &retfreq); //get VFO Main
+                        if (retcode == RIG_OK) rigGet.freqMain = retfreq;
+
+                        commandPriority = 1;
                     }
                 }
                 rigCmd.bandUp = 0;
@@ -295,8 +299,11 @@ void RigDaemon::rigUpdate()
                     retcode = rig_vfo_op(my_rig, RIG_VFO_CURR, RIG_OP_BAND_DOWN);
                     if (retcode == RIG_OK)
                     {
-                        commandPriority = 0;
-                        guiCmd.bwidthList = 1;
+                        freq_t retfreq;
+                        retcode = rig_get_freq(my_rig, RIG_VFO_CURR, &retfreq); //get VFO Main
+                        if (retcode == RIG_OK) rigGet.freqMain = retfreq;
+
+                        commandPriority = 1;
                     }
                 }
                 rigCmd.bandDown = 0;
@@ -309,13 +316,18 @@ void RigDaemon::rigUpdate()
                 {
                     retvalue.i = rigSet.band;
                     retcode = rig_set_level(my_rig, RIG_VFO_CURR, RIG_LEVEL_BAND_SELECT, retvalue);
-                    if (retcode == RIG_OK) rigGet.band = rigSet.band;
-                    qDebug() << retcode << rigCap.bandChange << rigSet.band;
-                }
+                    if (retcode == RIG_OK)
+                    {
+                        rigGet.band = rigSet.band;
 
+                        freq_t retfreq;
+                        retcode = rig_get_freq(my_rig, RIG_VFO_CURR, &retfreq); //get VFO Main
+                        if (retcode == RIG_OK) rigGet.freqMain = retfreq;
+
+                        commandPriority = 1;
+                    }
+                }
                 rigCmd.bandChange = 0;
-                commandPriority = 0;
-                //guiCmd.bwidthList = 1;
             }
 
             //* Tune
@@ -620,8 +632,15 @@ void RigDaemon::rigUpdate()
         if ((commandPriority == 1 && !rigGet.ptt && rigCom.fullPoll) || commandPriority == 0)
         {
             rig_get_mode(my_rig, RIG_VFO_CURR, &rigGet.mode, &rigGet.bwidth);
+
             if (rigGet.bwidth == rig_passband_narrow(my_rig, rigGet.mode)) rigGet.bwNarrow = 1;
             else rigGet.bwNarrow = 0;
+
+            if (rigGet.mode != rigSet.mode)
+            {
+                guiCmd.bwidthList = 1;  //Command update of BW list
+                guiCmd.tabList = 1;     //Command selection of appropriate mode function tab
+            }
 
             if (rigCap.modeSub) rig_get_mode(my_rig, rigGet.vfoSub, &rigGet.modeSub, &rigGet.bwidthSub);
         }
