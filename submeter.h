@@ -36,6 +36,11 @@ public slots:
     void setShortStep(double value);
     void setPrecision(int value);
 
+    void setBgColor(QColor color);
+    void setLineColor(QColor color);
+    void setProgressColor(QColor color);
+    void setScaleColor(QColor color);
+
     void setValue(double value);
     void setValue(int value);
 
@@ -63,6 +68,7 @@ private:
     QColor bgColor; //background color
     QColor lineColor;   //line color
     QColor progressColor;   //progress color
+    QColor scaleColor;   //scale text color
 
 signals:
 

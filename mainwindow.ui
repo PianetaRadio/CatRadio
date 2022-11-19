@@ -25,7 +25,7 @@
   <property name="minimumSize">
    <size>
     <width>610</width>
-    <height>601</height>
+    <height>605</height>
    </size>
   </property>
   <property name="maximumSize">
@@ -1550,6 +1550,11 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
         <property name="text">
          <string>Comp</string>
         </property>
@@ -1661,6 +1666,11 @@
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
         </property>
         <property name="text">
          <string>Mon</string>

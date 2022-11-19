@@ -113,12 +113,46 @@ MainWindow::MainWindow(QWidget *parent)
     rigCom.rigRefresh = configFile.value("rigRefresh", 100).toInt();
     rigCom.fullPoll = configFile.value("fullPolling", true).toBool();
     guiConf.vfoDisplayMode = configFile.value("vfoDisplayMode", 0).toInt();
+    guiConf.darkTheme = configFile.value("darkTheme", false).toBool();
     //Window settings
     restoreGeometry(configFile.value("WindowSettings/geometry").toByteArray());
     restoreState(configFile.value("WindowSettings/state").toByteArray());
 
     //* Style
     //ui->pushButton_PTT->setStyleSheet("QPushButton::checked {font: bold; color: red;}");
+
+    //Dark theme
+    if (guiConf.darkTheme)
+    {
+        QFile darkStyleFile(":qdarkstyle/dark/darkstyle.qss");
+
+        if (!darkStyleFile.exists()) ui->statusbar->showMessage("Unable to set stylesheet, file not found!");
+        else
+        {
+            darkStyleFile.open(QFile::ReadOnly | QFile::Text);
+            QTextStream ts(&darkStyleFile);
+            qApp->setStyleSheet(ts.readAll());
+
+            ui->progressBar_Smeter->setBgColor(Qt::black);
+            ui->progressBar_Smeter->setScaleColor(Qt::white);
+            ui->progressBar_Smeter->setLineColor(Qt::white);
+            ui->progressBar_Smeter->setProgressColor(QColor(0x66, 0x8f, 0xb8));
+
+            ui->progressBar_subMeter->setBgColor(Qt::black);
+            ui->progressBar_subMeter->setScaleColor(Qt::white);
+            ui->progressBar_subMeter->setLineColor(Qt::white);
+            ui->progressBar_subMeter->setProgressColor(Qt::blue);
+
+            ui->lineEdit_vfoMain->setBgColor(Qt::black);
+            ui->lineEdit_vfoMain->setLineColor(Qt::white);
+            ui->lineEdit_vfoMain->setTextColor(Qt::white);
+
+            ui->lineEdit_vfoSub->setBgColor(Qt::black);
+            ui->lineEdit_vfoSub->setLineColor(Qt::white);
+            ui->lineEdit_vfoSub->setTextColor(Qt::white);
+        }
+    }
+    //Light QFile darkStyleFile(":qdarkstyle/light/lightstyle.qss");
 
     QApplication::setWheelScrollLines(10);  //Mouse wheel scroll step
 }

@@ -27,6 +27,7 @@ SubMeter::SubMeter(QWidget *parent) : QWidget(parent)
     lineColor = QColor(Qt::black);
     bgColor = QColor(Qt::white);
     progressColor = QColor(Qt::green);
+    scaleColor = QColor(Qt::black);
 
     //Default value
     minValue = 0;
@@ -118,7 +119,7 @@ void SubMeter::drawProgress(QPainter *painter)
 void SubMeter::drawScale(QPainter *painter)
 {
     painter->save();
-    painter->setPen(lineColor);
+    painter->setPen(scaleColor);
 
     double initX = 0;
     double initTopY = height()*2/3-2;
@@ -238,6 +239,26 @@ void SubMeter::setPrecision(int value)
 {
     precision = value;
     update();
+}
+
+void SubMeter::setBgColor(QColor color)
+{
+    bgColor = color;
+}
+
+void SubMeter::setLineColor(QColor color)
+{
+    lineColor = color;
+}
+
+void SubMeter::setProgressColor(QColor color)
+{
+    progressColor = color;
+}
+
+void SubMeter::setScaleColor(QColor color)
+{
+    scaleColor = color;
 }
 
 void SubMeter::setValue(double value)

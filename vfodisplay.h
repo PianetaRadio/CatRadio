@@ -14,6 +14,10 @@ public slots:
     void setValue(unsigned long value);
     void setMode(int mode);
 
+    void setBgColor(QColor color);
+    void setLineColor(QColor color);
+    void setTextColor(QColor color);
+
 signals:
     void on_valueChanged(int value);
 

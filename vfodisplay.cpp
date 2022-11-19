@@ -95,6 +95,21 @@ void vfoDisplay::drawText(QPainter *painter)
     painter->restore();
 }
 
+void vfoDisplay::setBgColor(QColor color)
+{
+    bgColor = color;
+}
+
+void vfoDisplay::setLineColor(QColor color)
+{
+    lineColor = color;
+}
+
+void vfoDisplay::setTextColor(QColor color)
+{
+    textColor = color;
+}
+
 void vfoDisplay::setValue(unsigned long value)
 {
     currentValue = value;

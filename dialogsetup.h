@@ -16,12 +16,6 @@ public:
     ~DialogSetup();
 
 private slots:
-
-
-    void on_radioButton_vfoDispMode_LR_toggled(bool checked);
-
-    void on_radioButton_vfoDispMode_UD_toggled(bool checked);
-
     void on_buttonBox_accepted();
 
 private:

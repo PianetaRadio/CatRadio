@@ -26,6 +26,7 @@ SMeter::SMeter(QWidget *parent) : QWidget(parent)
     lineColor = QColor(Qt::black);
     bgColor = QColor(Qt::white);
     progressColor = QColor(Qt::green);
+    scaleColor = QColor(Qt::black);
 
     //Default value
     minValue = 0;
@@ -118,7 +119,7 @@ void SMeter::drawProgress(QPainter *painter)
 void SMeter::drawScalePWRMeter(QPainter *painter)
 {
     painter->save();
-    painter->setPen(lineColor);
+    painter->setPen(scaleColor);
 
     double initX = 0;
     double initTopY = height()*2/3-2;
@@ -190,7 +191,7 @@ void SMeter::drawScaleSMeter(QPainter *painter)
     double textHeight = meterFont.height();
 
     painter->save();
-    painter->setPen(lineColor);
+    painter->setPen(scaleColor);
 
     //Draw scale and scale values based on range values
     int longStep = 12;
@@ -300,6 +301,26 @@ void SMeter::setPrecision(int value)
 {
     precision = value;
     update();
+}
+
+void SMeter::setBgColor(QColor color)
+{
+    bgColor = color;
+}
+
+void SMeter::setLineColor(QColor color)
+{
+    lineColor = color;
+}
+
+void SMeter::setProgressColor(QColor color)
+{
+    progressColor = color;
+}
+
+void SMeter::setScaleColor(QColor color)
+{
+    scaleColor = color;
 }
 
 void SMeter::setValue(double value)

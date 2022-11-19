@@ -6,6 +6,7 @@
 
 typedef struct {
     int vfoDisplayMode; //0: use Left/Right mouse button, 1: click digit Up or Down
+    bool darkTheme; //flag for Dark theme
 } guiConfig;
 
 
