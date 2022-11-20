@@ -21,6 +21,7 @@
 #include "ui_mainwindow.h"
 #include "dialogconfig.h"
 #include "dialogsetup.h"
+#include "dialogcommand.h"
 #include "rigdaemon.h"
 #include "rigdata.h"
 #include "guidata.h"
@@ -40,7 +41,7 @@
 
 #include <rig.h>    //Hamlib
 
-extern RIG *my_rig; //Defined in rigdaemon.cpp
+RIG *my_rig;
 
 extern rigConnect rigCom;
 extern rigSettings rigGet;
@@ -60,6 +61,8 @@ FILE* debugFile;
 
 QThread workerThread; //
 RigDaemon *rigDaemon = new RigDaemon;
+
+QDialog *command = nullptr;
 
 
 //***** MainWindow *****
@@ -99,7 +102,7 @@ MainWindow::MainWindow(QWidget *parent)
     //* Thread for RigDaemon
     rigDaemon->moveToThread(&workerThread); //
     connect(&workerThread, &QThread::finished, rigDaemon, &QObject::deleteLater);
-    connect(timer, &QTimer::timeout, rigDaemon, &RigDaemon::rigUpdate);
+    connect(timer, &QTimer::timeout, this, &MainWindow::rigUpdate);
     connect(rigDaemon, &RigDaemon::resultReady, this, &MainWindow::on_rigDaemonResultReady);
     workerThread.start();
 
@@ -604,6 +607,10 @@ void MainWindow::guiUpdate()
     else if (rigGet.toneType == 4) ui->comboBox_toneFreq->setCurrentText(QString::number(rigGet.tone));  //DCS
 }
 
+void MainWindow::rigUpdate()
+{
+    rigDaemon->rigUpdate(my_rig);
+}
 
 //* RigDaemon handle results
 void MainWindow::on_rigDaemonResultReady()
@@ -678,23 +685,25 @@ void MainWindow::on_pushButton_Connect_toggled(bool checked)
 
     if (checked && rigCom.connected == 0)
     {
-       retcode = rigDaemon->rigConnect();   //Open Rig connection
+        int retcode;
 
-       if (retcode != RIG_OK)   //Connection error
-       {
-           rigCom.connected = 0;
-           connectMsg = "Connection error: ";
-           connectMsg.append(rigerror(retcode));
-           ui->pushButton_Connect->setChecked(false);  //Uncheck the button
-       }
-       else    //Rig connected
-       {
-           rigCom.connected = 1;
-           guiInit();
-           connectMsg = "Connected to ";
-           connectMsg.append(my_rig->caps->model_name);
-           if (rigCap.onoff == 0 || rigGet.onoff == RIG_POWER_ON || rigGet.onoff == RIG_POWER_UNKNOWN) timer->start(rigCom.rigRefresh);
-       }
+        my_rig = rigDaemon->rigConnect(&retcode);   //Open Rig connection
+
+        if (retcode != RIG_OK)   //Connection error
+        {
+            rigCom.connected = 0;
+            connectMsg = "Connection error: ";
+            connectMsg.append(rigerror(retcode));
+            ui->pushButton_Connect->setChecked(false);  //Uncheck the button
+        }
+        else    //Rig connected
+        {
+            rigCom.connected = 1;
+            guiInit();
+            connectMsg = "Connected to ";
+            connectMsg.append(my_rig->caps->model_name);
+            if (rigCap.onoff == 0 || rigGet.onoff == RIG_POWER_ON || rigGet.onoff == RIG_POWER_UNKNOWN) timer->start(rigCom.rigRefresh);
+        }
     }
     else if (rigCom.connected)   //Button unchecked
     {
@@ -1430,6 +1439,22 @@ void MainWindow::on_action_Setup_triggered()
 
     ui->lineEdit_vfoMain->setMode(guiConf.vfoDisplayMode);
     ui->lineEdit_vfoSub->setMode(guiConf.vfoDisplayMode);
+}
+
+void MainWindow::on_actionCommand_triggered()
+{
+    //DialogCommand command;
+    //command.setModal(true);
+    //command.exec();
+
+    if (!command)
+    {
+        command = new DialogCommand(this);
+    }
+    command->setModal(false);
+    command->show();
+    command->raise();
+    command->activateWindow();
 }
 
 void MainWindow::on_action_AboutCatRadio_triggered()

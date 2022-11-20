@@ -2058,13 +2058,19 @@
     </property>
     <addaction name="action_CatRadioHomepage"/>
     <addaction name="separator"/>
-    <addaction name="action_RadioInfo"/>
     <addaction name="separator"/>
     <addaction name="action_AboutCatRadio"/>
     <addaction name="action_AboutHamLib"/>
     <addaction name="action_AboutQT"/>
    </widget>
+   <widget class="QMenu" name="menuUtility">
+    <property name="title">
+     <string>Utility</string>
+    </property>
+    <addaction name="actionCommand"/>
+   </widget>
    <addaction name="menu_Config"/>
+   <addaction name="menuUtility"/>
    <addaction name="menu_Help"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -2098,9 +2104,9 @@
     <string>CatRadio homepage</string>
    </property>
   </action>
-  <action name="action_RadioInfo">
+  <action name="actionCommand">
    <property name="text">
-    <string>Radio Info</string>
+    <string>Command</string>
    </property>
   </action>
  </widget>

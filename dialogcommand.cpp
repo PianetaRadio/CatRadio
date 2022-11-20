@@ -17,26 +17,34 @@
  **/
 
 
-#ifndef RIGDAEMON_H
-#define RIGDAEMON_H
+#include "dialogcommand.h"
+#include "ui_dialogcommand.h"
 
-#include <QObject>
-#include <rig.h>
+#include "rig.h"
 
-class RigDaemon : public QObject
+DialogCommand::DialogCommand(QWidget *parent) :
+    QDialog(parent),
+    ui(new Ui::DialogCommand)
 {
-    Q_OBJECT
+    ui->setupUi(this);
+}
 
-public:
-    explicit RigDaemon(QObject *parent = nullptr);
-    RIG *rigConnect(int *retcode);
-    void rigUpdate(RIG *my_rig);
+DialogCommand::~DialogCommand()
+{
+    delete ui;
+}
 
-public slots:
+void DialogCommand::on_pushButton_send_clicked()
+{
+    //int rig_send_raw(rig, unsigned char *send, int send_len, unsigned char *reply, int reply_len, unsigned char term);
+    //send contains the raw command data
+    //send_len is the # of bytes to send
+    //If reply is NULL no answer is expected
+    //reply should be as long as need for any reply
+    //term is the command termination char -- could be semicolon, CR, or 0xfd for Icom rigs
+}
 
-signals:
-    void resultReady();
-
-};
-
-#endif // RIGDAEMON_H
+void DialogCommand::on_pushButton_close_clicked()
+{
+    this->close();
+}

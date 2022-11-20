@@ -28,9 +28,6 @@
 
 #include <rig.h>
 
-
-RIG *my_rig;
-
 extern rigConnect rigCom;
 extern rigSettings rigGet;
 extern rigSettings rigSet;
@@ -46,11 +43,9 @@ RigDaemon::RigDaemon(QObject *parent) : QObject(parent)
 
 }
 
-int RigDaemon::rigConnect()
+RIG *RigDaemon::rigConnect(int *retcode)
 {
-    int retcode;
-
-    my_rig = rig_init(rigCom.rigModel); //Allocate rig handle
+    RIG *my_rig = rig_init(rigCom.rigModel); //Allocate rig handle
 
     if (!my_rig)    //Wrong Rig number
     {
@@ -61,7 +56,8 @@ int RigDaemon::rigConnect()
         msgBox.setStandardButtons(QMessageBox::Ok);
         msgBox.exec();
 
-        return -1;   //RIG_EINVAL, Invalid parameter
+        *retcode = RIG_EINVAL;   //RIG_EINVAL, Invalid parameter
+        return nullptr;
     }
     else
     {
@@ -89,20 +85,19 @@ int RigDaemon::rigConnect()
             }
         }
 
-        retcode = rig_open(my_rig);
+        *retcode = rig_open(my_rig);
 
-        if (retcode != RIG_OK) return retcode;  //Rig not connected
+        if (*retcode != RIG_OK) return nullptr;  //Rig not connected
         else    //Rig connected
         {
             if (my_rig->caps->get_powerstat != NULL) rig_get_powerstat(my_rig, &rigGet.onoff);
             else rigGet.onoff = RIG_POWER_UNKNOWN;
-            return 0;
+            return my_rig;
         }
-
      }
 }
 
-void RigDaemon::rigUpdate()
+void RigDaemon::rigUpdate(RIG *my_rig)
 {
     int retcode;
     value_t retvalue;
@@ -305,7 +300,6 @@ void RigDaemon::rigUpdate()
                     if (retcode == RIG_OK)
                     {
                         rigGet.band = rigSet.band;
-
                         indexCmd = 21;
                     }
                 }

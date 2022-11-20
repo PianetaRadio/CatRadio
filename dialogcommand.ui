@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>DialogCommand</class>
+ <widget class="QDialog" name="DialogCommand">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>140</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Command</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="QLabel" name="label_commandSend">
+     <property name="text">
+      <string>Command Send</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QLineEdit" name="lineEdit_commandSend"/>
+   </item>
+   <item row="0" column="2">
+    <widget class="QPushButton" name="pushButton_send">
+     <property name="text">
+      <string>Send</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_receive">
+     <property name="text">
+      <string>Receive</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QLineEdit" name="lineEdit_receive">
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2">
+    <widget class="QCheckBox" name="checkBox_icom">
+     <property name="text">
+      <string>Icom</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="2">
+    <widget class="QPushButton" name="pushButton_close">
+     <property name="text">
+      <string>Close</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

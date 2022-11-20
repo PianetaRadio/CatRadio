@@ -17,26 +17,30 @@
  **/
 
 
-#ifndef RIGDAEMON_H
-#define RIGDAEMON_H
+#ifndef DIALOGCOMMAND_H
+#define DIALOGCOMMAND_H
 
-#include <QObject>
-#include <rig.h>
+#include <QDialog>
 
-class RigDaemon : public QObject
+namespace Ui {
+class DialogCommand;
+}
+
+class DialogCommand : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit RigDaemon(QObject *parent = nullptr);
-    RIG *rigConnect(int *retcode);
-    void rigUpdate(RIG *my_rig);
+    explicit DialogCommand(QWidget *parent = nullptr);
+    ~DialogCommand();
 
-public slots:
+private slots:
+    void on_pushButton_close_clicked();
 
-signals:
-    void resultReady();
+    void on_pushButton_send_clicked();
 
+private:
+    Ui::DialogCommand *ui;
 };
 
-#endif // RIGDAEMON_H
+#endif // DIALOGCOMMAND_H

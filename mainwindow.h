@@ -44,6 +44,7 @@ public:
 
 public slots:
     void guiUpdate();
+    void rigUpdate();   //Slot for QTimer
     void on_rigDaemonResultReady();    //Slot for rigDaemon resultReady
     void on_vfoDisplayMainValueChanged(int value); //Slot for vfoDisplay Main valueChanged
     void on_vfoDisplaySubValueChanged(int value); //Slot for vfoDisplay Sub valueChanged
@@ -202,6 +203,8 @@ private slots:
     void on_checkBox_micCompressor_toggled(bool checked);
 
     void on_checkBox_micMonitor_toggled(bool checked);
+
+    void on_actionCommand_triggered();
 
 private:
     Ui::MainWindow *ui;
