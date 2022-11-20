@@ -38,7 +38,7 @@ extern rigCommand rigCmd;
 extern rigCommand rigCap;
 extern guiCommand guiCmd;
 
-int commandPriority = 0;
+int indexCmd = 0;
 
 
 RigDaemon::RigDaemon(QObject *parent) : QObject(parent)
@@ -172,7 +172,7 @@ void RigDaemon::rigUpdate()
                 {
                     guiCmd.bwidthList = 1;  //Command update of BW list
                     guiCmd.tabList = 1;     //Command selection of appropriate mode function tab
-                    commandPriority = 0;
+                    indexCmd = 0;
                     //rig_get_mode(my_rig, RIG_VFO_CURR, &rigGet.mode, &rigGet.bwidth);   //Get BW
                 }
                 rigCmd.mode = 0;
@@ -223,8 +223,8 @@ void RigDaemon::rigUpdate()
                     if (retcode == RIG_OK)
                     {
                         if (rigCap.modeSub == 0) rigGet.modeSub = tempMode; //If mode sub VFO not targettable, use buffer
-                        commandPriority = 0;
-                        guiCmd.bwidthList = 1;
+                        indexCmd = 21;
+                        //guiCmd.bwidthList = 1;
                     }
                 }
 
@@ -237,8 +237,8 @@ void RigDaemon::rigUpdate()
                     {
                         if (rigCap.freqSub == 0) rigGet.freqSub = tempFreq; //If freq sub VFO not targettable, use buffer
                         if (rigCap.modeSub == 0) rigGet.modeSub = tempMode; //If mode sub VFO not targettable, use buffer
-                        commandPriority = 0;
-                        guiCmd.bwidthList = 1;
+                        indexCmd = 21;
+                        //guiCmd.bwidthList = 1;
                     }
                 }
                 rigCmd.vfoXchange = 0;
@@ -279,14 +279,7 @@ void RigDaemon::rigUpdate()
                 if (my_rig->caps->vfo_ops & RIG_OP_BAND_UP)
                 {
                     retcode = rig_vfo_op(my_rig, RIG_VFO_CURR, RIG_OP_BAND_UP);
-                    if (retcode == RIG_OK)
-                    {
-                        freq_t retfreq;
-                        retcode = rig_get_freq(my_rig, RIG_VFO_CURR, &retfreq); //get VFO Main
-                        if (retcode == RIG_OK) rigGet.freqMain = retfreq;
-
-                        commandPriority = 1;
-                    }
+                    if (retcode == RIG_OK) indexCmd = 21;
                 }
                 rigCmd.bandUp = 0;
             }
@@ -297,14 +290,7 @@ void RigDaemon::rigUpdate()
                 if (my_rig->caps->vfo_ops & RIG_OP_BAND_DOWN)
                 {
                     retcode = rig_vfo_op(my_rig, RIG_VFO_CURR, RIG_OP_BAND_DOWN);
-                    if (retcode == RIG_OK)
-                    {
-                        freq_t retfreq;
-                        retcode = rig_get_freq(my_rig, RIG_VFO_CURR, &retfreq); //get VFO Main
-                        if (retcode == RIG_OK) rigGet.freqMain = retfreq;
-
-                        commandPriority = 1;
-                    }
+                    if (retcode == RIG_OK) indexCmd = 21;
                 }
                 rigCmd.bandDown = 0;
             }
@@ -320,11 +306,7 @@ void RigDaemon::rigUpdate()
                     {
                         rigGet.band = rigSet.band;
 
-                        freq_t retfreq;
-                        retcode = rig_get_freq(my_rig, RIG_VFO_CURR, &retfreq); //get VFO Main
-                        if (retcode == RIG_OK) rigGet.freqMain = retfreq;
-
-                        commandPriority = 1;
+                        indexCmd = 21;
                     }
                 }
                 rigCmd.bandChange = 0;
@@ -629,24 +611,28 @@ void RigDaemon::rigUpdate()
 
         //***** Poll execution *****
         //* Mode and BW
-        if ((commandPriority == 1 && !rigGet.ptt && rigCom.fullPoll) || commandPriority == 0)
+        if ((indexCmd == 1 && !rigGet.ptt && rigCom.fullPoll) || indexCmd == 0)
         {
-            rig_get_mode(my_rig, RIG_VFO_CURR, &rigGet.mode, &rigGet.bwidth);
+            rmode_t tempMode;
 
-            if (rigGet.bwidth == rig_passband_narrow(my_rig, rigGet.mode)) rigGet.bwNarrow = 1;
-            else rigGet.bwNarrow = 0;
+            rig_get_mode(my_rig, RIG_VFO_CURR, &tempMode, &rigGet.bwidth);
 
-            if (rigGet.mode != rigSet.mode)
+            if (tempMode != rigGet.mode)
             {
                 guiCmd.bwidthList = 1;  //Command update of BW list
                 guiCmd.tabList = 1;     //Command selection of appropriate mode function tab
             }
 
+            rigGet.mode = tempMode;
+
+            if (rigGet.bwidth == rig_passband_narrow(my_rig, rigGet.mode)) rigGet.bwNarrow = 1;
+            else rigGet.bwNarrow = 0;
+
             if (rigCap.modeSub) rig_get_mode(my_rig, rigGet.vfoSub, &rigGet.modeSub, &rigGet.bwidthSub);
         }
 
         //* VFO and Split
-        if ((commandPriority == 2 && !rigGet.ptt && rigCom.fullPoll) || commandPriority == 0)
+        if ((indexCmd == 2 && !rigGet.ptt && rigCom.fullPoll) || indexCmd == 0)
         {
             rig_get_split_vfo(my_rig, RIG_VFO_CURR, &rigGet.split, &rigGet.vfoTx);            
 
@@ -654,62 +640,62 @@ void RigDaemon::rigUpdate()
         }
 
         //* Tuner
-        if ((commandPriority == 3 && !rigGet.ptt && rigCom.fullPoll) || commandPriority == 0) rig_get_func(my_rig, RIG_VFO_CURR, RIG_FUNC_TUNER, &rigGet.tuner);
+        if ((indexCmd == 3 && !rigGet.ptt && rigCom.fullPoll) || indexCmd == 0) rig_get_func(my_rig, RIG_VFO_CURR, RIG_FUNC_TUNER, &rigGet.tuner);
 
         //* Antenna
-        if ((commandPriority == 4 && !rigGet.ptt && rigCom.fullPoll) || commandPriority == 0) rig_get_ant(my_rig, RIG_VFO_CURR, RIG_ANT_CURR, &retvalue, &rigGet.ant, &rigGet.antTx, &rigGet.antRx);
+        if ((indexCmd == 4 && !rigGet.ptt && rigCom.fullPoll) || indexCmd == 0) rig_get_ant(my_rig, RIG_VFO_CURR, RIG_ANT_CURR, &retvalue, &rigGet.ant, &rigGet.antTx, &rigGet.antRx);
 
         //* AGC
-        if ((commandPriority == 5 && !rigGet.ptt && rigCom.fullPoll) || commandPriority == 0)
+        if ((indexCmd == 5 && !rigGet.ptt && rigCom.fullPoll) || indexCmd == 0)
         {
             rig_get_level(my_rig, RIG_VFO_CURR, RIG_LEVEL_AGC, &retvalue);
             rigGet.agc = levelagcvalue(retvalue.i);
         }
 
         //* Attenuator
-        if ((commandPriority == 6 && !rigGet.ptt && rigCom.fullPoll) || commandPriority == 0)
+        if ((indexCmd == 6 && !rigGet.ptt && rigCom.fullPoll) || indexCmd == 0)
         {
             rig_get_level(my_rig, RIG_VFO_CURR, RIG_LEVEL_ATT, &retvalue);
             rigGet.att = retvalue.i;
         }
 
         //* Preamp
-        if ((commandPriority == 7 && !rigGet.ptt && rigCom.fullPoll) || commandPriority == 0)
+        if ((indexCmd == 7 && !rigGet.ptt && rigCom.fullPoll) || indexCmd == 0)
         {
             rig_get_level(my_rig, RIG_VFO_CURR, RIG_LEVEL_PREAMP, &retvalue);
             rigGet.pre = retvalue.i;
         }
 
         //* RF power
-        if ((commandPriority == 8 && !rigGet.ptt && rigCom.fullPoll) || commandPriority == 0)
+        if ((indexCmd == 8 && !rigGet.ptt && rigCom.fullPoll) || indexCmd == 0)
         {
             rig_get_level(my_rig, RIG_VFO_CURR, RIG_LEVEL_RFPOWER, &retvalue);
             rigGet.rfPower = retvalue.f;
         }
 
         //* RF gain
-        if ((commandPriority == 9 && !rigGet.ptt && rigCom.fullPoll) || commandPriority == 0)
+        if ((indexCmd == 9 && !rigGet.ptt && rigCom.fullPoll) || indexCmd == 0)
         {
             rig_get_level(my_rig, RIG_VFO_CURR, RIG_LEVEL_RF, &retvalue);
             rigGet.rfGain = retvalue.f;
         }
 
         //* AF gain
-        if ((commandPriority == 10 && !rigGet.ptt && rigCom.fullPoll) || commandPriority == 0)
+        if ((indexCmd == 10 && !rigGet.ptt && rigCom.fullPoll) || indexCmd == 0)
         {
             rig_get_level(my_rig, RIG_VFO_CURR, RIG_LEVEL_AF, &retvalue);
             rigGet.afGain = retvalue.f;
         }
 
         //* Squelch
-        if ((commandPriority == 11 && !rigGet.ptt && rigCom.fullPoll) || commandPriority == 0)
+        if ((indexCmd == 11 && !rigGet.ptt && rigCom.fullPoll) || indexCmd == 0)
         {
             rig_get_level(my_rig, RIG_VFO_CURR, RIG_LEVEL_SQL, &retvalue);
             rigGet.squelch = retvalue.f;
         }
 
         //* MIC
-        if ((commandPriority == 12 && !rigGet.ptt && rigCom.fullPoll) || commandPriority == 0)
+        if ((indexCmd == 12 && !rigGet.ptt && rigCom.fullPoll) || indexCmd == 0)
         {
             if (rig_has_get_level(my_rig, RIG_LEVEL_MICGAIN))
             {
@@ -725,7 +711,7 @@ void RigDaemon::rigUpdate()
         }
 
         //* Monitor
-        if ((commandPriority == 13 && !rigGet.ptt && rigCom.fullPoll) || commandPriority == 0)
+        if ((indexCmd == 13 && !rigGet.ptt && rigCom.fullPoll) || indexCmd == 0)
         {
             if (rig_has_get_func(my_rig, RIG_FUNC_MON)) rig_get_func(my_rig, RIG_VFO_CURR, RIG_FUNC_MON, &rigGet.micMon);
             if (rig_has_get_level(my_rig, RIG_LEVEL_MONITOR_GAIN))
@@ -736,14 +722,14 @@ void RigDaemon::rigUpdate()
         }
 
         //* NB noise blanker
-        if ((commandPriority == 14 && !rigGet.ptt && rigCom.fullPoll) || commandPriority == 0)
+        if ((indexCmd == 14 && !rigGet.ptt && rigCom.fullPoll) || indexCmd == 0)
         {
             if (rig_has_get_func(my_rig, RIG_FUNC_NB)) rig_get_func(my_rig, RIG_VFO_CURR, RIG_FUNC_NB, &rigGet.noiseBlanker);
             if (rig_has_get_func(my_rig, RIG_FUNC_NB2)) rig_get_func(my_rig, RIG_VFO_CURR, RIG_FUNC_NB2, &rigGet.noiseBlanker2);
         }
 
         //* NR noise reduction
-        if ((commandPriority == 15 && !rigGet.ptt && rigCom.fullPoll) || commandPriority == 0)
+        if ((indexCmd == 15 && !rigGet.ptt && rigCom.fullPoll) || indexCmd == 0)
         {
             if (rig_has_get_func(my_rig, RIG_FUNC_NR)) rig_get_func(my_rig, RIG_VFO_CURR, RIG_FUNC_NR, &rigGet.noiseReduction);
             if (rig_has_get_level(my_rig, RIG_LEVEL_NR))
@@ -754,13 +740,13 @@ void RigDaemon::rigUpdate()
         }
 
         //* NF notch filter
-        if ((commandPriority == 16 && !rigGet.ptt && rigCom.fullPoll) || commandPriority == 0)
+        if ((indexCmd == 16 && !rigGet.ptt && rigCom.fullPoll) || indexCmd == 0)
         {
             if (rig_has_get_func(my_rig, RIG_FUNC_ANF)) rig_get_func(my_rig, RIG_VFO_CURR, RIG_FUNC_ANF, &rigGet.notchFilter);
         }
 
         //* IF Shift
-        if ((commandPriority == 17 && !rigGet.ptt && rigCom.fullPoll) || commandPriority == 0)
+        if ((indexCmd == 17 && !rigGet.ptt && rigCom.fullPoll) || indexCmd == 0)
         {
             if (rig_has_get_level(my_rig, RIG_LEVEL_NR))
             {
@@ -770,7 +756,7 @@ void RigDaemon::rigUpdate()
         }
 
         //* Clarifier
-        if ((commandPriority == 18 && !rigGet.ptt && rigCom.fullPoll) || commandPriority == 0)
+        if ((indexCmd == 18 && !rigGet.ptt && rigCom.fullPoll) || indexCmd == 0)
         {
             if (rig_has_get_func(my_rig, RIG_FUNC_RIT)) rig_get_func(my_rig, RIG_VFO_CURR, RIG_FUNC_RIT, &rigGet.rit);  //RIT
             if (rig_has_get_func(my_rig, RIG_FUNC_XIT)) rig_get_func(my_rig, RIG_VFO_CURR, RIG_FUNC_XIT, &rigGet.xit);  //XIT
@@ -782,7 +768,7 @@ void RigDaemon::rigUpdate()
         }
 
         //* CW
-        if ((commandPriority == 19 && !rigGet.ptt && rigCom.fullPoll) || commandPriority == 0) //&& mode=CW
+        if ((indexCmd == 19 && !rigGet.ptt && rigCom.fullPoll) || indexCmd == 0) //&& mode=CW
         {
             if (rig_has_get_func(my_rig, RIG_FUNC_FBKIN)) rig_get_func(my_rig, RIG_VFO_CURR, RIG_FUNC_FBKIN, &rigGet.bkin);   //Break-in
             if (rig_has_get_func(my_rig, RIG_FUNC_APF)) rig_get_func(my_rig, RIG_VFO_CURR, RIG_FUNC_APF, &rigGet.apf);      //Audio Peak Filter
@@ -791,7 +777,7 @@ void RigDaemon::rigUpdate()
         }
 
         //* FM
-        if ((commandPriority == 20 && !rigGet.ptt && rigCom.fullPoll) || commandPriority == 0) //&& mode=FM
+        if ((indexCmd == 20 && !rigGet.ptt && rigCom.fullPoll) || indexCmd == 0) //&& mode=FM
         {
             rig_get_rptr_shift(my_rig, RIG_VFO_CURR, &rigGet.rptShift);     //Repeater Shift
             rig_get_rptr_offs(my_rig, RIG_VFO_CURR, &rigGet.rptOffset);     //Repeater Offset
@@ -832,8 +818,8 @@ void RigDaemon::rigUpdate()
             if (rigGet.toneType != rigSet.toneType) guiCmd.toneList = 1;    //update tone list
         }
 
-        commandPriority ++;
-        if (commandPriority == 21) commandPriority = 1;
+        indexCmd ++;
+        if (indexCmd >= 21) indexCmd = 1;
     }
 
     emit resultReady();

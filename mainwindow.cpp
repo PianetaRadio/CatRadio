@@ -141,7 +141,7 @@ MainWindow::MainWindow(QWidget *parent)
             ui->progressBar_subMeter->setBgColor(Qt::black);
             ui->progressBar_subMeter->setScaleColor(Qt::white);
             ui->progressBar_subMeter->setLineColor(Qt::white);
-            ui->progressBar_subMeter->setProgressColor(Qt::blue);
+            ui->progressBar_subMeter->setProgressColor(QColor(0x66, 0x8f, 0xb8));
 
             ui->lineEdit_vfoMain->setBgColor(Qt::black);
             ui->lineEdit_vfoMain->setLineColor(Qt::white);
