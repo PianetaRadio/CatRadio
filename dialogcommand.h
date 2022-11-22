@@ -20,7 +20,10 @@
 #ifndef DIALOGCOMMAND_H
 #define DIALOGCOMMAND_H
 
+#include "rig.h"
+
 #include <QDialog>
+
 
 namespace Ui {
 class DialogCommand;
@@ -31,7 +34,7 @@ class DialogCommand : public QDialog
     Q_OBJECT
 
 public:
-    explicit DialogCommand(QWidget *parent = nullptr);
+    explicit DialogCommand(RIG *rig, QWidget *parent = nullptr);
     ~DialogCommand();
 
 private slots:
@@ -41,6 +44,8 @@ private slots:
 
 private:
     Ui::DialogCommand *ui;
+
+    RIG *my_rig;
 };
 
 #endif // DIALOGCOMMAND_H

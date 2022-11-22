@@ -23,6 +23,8 @@
 #include <QMainWindow>
 #include <QTimer>
 
+#include "rig.h"
+
 #define RELEASE_DATE __DATE__
 #define VERSION_MAJ 1
 #define VERSION_MIN 3
@@ -204,11 +206,15 @@ private slots:
 
     void on_checkBox_micMonitor_toggled(bool checked);
 
-    void on_actionCommand_triggered();
+    void on_action_Command_triggered();
+
+    void on_action_RadioInfo_triggered();
 
 private:
     Ui::MainWindow *ui;
     QTimer *timer;
+
+    RIG *my_rig;
 
     void guiInit();
     void setSubMeter();

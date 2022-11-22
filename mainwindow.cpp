@@ -22,6 +22,7 @@
 #include "dialogconfig.h"
 #include "dialogsetup.h"
 #include "dialogcommand.h"
+#include "dialogradioinfo.h"
 #include "rigdaemon.h"
 #include "rigdata.h"
 #include "guidata.h"
@@ -41,7 +42,7 @@
 
 #include <rig.h>    //Hamlib
 
-RIG *my_rig;
+//RIG *my_rig;
 
 extern rigConnect rigCom;
 extern rigSettings rigGet;
@@ -63,6 +64,7 @@ QThread workerThread; //
 RigDaemon *rigDaemon = new RigDaemon;
 
 QDialog *command = nullptr;
+QDialog *radioInfo = nullptr;
 
 
 //***** MainWindow *****
@@ -334,9 +336,9 @@ void MainWindow::guiInit()
         else rigCap.modeSub = 0;
         if (my_rig->caps->targetable_vfo == RIG_TARGETABLE_NONE)
         {
-        rigCap.freqSub = 0; //disable get/set freq for subVFO
-        rigCap.modeSub = 0; //disable get/set mode for subVFO
-        ui->radioButton_VFOSub->setCheckable(false);    //disable VFOsub radio button
+            rigCap.freqSub = 0; //disable get/set freq for subVFO
+            rigCap.modeSub = 0; //disable get/set mode for subVFO
+            ui->radioButton_VFOSub->setCheckable(false);    //disable VFOsub radio button
         }
     //}
     //else    //NET rigctl, as workaround assume targetable_vfo
@@ -344,6 +346,10 @@ void MainWindow::guiInit()
     //    rigCap.freqSub = 1;
     //    rigCap.modeSub = 1;
     //}
+
+    //* Menu
+    //ui->action_Command->setEnabled(true);
+    ui->action_RadioInfo->setEnabled(true);
 
     guiCmd.rangeList = 1;   //update range list
     guiCmd.antList = 1; //update antenna list
@@ -1441,7 +1447,14 @@ void MainWindow::on_action_Setup_triggered()
     ui->lineEdit_vfoSub->setMode(guiConf.vfoDisplayMode);
 }
 
-void MainWindow::on_actionCommand_triggered()
+void MainWindow::on_action_RadioInfo_triggered()
+{
+    if (!radioInfo) radioInfo = new DialogRadioInfo(my_rig, this);
+    radioInfo->setModal(true);
+    radioInfo->exec();
+}
+
+void MainWindow::on_action_Command_triggered()
 {
     //DialogCommand command;
     //command.setModal(true);
@@ -1449,7 +1462,7 @@ void MainWindow::on_actionCommand_triggered()
 
     if (!command)
     {
-        command = new DialogCommand(this);
+        command = new DialogCommand(my_rig, this);
     }
     command->setModal(false);
     command->show();
@@ -1500,3 +1513,6 @@ void MainWindow::on_action_CatRadioHomepage_triggered()
     QUrl homepage("https://www.pianetaradio.it/blog/catradio/");
     QDesktopServices::openUrl(homepage);
 }
+
+
+

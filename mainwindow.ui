@@ -2063,14 +2063,15 @@
     <addaction name="action_AboutHamLib"/>
     <addaction name="action_AboutQT"/>
    </widget>
-   <widget class="QMenu" name="menuUtility">
+   <widget class="QMenu" name="menu_Utility">
     <property name="title">
      <string>Utility</string>
     </property>
-    <addaction name="actionCommand"/>
+    <addaction name="action_RadioInfo"/>
+    <addaction name="action_Command"/>
    </widget>
    <addaction name="menu_Config"/>
-   <addaction name="menuUtility"/>
+   <addaction name="menu_Utility"/>
    <addaction name="menu_Help"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -2104,9 +2105,20 @@
     <string>CatRadio homepage</string>
    </property>
   </action>
-  <action name="actionCommand">
+  <action name="action_Command">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Command</string>
+   </property>
+  </action>
+  <action name="action_RadioInfo">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Radio info</string>
    </property>
   </action>
  </widget>

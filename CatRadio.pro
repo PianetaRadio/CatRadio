@@ -10,7 +10,9 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    dialogcommand.cpp \
     dialogconfig.cpp \
+    dialogradioinfo.cpp \
     dialogsetup.cpp \
     guidata.cpp \
     main.cpp \
@@ -23,7 +25,9 @@ SOURCES += \
     vfodisplay.cpp
 
 HEADERS += \
+    dialogcommand.h \
     dialogconfig.h \
+    dialogradioinfo.h \
     dialogsetup.h \
     guidata.h \
     mainwindow.h \
@@ -35,7 +39,9 @@ HEADERS += \
     vfodisplay.h
 
 FORMS += \
+    dialogcommand.ui \
     dialogconfig.ui \
+    dialogradioinfo.ui \
     dialogsetup.ui \
     mainwindow.ui
 

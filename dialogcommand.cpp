@@ -22,11 +22,13 @@
 
 #include "rig.h"
 
-DialogCommand::DialogCommand(QWidget *parent) :
+
+DialogCommand::DialogCommand(RIG *rig, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::DialogCommand)
 {
     ui->setupUi(this);
+    my_rig = rig;
 }
 
 DialogCommand::~DialogCommand()
@@ -36,7 +38,25 @@ DialogCommand::~DialogCommand()
 
 void DialogCommand::on_pushButton_send_clicked()
 {
-    //int rig_send_raw(rig, unsigned char *send, int send_len, unsigned char *reply, int reply_len, unsigned char term);
+    unsigned char rcvdCmd[100] = "a";
+    //QString rcvdCmdS;
+    int rcvdCmdLen = 10;
+
+    QString sendCmdS = ui->lineEdit_commandSend->text();
+    const unsigned char *sendCmd = (unsigned char*)sendCmdS.toLatin1().data();
+    int sendCmdLen = sendCmdS.size();
+    unsigned char termCmd[] = ";";
+
+    //qDebug()<<sendCmdS<<(char*)termCmd<<(char*)sendCmd<<sendCmdLen;
+
+    rig_send_raw(my_rig, sendCmd, sendCmdLen, rcvdCmd, rcvdCmdLen, termCmd);
+
+    //sendCmdS = (char*)rcvdCmd;
+
+    //qDebug()<<i<<rcvdCmdS<<rcvdCmd<<rcvdCmdLen;
+
+
+    //int rig_send_raw(rig, const unsigned char *send, int send_len, unsigned char *reply, int reply_len, unsigned char *term);
     //send contains the raw command data
     //send_len is the # of bytes to send
     //If reply is NULL no answer is expected
