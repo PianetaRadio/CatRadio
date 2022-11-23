@@ -246,21 +246,15 @@ void MainWindow::guiInit()
 
     //* AGC level comboBox
     ui->comboBox_AGC->clear();
-    agc_level_e agcLevel;
-    for (i = 0; i < 7; i++)
+    for (i = 0; i < HAMLIB_MAX_AGC_LEVELS && i < my_rig->caps->agc_level_count; i++) ui->comboBox_AGC->addItem(rig_stragclevel(my_rig->caps->agc_levels[i]));
+    if (i==0)   //Print all levels if list is not specified
     {
-        agcLevel = levelagcvalue(i);
-        if (rig_has_set_level(my_rig, agcLevel))
-        {
-            ui->comboBox_AGC->addItem(rig_stragclevel(agcLevel));
-        }
+        ui->comboBox_AGC->addItem(rig_stragclevel(RIG_AGC_OFF));
+        ui->comboBox_AGC->addItem(rig_stragclevel(RIG_AGC_AUTO));
+        ui->comboBox_AGC->addItem(rig_stragclevel(RIG_AGC_FAST));
+        ui->comboBox_AGC->addItem(rig_stragclevel(RIG_AGC_MEDIUM));
+        ui->comboBox_AGC->addItem(rig_stragclevel(RIG_AGC_SLOW));
     }
-    //It seems that has_set_level or has_get_level is not well implemented in Hamlib, at the moment it is skipped in favour of fix values entry
-    //ui->comboBox_AGC->addItem(rig_stragclevel(RIG_AGC_OFF));
-    //ui->comboBox_AGC->addItem(rig_stragclevel(RIG_AGC_AUTO));
-    //ui->comboBox_AGC->addItem(rig_stragclevel(RIG_AGC_FAST));
-    //ui->comboBox_AGC->addItem(rig_stragclevel(RIG_AGC_MEDIUM));
-    //ui->comboBox_AGC->addItem(rig_stragclevel(RIG_AGC_SLOW));
 
     //* Meter comboBox
     ui->comboBox_Meter->clear();
@@ -1513,6 +1507,3 @@ void MainWindow::on_action_CatRadioHomepage_triggered()
     QUrl homepage("https://www.pianetaradio.it/blog/catradio/");
     QDesktopServices::openUrl(homepage);
 }
-
-
-
