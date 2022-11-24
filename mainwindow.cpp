@@ -129,6 +129,7 @@ MainWindow::MainWindow(QWidget *parent)
     //Dark theme
     if (guiConf.darkTheme)
     {
+        //QFile darkStyleFile(":/dark/stylesheet.qss");
         QFile darkStyleFile(":qdarkstyle/dark/darkstyle.qss");
 
         if (!darkStyleFile.exists()) ui->statusbar->showMessage("Unable to set stylesheet, file not found!");
@@ -1472,10 +1473,10 @@ void MainWindow::on_action_AboutCatRadio_triggered()
     QString version = QString::number(VERSION_MAJ)+"."+QString::number(VERSION_MIN)+"."+QString::number(VERSION_MIC);
     msgBox.setText("<b>CatRadio</b> <i>Radio control software</i><br/>version "+version+" "+RELEASE_DATE);
     msgBox.setInformativeText("<p>Copyright (C) 2022 Gianfranco Sordetti IZ8EWD<br/>"
-                              "<a href='https://www.pianetaradio.it'>www.pianetaradio.it</a></p>"
+                              "<a href='https://www.pianetaradio.it' style='color: #668fb8'>www.pianetaradio.it</a></p>"
                               "<p>This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.<br/>"
                               "This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.<br/>"
-                              "You should have received a copy of the GNU General Public License along with this program.  If not, see <a href='http://www.gnu.org/licenses/'>www.gnu.org/licenses</a>.</p>");
+                              "You should have received a copy of the GNU General Public License along with this program.  If not, see <a href='http://www.gnu.org/licenses/' style='color: #668fb8'>www.gnu.org/licenses</a>.</p>");
     msgBox.setIcon(QMessageBox::Information);
     msgBox.setStandardButtons(QMessageBox::Ok);
 
@@ -1502,27 +1503,23 @@ void MainWindow::on_action_AboutHamLib_triggered()
     msgBox.exec();
 }
 
-/**
 void MainWindow::on_action_AboutDarkTheme_triggered()
 {
     QMessageBox msgBox;
     msgBox.setWindowTitle("About Dark Theme");
     msgBox.setTextFormat(Qt::RichText);
-    msgBox.setText("<b>Dark Theme</b>);
-    msgBox.setInformativeText("<p>Copyright (C) ...<br/>"
-                              "<a href='https://...'>www....</a></p>"
-                              "<p>The MIT License (MIT)</p>
+    msgBox.setText("<b>QDarkStyleSheet</b>");
+    msgBox.setInformativeText("<p>Copyright (c) 2013-2019 Colin Duquesnoy<br/>"
+                              "<a href='https://github.com/ColinDuquesnoy/QDarkStyleSheet' style='color: #668fb8'>github.com/ColinDuquesnoy/QDarkStyleSheet</a></p>"
+                              "<p>The MIT License (MIT)</p>"
                               "<p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:<br/>"
                               "The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.<br/>"
-                              "THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>");
-    msgBox.setIcon(QMessageBox::NoIcon);
+                              "THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>"
+                              "<p>Images contained in this project is licensed under CC-BY license.</p>");
+    msgBox.setIcon(QMessageBox::Information);
     msgBox.setStandardButtons(QMessageBox::Ok);
-
-    QPixmap icon("catradio.png");
-    msgBox.setIconPixmap(icon);
-
     msgBox.exec();
-}**/
+}
 
 void MainWindow::on_action_CatRadioHomepage_triggered()
 {

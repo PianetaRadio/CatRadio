@@ -210,6 +210,8 @@ private slots:
 
     void on_action_RadioInfo_triggered();
 
+    void on_action_AboutDarkTheme_triggered();
+
 private:
     Ui::MainWindow *ui;
     QTimer *timer;
