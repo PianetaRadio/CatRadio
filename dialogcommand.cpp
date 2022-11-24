@@ -55,7 +55,7 @@ void DialogCommand::on_pushButton_send_clicked()
 
     //QString rcvdCmdS = rcvdCmd;
 
-    qDebug()<<(char *)rcvdCmd;
+    //qDebug()<<(char *)rcvdCmd;
 
 
     //int rig_send_raw(rig, const unsigned char *send, int send_len, unsigned char *reply, int reply_len, unsigned char *term);
