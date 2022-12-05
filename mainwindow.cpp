@@ -81,7 +81,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     //* Debug
     rig_set_debug_level(RIG_DEBUG_WARN);  //normal
-    //rig_set_debug_level(RIG_DEBUG_TRACE);   //debug
+    //rig_set_debug_level(RIG_DEBUG_VERBOSE); //debug verbose
+    //rig_set_debug_level(RIG_DEBUG_TRACE);   //debug trace
     rig_set_debug_time_stamp(true);
     if ((debugFile=fopen("catradio.log","w+")) == NULL) rig_set_debug_level(RIG_DEBUG_NONE);
     else rig_set_debug_file(debugFile);

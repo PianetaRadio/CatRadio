@@ -13,49 +13,79 @@
   <property name="windowTitle">
    <string>Command</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
+  <layout class="QGridLayout" name="gridLayout" columnstretch="0,0,0,0">
    <item row="0" column="0">
     <widget class="QLabel" name="label_commandSend">
      <property name="text">
       <string>Command Send</string>
      </property>
+     <property name="buddy">
+      <cstring>lineEdit_commandSend</cstring>
+     </property>
     </widget>
    </item>
-   <item row="0" column="1">
-    <widget class="QLineEdit" name="lineEdit_commandSend"/>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_received">
+     <property name="text">
+      <string>Received</string>
+     </property>
+     <property name="buddy">
+      <cstring>lineEdit_receive</cstring>
+     </property>
+    </widget>
    </item>
-   <item row="0" column="2">
+   <item row="0" column="3">
     <widget class="QPushButton" name="pushButton_send">
      <property name="text">
       <string>Send</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="label_receive">
+   <item row="1" column="3">
+    <widget class="QRadioButton" name="radioButton_LF">
      <property name="text">
-      <string>Receive</string>
+      <string>LF</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="1">
+   <item row="0" column="1" colspan="2">
+    <widget class="QLineEdit" name="lineEdit_commandSend"/>
+   </item>
+   <item row="3" column="3">
+    <widget class="QPushButton" name="pushButton_close">
+     <property name="text">
+      <string>Close</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2">
+    <widget class="QRadioButton" name="radioButton_CR">
+     <property name="text">
+      <string>CR</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1" colspan="3">
     <widget class="QLineEdit" name="lineEdit_receive">
      <property name="readOnly">
       <bool>true</bool>
      </property>
     </widget>
    </item>
-   <item row="1" column="2">
-    <widget class="QCheckBox" name="checkBox_icom">
+   <item row="1" column="1">
+    <widget class="QRadioButton" name="radioButton_icom">
      <property name="text">
-      <string>Icom</string>
+      <string>Icom 0xfd</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="2">
-    <widget class="QPushButton" name="pushButton_close">
+   <item row="1" column="0">
+    <widget class="QRadioButton" name="radioButton_yaesu">
      <property name="text">
-      <string>Close</string>
+      <string>Yaesu/Kwd ;</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
      </property>
     </widget>
    </item>

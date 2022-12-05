@@ -22,6 +22,11 @@
 
 #include "rig.h"
 
+#include <stdio.h>
+#include <string.h>
+
+#include <QDebug>
+
 
 DialogCommand::DialogCommand(RIG *rig, QWidget *parent) :
     QDialog(parent),
@@ -29,6 +34,10 @@ DialogCommand::DialogCommand(RIG *rig, QWidget *parent) :
 {
     ui->setupUi(this);
     my_rig = rig;
+    int backend = RIG_BACKEND_NUM(my_rig->caps->rig_model);
+
+    if (backend == RIG_YAESU || backend == RIG_KENWOOD) ui->radioButton_yaesu->setChecked(true);
+    else if (backend == RIG_ICOM) ui->radioButton_icom->setChecked(true);
 }
 
 DialogCommand::~DialogCommand()
@@ -38,25 +47,45 @@ DialogCommand::~DialogCommand()
 
 void DialogCommand::on_pushButton_send_clicked()
 {
-
+    bool hex =  false;  //Flag for Hex command
 
     QString sendCmdS = ui->lineEdit_commandSend->text();
-    const unsigned char *sendCmd = (unsigned char*)sendCmdS.toLatin1().data();
-    int sendCmdLen = sendCmdS.size();
-    unsigned char termCmd[] = ";";
+    QByteArray sendCmdA;
+    if (sendCmdS.isEmpty()) return;
+    if (sendCmdS.contains("0x", Qt::CaseInsensitive))   //Hex input
+    {
+        sendCmdS = sendCmdS.mid(2);
+        sendCmdA = QByteArray::fromHex(sendCmdS.toLatin1());
+        hex = true;
+    }
+    else sendCmdA = sendCmdS.toUtf8();  //Char input
 
-    unsigned char rcvdCmd[100];
+    QByteArray termCmdA;
+    termCmdA.resize(1);
+    if (ui->radioButton_yaesu->isChecked()) termCmdA[0] = ';';
+    else if (ui->radioButton_icom->isChecked()) termCmdA[0] = 0xfd;
+    else if (ui->radioButton_CR->isChecked()) termCmdA[0] = 0x0d;
+    else if (ui->radioButton_LF->isChecked()) termCmdA[0] = 0x0a;
+    else termCmdA[0] = '\0';
+    unsigned char *termCmd = (unsigned char*)termCmdA.data();
 
+    sendCmdA.append(termCmdA);
+    unsigned char *sendCmd = (unsigned char*)sendCmdA.data();
+    int sendCmdLen = strlen((char*)sendCmd);
+
+    unsigned char rcvdCmd[200];
     int rcvdCmdLen = sizeof(rcvdCmd);
 
-    //qDebug()<<sendCmdS<<(char*)termCmd<<(char*)sendCmd<<sendCmdLen;
+    int retLen = rig_send_raw(my_rig, sendCmd, sendCmdLen, rcvdCmd, rcvdCmdLen, termCmd);
 
-    rig_send_raw(my_rig, sendCmd, sendCmdLen, rcvdCmd, rcvdCmdLen, termCmd);
-
-    //QString rcvdCmdS = rcvdCmd;
-
-    //qDebug()<<(char *)rcvdCmd;
-
+    if (retLen > 0)
+    {
+        QString rcvdCmdS;
+        QByteArray rcvdCmdA(QByteArray::fromRawData((char *)rcvdCmd, retLen));
+        if (hex) rcvdCmdS = rcvdCmdA.toHex();
+        else rcvdCmdS = rcvdCmdA;
+        ui->lineEdit_receive->setText(rcvdCmdS);
+    }
 
     //int rig_send_raw(rig, const unsigned char *send, int send_len, unsigned char *reply, int reply_len, unsigned char *term);
     //send contains the raw command data
