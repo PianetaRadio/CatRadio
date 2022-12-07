@@ -120,6 +120,7 @@ MainWindow::MainWindow(QWidget *parent)
     rigCom.fullPoll = configFile.value("fullPolling", true).toBool();
     guiConf.vfoDisplayMode = configFile.value("vfoDisplayMode", 0).toInt();
     guiConf.darkTheme = configFile.value("darkTheme", false).toBool();
+    guiConf.peakHold = configFile.value("peakHold", true).toBool();
     //Window settings
     restoreGeometry(configFile.value("WindowSettings/geometry").toByteArray());
     restoreState(configFile.value("WindowSettings/state").toByteArray());
@@ -160,6 +161,10 @@ MainWindow::MainWindow(QWidget *parent)
         }
     }
     //Light QFile darkStyleFile(":qdarkstyle/light/lightstyle.qss");
+
+    //Meter Peak hold
+    ui->progressBar_Smeter->setPeak(guiConf.peakHold);
+    ui->progressBar_Smeter->setPeakFactor(rigCom.rigRefresh/1000.0/2);
 
     QApplication::setWheelScrollLines(10);  //Mouse wheel scroll step
 }

@@ -36,9 +36,13 @@ SMeter::SMeter(QWidget *parent) : QWidget(parent)
     shortStep = 10;
     precision = 0;
 
-    meterTx = 0;
+    meterTx = false;
 
     currentValue = -54;
+    peakValue = currentValue;
+    peakFactor = 0.1;
+
+    peakHold = true;
 }
 
 void SMeter::paintEvent(QPaintEvent *)
@@ -53,6 +57,7 @@ void SMeter::paintEvent(QPaintEvent *)
 
     drawMeter(&painter);
     drawProgress(&painter);
+    if (peakHold) drawPeak(&painter);
     drawScaleSMeter(&painter);
     drawScalePWRMeter(&painter);
 }
@@ -94,6 +99,8 @@ void SMeter::drawProgress(QPainter *painter)
     double increment = length / (max - min);
     double initX, initXX;
 
+    if (currentValue>max) currentValue = max;
+
     if (currentValue>gate)
     {
         initX = (gate - min) * increment;
@@ -112,6 +119,47 @@ void SMeter::drawProgress(QPainter *painter)
         QRect rect(1, height()/3+2+1, initX, height()/3-4-2);
         painter->drawRect(rect);
     }
+
+    painter->restore();
+}
+
+void SMeter::drawPeak(QPainter *painter)
+{
+    double max, min;
+
+    painter->save();
+    painter->setPen(Qt::NoPen);
+
+    if (meterTx)    //RF power meter
+    {
+        max = maxValue;
+        min = minValue;
+    }
+    else    //SMeter
+    {
+        max = 60;
+        min = -54;
+    }
+
+    double length = width()-14;
+    double increment = length / (max - min);
+    double initX;
+
+    if (currentValue>=peakValue) peakValue = currentValue;
+    else peakValue = peakValue - peakFactor*(peakValue - currentValue);
+    if (peakValue>max) peakValue = max;
+
+    if (peakValue>=gateValue) painter->setBrush(QColor(Qt::red));
+    else painter->setBrush(progressColor);
+
+    initX = (peakValue - min) * increment;
+
+    QRect rect(initX - 2, height()/3+2+1, 2, height()/3-4-2);
+    painter->drawRect(rect);
+
+    //QPointF topPot = QPointF(initX, height()/3+2+1);
+    //QPointF bottomPot = QPointF(initX, height()*2/3-2-1);
+    //painter->drawLine(topPot, bottomPot);
 
     painter->restore();
 }
@@ -337,4 +385,14 @@ void SMeter::setValue(int value)
 void SMeter::setTx(bool Tx)
 {
     meterTx = Tx;
+}
+
+void SMeter::setPeak(bool Peak)
+{
+    peakHold = Peak;
+}
+
+void SMeter::setPeakFactor(double factor)
+{
+    peakFactor = factor;
 }

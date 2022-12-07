@@ -46,11 +46,14 @@ public slots:
     void setValue(int value);
 
     void setTx(bool Tx);
+    void setPeak(bool Peak);
+    void setPeakFactor(double factor);
 
 protected:
     void paintEvent(QPaintEvent *);
     void drawMeter(QPainter *painter);
     void drawProgress(QPainter *painter);
+    void drawPeak(QPainter *painter);
     void drawScaleSMeter(QPainter *painter);
     void drawScalePWRMeter(QPainter *painter);
 
@@ -64,8 +67,11 @@ private:
 
     double value;   //target value
     double currentValue;    //current value
+    double peakValue;   //peak value
+    double peakFactor;  //peak factor
 
     bool meterTx;  //Switch between SMeter or PowerMeter
+    bool peakHold;  //Peak hold
 
     QColor bgColor; //background color
     QColor lineColor;   //line color
