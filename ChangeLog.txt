@@ -2,6 +2,10 @@ CatRadio
 
 (+ New, * Updated, - Removed)
 
+1.4.0 - 2022-mm-dd
+	* Bug fix: COM port list
+	* Updated to library Hamlib 4.5.1
+
 1.3.0 - 2022-11-24
 	+ Radio info
 	+ Dark theme
