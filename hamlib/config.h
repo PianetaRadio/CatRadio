@@ -5,7 +5,7 @@
 #define ABI_AGE 0
 
 /* Frontend ABI revision */
-#define ABI_REVISION 5
+#define ABI_REVISION 6
 
 /* Frontend ABI version */
 #define ABI_VERSION 4
@@ -321,6 +321,9 @@
 /* Define to 1 if you have the `usleep' function. */
 #define HAVE_USLEEP 1
 
+/* Define if usrp is available */
+/* #undef HAVE_USRP */
+
 /* Define to 1 if you have the <values.h> header file. */
 /* #undef HAVE_VALUES_H */
 
@@ -342,6 +345,9 @@
 /* Define to 1 if you have the <wspiapi.h> header file. */
 #define HAVE_WSPIAPI_H 1
 
+/* Define if libxml2 is available */
+/* #undef HAVE_XML2 */
+
 /* Define to the sub-directory where libtool stores uninstalled libraries. */
 #define LT_OBJDIR ".libs/"
 
@@ -358,7 +364,7 @@
 #define PACKAGE_NAME "Hamlib"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "Hamlib 4.5"
+#define PACKAGE_STRING "Hamlib 4.5.1"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "hamlib"
@@ -367,7 +373,7 @@
 #define PACKAGE_URL "http://www.hamlib.org"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "4.5"
+#define PACKAGE_VERSION "4.5.1"
 
 /* Define to necessary symbol if this constant uses a non-standard name on
    your system. */
@@ -407,7 +413,7 @@
 
 
 /* Version number of package */
-#define VERSION "4.5"
+#define VERSION "4.5.1"
 
 /* Define to 1 if on MINIX. */
 /* #undef _MINIX */
