@@ -38,8 +38,8 @@ SMeter::SMeter(QWidget *parent) : QWidget(parent)
 
     meterTx = false;
 
-    currentValue = -54;
-    peakValue = currentValue;
+    currentValue = minValue;
+    peakValue = minValue;
     peakFactor = 0.1;
 
     peakHold = true;
@@ -156,10 +156,6 @@ void SMeter::drawPeak(QPainter *painter)
 
     QRect rect(initX - 2, height()/3+2+1, 2, height()/3-4-2);
     painter->drawRect(rect);
-
-    //QPointF topPot = QPointF(initX, height()/3+2+1);
-    //QPointF bottomPot = QPointF(initX, height()*2/3-2-1);
-    //painter->drawLine(topPot, bottomPot);
 
     painter->restore();
 }
@@ -319,7 +315,6 @@ void SMeter::drawScaleSMeter(QPainter *painter)
 void SMeter::setMinValue(double value)
 {
     minValue = value;
-    update();
 }
 
 void SMeter::setMaxValue(double value)
@@ -336,19 +331,16 @@ void SMeter::setGateValue(double value)
 void SMeter::setLongStep(double value)
 {
     longStep = value;
-    update();
 }
 
 void SMeter::setShortStep(double value)
 {
     shortStep = value;
-    update();
 }
 
 void SMeter::setPrecision(int value)
 {
     precision = value;
-    update();
 }
 
 void SMeter::setBgColor(QColor color)
@@ -374,7 +366,7 @@ void SMeter::setScaleColor(QColor color)
 void SMeter::setValue(double value)
 {
     currentValue = value;
-    update();
+    update(1, height()/3+2+1, width()-14, height()/3-4-2);
 }
 
 void SMeter::setValue(int value)
@@ -387,6 +379,11 @@ void SMeter::setTx(bool Tx)
     meterTx = Tx;
 }
 
+bool SMeter::getTx()
+{
+    return meterTx;
+}
+
 void SMeter::setPeak(bool Peak)
 {
     peakHold = Peak;
@@ -395,4 +392,10 @@ void SMeter::setPeak(bool Peak)
 void SMeter::setPeakFactor(double factor)
 {
     peakFactor = factor;
+}
+
+void SMeter::resetPeakValue()
+{
+    if (meterTx) peakValue = minValue;
+    else peakValue = -54;
 }

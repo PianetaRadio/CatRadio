@@ -46,8 +46,10 @@ public slots:
     void setValue(int value);
 
     void setTx(bool Tx);
+    bool getTx();
     void setPeak(bool Peak);
     void setPeakFactor(double factor);
+    void resetPeakValue();
 
 protected:
     void paintEvent(QPaintEvent *);

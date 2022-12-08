@@ -162,11 +162,20 @@ MainWindow::MainWindow(QWidget *parent)
     }
     //Light QFile darkStyleFile(":qdarkstyle/light/lightstyle.qss");
 
-    //Meter Peak hold
-    ui->progressBar_Smeter->setPeak(guiConf.peakHold);
+    QApplication::setWheelScrollLines(10);  //Mouse wheel scroll step
+
+    //* Init
+    //Meter
+    ui->progressBar_Smeter->setTx(false);
+    ui->progressBar_Smeter->setMaxValue(100);
+    ui->progressBar_Smeter->setGateValue(80);
+    ui->progressBar_Smeter->setValue(-54);
+    ui->progressBar_Smeter->resetPeakValue();
     ui->progressBar_Smeter->setPeakFactor(rigCom.rigRefresh/1000.0/2);
 
-    QApplication::setWheelScrollLines(10);  //Mouse wheel scroll step
+    //VFO
+    ui->lineEdit_vfoMain->setValue(0);
+    ui->lineEdit_vfoSub->setValue(0);
 }
 
 MainWindow::~MainWindow()
@@ -263,7 +272,9 @@ void MainWindow::guiInit()
         ui->comboBox_AGC->addItem(rig_stragclevel(RIG_AGC_SLOW));
     }
 
-    //* Meter comboBox
+    //* Meters & Sub-meter comboBox
+    //ui->progressBar_Smeter->setMaxValue(5); //FIXME tx_range_list
+    ui->progressBar_Smeter->setPeak(guiConf.peakHold);
     ui->comboBox_Meter->clear();
     if (rig_has_get_level(my_rig, RIG_METER_SWR)) ui->comboBox_Meter->addItem("SWR");
     if (rig_has_get_level(my_rig, RIG_METER_ALC)) ui->comboBox_Meter->addItem("ALC");
@@ -535,25 +546,33 @@ void MainWindow::guiUpdate()
     if (rigGet.ptt == RIG_PTT_ON)
     {
         //ui->pushButton_PTT->setChecked(true);
-
         if (rigGet.vfoTx == rigGet.vfoSub) ui->label_vfoSub->setStyleSheet("QLabel {background-color: red}");
         else ui->label_vfoMain->setStyleSheet("QLabel {background-color: red}");
 
-        ui->progressBar_Smeter->setTx(true);
+        if (!ui->progressBar_Smeter->getTx())
+        {
+            ui->progressBar_Smeter->setTx(true);
+            ui->progressBar_Smeter->setValue(0);
+            ui->progressBar_Smeter->resetPeakValue();
+        }
         ui->progressBar_Smeter->setValue(rigGet.powerMeter.f*100);
         ui->progressBar_subMeter->setValue(rigGet.subMeter.f);
     }
     else    //RIG_PTT_OFF
     {
         //ui->pushButton_PTT->setChecked(false);
-
         if (rigGet.vfoTx == rigGet.vfoSub) ui->label_vfoSub->setStyleSheet("QLabel {}");
         else ui->label_vfoMain->setStyleSheet("QLabel {}");
 
-        ui->progressBar_Smeter->setTx(false);
+        if (ui->progressBar_Smeter->getTx())
+        {
+            ui->progressBar_Smeter->setTx(false);
+            ui->progressBar_Smeter->setValue(-54);
+            ui->progressBar_Smeter->resetPeakValue();
+            if (rigSet.meter == RIG_LEVEL_SWR) ui->progressBar_subMeter->setValue(1.0);
+            else ui->progressBar_subMeter->setValue(0.0);
+        }
         ui->progressBar_Smeter->setValue(rigGet.sMeter.i);
-        if (rigSet.meter == RIG_LEVEL_SWR) ui->progressBar_subMeter->setValue(1.0);
-        else ui->progressBar_subMeter->setValue(0.0);
     }
 
     //* Levels
