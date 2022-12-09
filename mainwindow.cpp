@@ -171,7 +171,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->progressBar_Smeter->setGateValue(80);
     ui->progressBar_Smeter->setValue(-54);
     ui->progressBar_Smeter->resetPeakValue();
-    ui->progressBar_Smeter->setPeakFactor(rigCom.rigRefresh/1000.0/2);
+    ui->progressBar_Smeter->setPeakFactor(rigCom.rigRefresh/1000.0);
 
     //VFO
     ui->lineEdit_vfoMain->setValue(0);

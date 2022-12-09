@@ -126,6 +126,7 @@ void SMeter::drawProgress(QPainter *painter)
 void SMeter::drawPeak(QPainter *painter)
 {
     double max, min;
+    double gate;
 
     painter->save();
     painter->setPen(Qt::NoPen);
@@ -134,11 +135,13 @@ void SMeter::drawPeak(QPainter *painter)
     {
         max = maxValue;
         min = minValue;
+        gate = gateValue;
     }
     else    //SMeter
     {
         max = 60;
         min = -54;
+        gate = 0;
     }
 
     double length = width()-14;
@@ -149,7 +152,7 @@ void SMeter::drawPeak(QPainter *painter)
     else peakValue = peakValue - peakFactor*(peakValue - currentValue);
     if (peakValue>max) peakValue = max;
 
-    if (peakValue>=gateValue) painter->setBrush(QColor(Qt::red));
+    if (peakValue>=gate) painter->setBrush(QColor(Qt::red));
     else painter->setBrush(progressColor);
 
     initX = (peakValue - min) * increment;
