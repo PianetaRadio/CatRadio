@@ -333,7 +333,7 @@ typedef enum {
  */
 /* TODO: kill me, and replace by real AGC delay */
 enum agc_level_e {
-    RIG_AGC_OFF =       0,
+    RIG_AGC_OFF = 0,
     RIG_AGC_SUPERFAST,
     RIG_AGC_FAST,
     RIG_AGC_SLOW,
@@ -341,7 +341,8 @@ enum agc_level_e {
     RIG_AGC_MEDIUM,
     RIG_AGC_AUTO,
     RIG_AGC_LONG,
-    RIG_AGC_ON              /*< Turns AGC ON -- Kenwood -- restores last level set */
+    RIG_AGC_ON,             /*< Turns AGC ON -- Kenwood -- restores last level set */
+    RIG_AGC_NONE            /*< Rig does not have CAT AGC control */
 };
 
 
@@ -3396,6 +3397,7 @@ extern HAMLIB_EXPORT(int) rig_set_vfo_opt(RIG *rig, int status);
 extern HAMLIB_EXPORT(int) rig_get_vfo_info(RIG *rig, vfo_t vfo, freq_t *freq, rmode_t *mode, pbwidth_t *width, split_t *split, int *satmode);
 extern HAMLIB_EXPORT(int) rig_get_rig_info(RIG *rig, char *response, int max_response_len);
 extern HAMLIB_EXPORT(int) rig_get_cache(RIG *rig, vfo_t vfo, freq_t *freq, int * cache_ms_freq, rmode_t *mode, int *cache_ms_mode, pbwidth_t *width, int *cache_ms_width);
+extern HAMLIB_EXPORT(int) rig_get_cache_freq(RIG *rig, vfo_t vfo, freq_t *freq, int * cache_ms_freq);
 
 extern HAMLIB_EXPORT(int) rig_set_clock(RIG *rig, int year, int month, int day, int hour, int min, int sec, double msec, int utc_offset);
 extern HAMLIB_EXPORT(int) rig_get_clock(RIG *rig, int *year, int *month, int *day, int *hour, int *min, int *sec, double *msec, int *utc_offset);
@@ -3425,6 +3427,8 @@ extern HAMLIB_EXPORT(char*) rig_make_md5(char *pass);
 
 extern HAMLIB_EXPORT(int) rig_set_lock_mode(RIG *rig, int lock);
 extern HAMLIB_EXPORT(int) rig_get_lock_mode(RIG *rig, int *lock);
+
+extern HAMLIB_EXPORT(int) rig_is_model(RIG *rig, rig_model_t model);
 
 
 //! @endcond
