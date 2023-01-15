@@ -79,14 +79,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     timer = new QTimer(this);   //timer for rigDaemon thread call
 
-    //* Debug
-    rig_set_debug_level(RIG_DEBUG_WARN);  //normal
-    //rig_set_debug_level(RIG_DEBUG_VERBOSE); //debug verbose
-    //rig_set_debug_level(RIG_DEBUG_TRACE);   //debug trace
-    rig_set_debug_time_stamp(true);
-    if ((debugFile=fopen("catradio.log","w+")) == NULL) rig_set_debug_level(RIG_DEBUG_NONE);
-    else rig_set_debug_file(debugFile);
-
     //* Signal and Slot connection for Slider and associated Label
     connect(ui->verticalSlider_RFpower, &QAbstractSlider::valueChanged, ui->label_RFpowerValue, QOverload<int>::of(&QLabel::setNum));
     connect(ui->verticalSlider_RFgain, &QAbstractSlider::valueChanged, ui->label_RFgainValue, QOverload<int>::of(&QLabel::setNum));
@@ -121,9 +113,19 @@ MainWindow::MainWindow(QWidget *parent)
     guiConf.vfoDisplayMode = configFile.value("vfoDisplayMode", 0).toInt();
     guiConf.darkTheme = configFile.value("darkTheme", false).toBool();
     guiConf.peakHold = configFile.value("peakHold", true).toBool();
+    guiConf.debugMode = configFile.value("debugMode", false).toBool();
     //Window settings
     restoreGeometry(configFile.value("WindowSettings/geometry").toByteArray());
     restoreState(configFile.value("WindowSettings/state").toByteArray());
+
+    //* Debug
+    if (guiConf.debugMode) rig_set_debug_level(RIG_DEBUG_VERBOSE); //debug verbose
+    else rig_set_debug_level(RIG_DEBUG_WARN);  //normal
+    //rig_set_debug_level(RIG_DEBUG_VERBOSE); //debug verbose
+    //rig_set_debug_level(RIG_DEBUG_TRACE);   //debug trace
+    rig_set_debug_time_stamp(true);
+    if ((debugFile=fopen("catradio.log","w+")) == NULL) rig_set_debug_level(RIG_DEBUG_NONE);
+    else rig_set_debug_file(debugFile);
 
     //* Style
     //ui->pushButton_PTT->setStyleSheet("QPushButton::checked {font: bold; color: red;}");
@@ -360,7 +362,7 @@ void MainWindow::guiInit()
     //}
 
     //* Menu
-    //ui->action_Command->setEnabled(true);
+    ui->action_Command->setEnabled(true);
     ui->action_RadioInfo->setEnabled(true);
 
     guiCmd.rangeList = 1;   //update range list

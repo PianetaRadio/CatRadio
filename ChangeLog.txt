@@ -3,6 +3,7 @@ CatRadio
 (+ New, * Updated, - Removed)
 
 1.4.0 - 2022-mm-dd
+	+ Debug mode
 	* Bug fix: COM port list
 	* Updated to library Hamlib 4.5.4
 

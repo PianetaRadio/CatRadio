@@ -20,6 +20,7 @@ DialogSetup::DialogSetup(QWidget *parent) :
    if (guiConf.vfoDisplayMode) ui->radioButton_vfoDispMode_UD->setChecked(true);
    if (guiConf.darkTheme) ui->radioButton_themeDark->setChecked(true);
    if (guiConf.peakHold) ui->checkBox_peakHold->setChecked(true);
+   if (guiConf.debugMode) ui->checkBox_debug->setChecked(true);
 }
 
 DialogSetup::~DialogSetup()
@@ -41,10 +42,12 @@ void DialogSetup::on_buttonBox_accepted()
 
     guiConf.vfoDisplayMode = ui->radioButton_vfoDispMode_UD->isChecked();
     guiConf.darkTheme = ui->radioButton_themeDark->isChecked();
+    guiConf.debugMode = ui->checkBox_debug->isChecked();
 
     //* Save settings in catradio.ini
     QSettings configFile(QString("catradio.ini"), QSettings::IniFormat);
     configFile.setValue("vfoDisplayMode", guiConf.vfoDisplayMode);
     configFile.setValue("darkTheme", guiConf.darkTheme);
     configFile.setValue("peakHold", guiConf.peakHold);
+    configFile.setValue("debugMode", guiConf.debugMode);
 }
