@@ -3,7 +3,7 @@ CatRadio
 (+ New, * Updated, - Removed)
 
 1.4.0 - 2023-mm-dd
-	+ Meter peak indicator
+	+ Meter peak hold indicator
 	+ Debug mode
 	* Power status improvement
 	* Bug fix: COM port list

@@ -20,7 +20,6 @@
 #include "submeter.h"
 #include <QPainter>
 #include <math.h>
-#include <QDebug>
 
 SubMeter::SubMeter(QWidget *parent) : QWidget(parent)
 {
@@ -40,6 +39,10 @@ SubMeter::SubMeter(QWidget *parent) : QWidget(parent)
     meterSWR = 0;
 
     currentValue = 0;
+    peakValue = minValue;
+    peakFactor = 0.1;
+
+    peakHold = true;
 }
 
 void SubMeter::paintEvent(QPaintEvent *)
@@ -54,6 +57,7 @@ void SubMeter::paintEvent(QPaintEvent *)
 
     drawMeter(&painter);
     drawProgress(&painter);
+    if (peakHold) drawPeak(&painter);
     drawScale(&painter);
 }
 
@@ -112,6 +116,38 @@ void SubMeter::drawProgress(QPainter *painter)
         QRect rect(1, height()/3+2+1, initX, height()/3-4-2);
         painter->drawRect(rect);
     }
+
+    painter->restore();
+}
+
+void SubMeter::drawPeak(QPainter *painter)
+{
+    double max, min;
+    double gate;
+
+    painter->save();
+    painter->setPen(Qt::NoPen);
+
+    max = maxValue;
+    min = minValue;
+    gate = gateValue;
+    if (meterSWR) min = 1;   //SWR meter
+
+    double length = width()-14;
+    double increment = length / (max - min);
+    double initX;
+
+    if (currentValue>=peakValue) peakValue = currentValue;
+    else peakValue = peakValue - peakFactor*(peakValue - currentValue);
+    if (peakValue>max) peakValue = max;
+
+    if (peakValue>gate) painter->setBrush(QColor(Qt::red));
+    else painter->setBrush(progressColor);
+
+    initX = (peakValue - min) * increment;
+
+    QRect rect(initX - 2, height()/3+2+1, 2, height()/3-4-2);
+    painter->drawRect(rect);
 
     painter->restore();
 }
@@ -275,4 +311,20 @@ void SubMeter::setValue(int value)
 void SubMeter::setMeterSWR(bool swr)
 {
     meterSWR = swr;
+}
+
+void SubMeter::setPeak(bool Peak)
+{
+    peakHold = Peak;
+}
+
+void SubMeter::setPeakFactor(double factor)
+{
+    peakFactor = factor;
+}
+
+void SubMeter::resetPeakValue()
+{
+    if (!meterSWR) peakValue = minValue;
+    else peakValue = 1.0;
 }

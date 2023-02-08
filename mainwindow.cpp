@@ -174,6 +174,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->progressBar_Smeter->setValue(-54);
     ui->progressBar_Smeter->resetPeakValue();
     ui->progressBar_Smeter->setPeakFactor(rigCom.rigRefresh/1000.0);
+    ui->progressBar_subMeter->resetPeakValue();
+    ui->progressBar_subMeter->setPeakFactor(rigCom.rigRefresh/1000.0);
 
     //VFO
     ui->lineEdit_vfoMain->setValue(0);
@@ -277,6 +279,7 @@ void MainWindow::guiInit()
     //* Meters & Sub-meter comboBox
     //ui->progressBar_Smeter->setMaxValue(5); //FIXME tx_range_list
     ui->progressBar_Smeter->setPeak(guiConf.peakHold);
+    ui->progressBar_subMeter->setPeak(guiConf.peakHold);
     ui->comboBox_Meter->clear();
     if (rig_has_get_level(my_rig, RIG_METER_SWR)) ui->comboBox_Meter->addItem("SWR");
     if (rig_has_get_level(my_rig, RIG_METER_ALC)) ui->comboBox_Meter->addItem("ALC");
@@ -702,6 +705,8 @@ void MainWindow::setSubMeter()
         ui->progressBar_subMeter->setShortStep(0.1);
         ui->progressBar_subMeter->setValue(0);
     }
+
+    ui->progressBar_subMeter->resetPeakValue();
 }
 
 

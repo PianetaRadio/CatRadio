@@ -46,10 +46,15 @@ public slots:
 
     void setMeterSWR(bool swr);
 
+    void setPeak(bool Peak);
+    void setPeakFactor(double factor);
+    void resetPeakValue();
+
 protected:
     void paintEvent(QPaintEvent *);
     void drawMeter(QPainter *painter);
     void drawProgress(QPainter *painter);
+    void drawPeak(QPainter *painter);
     void drawScale(QPainter *painter);
 
 private:
@@ -64,6 +69,10 @@ private:
 
     double value;   //target value
     double currentValue;    //current value
+    double peakValue;   //peak value
+    double peakFactor;  //peak factor
+
+    bool peakHold;  //Peak hold
 
     QColor bgColor; //background color
     QColor lineColor;   //line color
