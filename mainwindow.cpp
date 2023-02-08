@@ -730,7 +730,13 @@ void MainWindow::on_pushButton_Connect_toggled(bool checked)
             guiInit();
             connectMsg = "Connected to ";
             connectMsg.append(my_rig->caps->model_name);
-            if (rigCap.onoff == 0 || rigGet.onoff == RIG_POWER_ON || rigGet.onoff == RIG_POWER_UNKNOWN) timer->start(rigCom.rigRefresh);
+            if (rigCap.onoff == 0 || rigGet.onoff == RIG_POWER_ON || rigGet.onoff == RIG_POWER_UNKNOWN)
+            {
+                freq_t retfreq;
+                retcode = rig_get_freq(my_rig, RIG_VFO_CURR, &retfreq); //double check if rig is on by getting the current frequency
+                if (retcode == RIG_OK) timer->start(rigCom.rigRefresh);
+                else rigGet.onoff = RIG_POWER_OFF;
+            }
         }
     }
     else if (rigCom.connected)   //Button unchecked
