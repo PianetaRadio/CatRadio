@@ -377,7 +377,12 @@ void MainWindow::guiInit()
 void MainWindow::guiUpdate()
 {
     //* Power button
-    if (rigGet.onoff == RIG_POWER_ON || rigGet.onoff == RIG_POWER_UNKNOWN) ui->pushButton_Power->setChecked(true);
+    if (rigGet.onoff == RIG_POWER_ON) ui->pushButton_Power->setChecked(true);
+    else if (rigGet.onoff == RIG_POWER_OFF)
+    {
+        if(timer->isActive()) timer->stop();
+        ui->pushButton_Power->setChecked(false);
+    }
 
     //* VFOs
     if (!rigCmd.freqMain) ui->lineEdit_vfoMain->setValue(rigGet.freqMain);
@@ -742,7 +747,11 @@ void MainWindow::on_pushButton_Connect_toggled(bool checked)
             {
                 freq_t retfreq;
                 retcode = rig_get_freq(my_rig, RIG_VFO_CURR, &retfreq); //double check if rig is on by getting the current frequency
-                if (retcode == RIG_OK) timer->start(rigCom.rigRefresh);
+                if (retcode == RIG_OK)
+                {
+                    rigGet.onoff = RIG_POWER_ON;    //force it for rigCap.onoff = 0 || rigGet.onoff = RIG_POWER_UNKNOWN
+                    timer->start(rigCom.rigRefresh);
+                }
                 else rigGet.onoff = RIG_POWER_OFF;
             }
         }
@@ -750,7 +759,7 @@ void MainWindow::on_pushButton_Connect_toggled(bool checked)
     else if (rigCom.connected)   //Button unchecked
     {
         rigCom.connected = 0;
-        timer->stop();
+        if(timer->isActive()) timer->stop();
         rig_close(my_rig);  //Close the communication to the rig
         connectMsg = "Disconnected";
         //rig_cleanup(my_rig);    //Release rig handle and free associated memory
@@ -773,12 +782,13 @@ void MainWindow::on_pushButton_Power_toggled(bool checked)
     }
     else if (!checked && rigGet.onoff)
     {
-        retcode = rig_set_powerstat(my_rig, RIG_POWER_OFF);
-        if (retcode == RIG_OK)
-        {
-            ui->pushButton_Power->setChecked(false);  //Uncheck the button
-            timer->stop();
-        }
+        rigCmd.onoff = 1;
+        //retcode = rig_set_powerstat(my_rig, RIG_POWER_OFF);
+        //if (retcode == RIG_OK)
+        //{
+        //    ui->pushButton_Power->setChecked(false);  //Uncheck the button
+        //    timer->stop();
+        //}
     }
 }
 

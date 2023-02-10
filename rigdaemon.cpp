@@ -159,6 +159,14 @@ void RigDaemon::rigUpdate(RIG *my_rig)
         //***** Command execution *****
         if (!rigGet.ptt && !rigSet.ptt)
         {
+            //* Power off
+            if (rigCmd.onoff && rigCap.onoff)
+            {
+                retcode = rig_set_powerstat(my_rig, RIG_POWER_OFF);
+                if (retcode == RIG_OK) rigGet.onoff = RIG_POWER_OFF;
+            }
+            rigCmd.onoff = 0;
+
             //* Mode
             if (rigCmd.mode && rigSet.mode != RIG_MODE_NONE)    //VFO Main
             {
