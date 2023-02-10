@@ -382,6 +382,7 @@ void MainWindow::guiUpdate()
     {
         if(timer->isActive()) timer->stop();
         ui->pushButton_Power->setChecked(false);
+        ui->statusbar->showMessage("Power off");
     }
 
     //* VFOs
