@@ -574,10 +574,13 @@ void MainWindow::guiUpdate()
             ui->progressBar_Smeter->setTx(false);
             ui->progressBar_Smeter->setValue(-54);
             ui->progressBar_Smeter->resetPeakValue();
-            if (rigSet.meter == RIG_LEVEL_SWR) ui->progressBar_subMeter->setValue(1.0);
-            else ui->progressBar_subMeter->setValue(0.0);
+            //if (rigSet.meter == RIG_LEVEL_SWR) ui->progressBar_subMeter->setValue(1.0);
+            //else ui->progressBar_subMeter->setValue(0.0);
+            //ui->progressBar_subMeter->resetPeakValue();
         }
         ui->progressBar_Smeter->setValue(rigGet.sMeter.i);
+        if (rigSet.meter == RIG_LEVEL_SWR) ui->progressBar_subMeter->setValue(1.0);
+        else ui->progressBar_subMeter->setValue(0.0);
     }
 
     //* Levels
