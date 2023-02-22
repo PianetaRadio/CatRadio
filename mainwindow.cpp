@@ -382,7 +382,7 @@ void MainWindow::guiUpdate()
     {
         if(timer->isActive()) timer->stop();
         ui->pushButton_Power->setChecked(false);
-        ui->statusbar->showMessage("Power off");
+        ui->statusbar->showMessage("Radio off");
     }
 
     //* VFOs
@@ -779,7 +779,11 @@ void MainWindow::on_pushButton_Power_toggled(bool checked)
             ui->pushButton_Power->setChecked(false);  //Uncheck the button
             ui->statusbar->showMessage(rigerror(retcode));
         }
-        else timer->start(rigCom.rigRefresh);
+        else
+        {
+            rigGet.onoff = RIG_POWER_ON;
+            timer->start(rigCom.rigRefresh);
+        }
     }
     else if (!checked && rigGet.onoff)
     {
