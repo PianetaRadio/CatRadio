@@ -42,6 +42,7 @@ void DialogSetup::on_buttonBox_accepted()
 
     guiConf.vfoDisplayMode = ui->radioButton_vfoDispMode_UD->isChecked();
     guiConf.darkTheme = ui->radioButton_themeDark->isChecked();
+    guiConf.peakHold = ui->checkBox_peakHold->isChecked();
     guiConf.debugMode = ui->checkBox_debug->isChecked();
 
     //* Save settings in catradio.ini

@@ -134,7 +134,7 @@ void SubMeter::drawPeak(QPainter *painter)
     if (meterSWR) min = 1;   //SWR meter
 
     double length = width()-14;
-    double increment = length / (max - min);
+    double increment;
     double initX;
 
     if (currentValue>=peakValue) peakValue = currentValue;
@@ -144,7 +144,17 @@ void SubMeter::drawPeak(QPainter *painter)
     if (peakValue>gate) painter->setBrush(QColor(Qt::red));
     else painter->setBrush(progressColor);
 
-    initX = (peakValue - min) * increment;
+    if (meterSWR)
+    {
+        increment = length / (10 * log10(maxValue));
+        initX = 10 * log10(peakValue) * increment;
+    }
+    else
+    {
+        increment = length / (max - min);
+        initX = (peakValue - min) * increment;
+    }
+    //initX = (peakValue - min) * increment;
 
     QRect rect(initX - 2, height()/3+2+1, 2, height()/3-4-2);
     painter->drawRect(rect);
