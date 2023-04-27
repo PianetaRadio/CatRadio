@@ -1540,7 +1540,7 @@ void MainWindow::on_action_AboutCatRadio_triggered()
     msgBox.setTextFormat(Qt::RichText);
     QString version = QString::number(VERSION_MAJ)+"."+QString::number(VERSION_MIN)+"."+QString::number(VERSION_MIC);
     msgBox.setText("<b>CatRadio</b> <i>Radio control software</i><br/>version "+version+" "+RELEASE_DATE);
-    msgBox.setInformativeText("<p>Copyright (C) 2022 Gianfranco Sordetti IZ8EWD<br/>"
+    msgBox.setInformativeText("<p>Copyright (C) 2022-2023 Gianfranco Sordetti IZ8EWD<br/>"
                               "<a href='https://www.pianetaradio.it' style='color: #668fb8'>www.pianetaradio.it</a></p>"
                               "<p>This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.<br/>"
                               "This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.<br/>"
