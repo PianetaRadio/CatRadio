@@ -759,11 +759,23 @@ void MainWindow::on_pushButton_Connect_toggled(bool checked)
     }
     else if (rigCom.connected)   //Button unchecked
     {
-        rigCom.connected = 0;
-        if(timer->isActive()) timer->stop();
-        rig_close(my_rig);  //Close the communication to the rig
-        connectMsg = "Disconnected";
-        //rig_cleanup(my_rig);    //Release rig handle and free associated memory
+        if (rigSet.ptt == RIG_PTT_OFF)  //Disconnect only if PTT off
+        {
+            rigCom.connected = 0;
+            if(timer->isActive()) timer->stop();
+            rig_close(my_rig);  //Close the communication to the rig
+            connectMsg = "Disconnected";
+            //rig_cleanup(my_rig);    //Release rig handle and free associated memory
+
+            //Reset meters
+            ui->progressBar_Smeter->setValue(-54);
+            setSubMeter();
+        }
+        else
+        {
+            ui->pushButton_Connect->setChecked(false);  //Uncheck the button
+            connectMsg = "Warning PTT on!";
+        }
     }
 
     ui->statusbar->showMessage(connectMsg);
