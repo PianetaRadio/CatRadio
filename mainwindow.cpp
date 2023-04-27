@@ -1207,44 +1207,65 @@ void MainWindow::on_vfoDisplaySubValueChanged(int value)
 
 void MainWindow::on_comboBox_Mode_activated(int index)
 {
-    rigSet.mode = rig_parse_mode(ui->comboBox_Mode->itemText(index).toLatin1());
-    rigCmd.mode = 1;
+    if (!rigCmd.mode)
+    {
+        rigSet.mode = rig_parse_mode(ui->comboBox_Mode->itemText(index).toLatin1());
+        rigCmd.mode = 1;
+    }
 }
 
 void MainWindow::on_comboBox_ModeSub_activated(int index)
 {
-    rigSet.modeSub = rig_parse_mode(ui->comboBox_ModeSub->itemText(index).toLatin1());
-    rigCmd.modeSub = 1;
+    if (!rigCmd.modeSub)
+    {
+        rigSet.modeSub = rig_parse_mode(ui->comboBox_ModeSub->itemText(index).toLatin1());
+        rigCmd.modeSub = 1;
+    }
 }
 
 void MainWindow::on_comboBox_BW_activated(int index)
 {
-    rigSet.bwidth = ui->comboBox_BW->itemText(index).toInt();
-    rigCmd.bwidth = 1;
+    if (!rigCmd.bwidth)
+    {
+        rigSet.bwidth = ui->comboBox_BW->itemText(index).toInt();
+        rigCmd.bwidth = 1;
+    }
 }
 
 void MainWindow::on_comboBox_AGC_activated(int index)
 {
-    rigSet.agc = levelagcstr(ui->comboBox_AGC->itemText(index));
-    rigCmd.agc = 1;
+    if (!rigCmd.agc)
+    {
+        rigSet.agc = levelagcstr(ui->comboBox_AGC->itemText(index));
+        rigCmd.agc = 1;
+    }
 }
 
 void MainWindow::on_comboBox_Att_activated(int index)
 {
-    rigSet.att = ui->comboBox_Att->itemText(index).toInt();
-    rigCmd.att = 1;
+    if (!rigCmd.att)
+    {
+        rigSet.att = ui->comboBox_Att->itemText(index).toInt();
+        rigCmd.att = 1;
+    }
 }
 
 void MainWindow::on_comboBox_Preamp_activated(int index)
 {
-    rigSet.pre = ui->comboBox_Preamp->itemText(index).toInt();
-    rigCmd.pre = 1;
+    if (!rigCmd.pre)
+    {
+        rigSet.pre = ui->comboBox_Preamp->itemText(index).toInt();
+        rigCmd.pre = 1;
+    }
 }
 
 void MainWindow::on_comboBox_Ant_activated(int index)
 {
-    rigSet.ant = antstr(ui->comboBox_Ant->itemText(index));
-    rigCmd.ant = 1;
+    if (!rigCmd.ant)
+    {
+        rigSet.ant = antstr(ui->comboBox_Ant->itemText(index));
+        rigCmd.ant = 1;
+    }
 }
 
 void MainWindow::on_comboBox_Meter_activated(int index)
@@ -1285,20 +1306,29 @@ void MainWindow::on_comboBox_toneFreq_activated(int index)
 
 void MainWindow::on_spinBox_NR_valueChanged(int arg1)
 {
-    rigSet.noiseReductionLevel = arg1;
-    rigCmd.noiseReductionLevel = 1;
+    if (!rigCmd.noiseReductionLevel)
+    {
+        rigSet.noiseReductionLevel = arg1;
+        rigCmd.noiseReductionLevel = 1;
+    }
 }
 
 void MainWindow::on_spinBox_WPM_valueChanged(int arg1)
 {
-    rigSet.wpm = arg1;
-    rigCmd.wpm = 1;
+    if (!rigCmd.wpm)
+    {
+        rigSet.wpm = arg1;
+        rigCmd.wpm = 1;
+    }
 }
 
 void MainWindow::on_spinBox_RPToffset_valueChanged(int arg1)
 {
-    rigSet.rptOffset = arg1*1000;
-    rigCmd.rptOffset = 1;
+    if (!rigCmd.rptOffset)
+    {
+        rigSet.rptOffset = arg1*1000;
+        rigCmd.rptOffset = 1;
+    }
 }
 
 //***** Slider *****
