@@ -377,12 +377,30 @@ void MainWindow::guiInit()
 void MainWindow::guiUpdate()
 {
     //* Power button
-    if (rigGet.onoff == RIG_POWER_ON) ui->pushButton_Power->setChecked(true);
+    if (rigGet.onoff == RIG_POWER_ON)
+    {
+        ui->pushButton_Power->setChecked(true);
+        //ui->pushButton_Power->setStyleSheet("QPushButton {color: limegreen;}");
+    }
     else if (rigGet.onoff == RIG_POWER_OFF)
     {
-        if(timer->isActive()) timer->stop();
-        ui->pushButton_Power->setChecked(false);
-        ui->statusbar->showMessage("Radio off");
+        if(timer->isActive())
+        {
+            timer->stop();
+
+            ui->pushButton_Power->setChecked(false);
+            //ui->pushButton_Power->setStyleSheet("");
+
+            //Reset Smeter
+            rigGet.sMeter.i = -54;
+            ui->progressBar_Smeter->resetPeakValue();
+
+            //Reset VFOs
+            rigGet.freqMain = 0;
+            rigGet.freqSub = 0;
+
+            ui->statusbar->showMessage("Radio off");
+        }
     }
 
     //* VFOs
@@ -769,6 +787,7 @@ void MainWindow::on_pushButton_Connect_toggled(bool checked)
 
             //Reset meters
             ui->progressBar_Smeter->setValue(-54);
+            ui->progressBar_Smeter->resetPeakValue();
             setSubMeter();
         }
         else
@@ -800,12 +819,7 @@ void MainWindow::on_pushButton_Power_toggled(bool checked)
     else if (!checked && rigGet.onoff)
     {
         rigCmd.onoff = 1;
-        //retcode = rig_set_powerstat(my_rig, RIG_POWER_OFF);
-        //if (retcode == RIG_OK)
-        //{
-        //    ui->pushButton_Power->setChecked(false);  //Uncheck the button
-        //    timer->stop();
-        //}
+        //Note: the onoff command works only if the PTT is off (see rigdaemon.cpp)
     }
 }
 
