@@ -1129,7 +1129,7 @@
     <widget class="SubMeter" name="progressBar_subMeter" native="true">
      <property name="geometry">
       <rect>
-       <x>250</x>
+       <x>240</x>
        <y>0</y>
        <width>161</width>
        <height>61</height>
@@ -1144,6 +1144,19 @@
        <width>75</width>
        <height>24</height>
       </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_hiSWR">
+     <property name="geometry">
+      <rect>
+       <x>410</x>
+       <y>0</y>
+       <width>63</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Hi SWR</string>
      </property>
     </widget>
    </widget>

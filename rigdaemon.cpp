@@ -149,7 +149,13 @@ void RigDaemon::rigUpdate(RIG *my_rig)
         if (rigGet.ptt == 1 || rigSet.ptt == 1)
         {
             rig_get_level(my_rig, RIG_VFO_CURR, RIG_LEVEL_RFPOWER_METER, &rigGet.powerMeter);
-            rig_get_level(my_rig, RIG_VFO_CURR, rigSet.meter, &rigGet.subMeter);
+            if (rigSet.meter != RIG_METER_NONE) rig_get_level(my_rig, RIG_VFO_CURR, rigSet.meter, &rigGet.subMeter);
+
+            if (rig_has_get_level(my_rig, RIG_METER_SWR) && (rigSet.meter != RIG_LEVEL_SWR))
+            {
+                rig_get_level(my_rig, RIG_VFO_CURR, RIG_LEVEL_SWR, &rigGet.hiSWR);
+            }
+            else if (rigSet.meter == RIG_LEVEL_SWR) rigGet.hiSWR = rigGet.subMeter;
         }
         else
         {

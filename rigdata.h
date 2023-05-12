@@ -51,6 +51,7 @@ typedef struct {
     value_t sMeter; //Smeter signal strenght
     value_t powerMeter; //RF power meter
     value_t subMeter; //secondary meter
+    value_t hiSWR;  //SWR level for Hi SWR indicator
     unsigned long long meter; //secondary meter type
     float rfPower;    //RF power output level
     float rfGain;   //RF gain rx

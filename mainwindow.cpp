@@ -288,6 +288,7 @@ void MainWindow::guiInit()
     if (rig_has_get_level(my_rig, RIG_METER_VDD)) ui->comboBox_Meter->addItem("VDD");
     rigSet.meter = levelmeterstr (ui->comboBox_Meter->currentText());
     setSubMeter();
+    ui->label_hiSWR->setVisible(false);
 
     //* Attenuator comboBox
     ui->comboBox_Att->clear();
@@ -586,6 +587,7 @@ void MainWindow::guiUpdate()
         }
         ui->progressBar_Smeter->setValue(rigGet.powerMeter.f*100);
         ui->progressBar_subMeter->setValue(rigGet.subMeter.f);
+        if (rigGet.hiSWR.f > 2) ui->label_hiSWR->setVisible(true);
     }
     else    //RIG_PTT_OFF
     {
@@ -598,6 +600,7 @@ void MainWindow::guiUpdate()
             ui->progressBar_Smeter->setTx(false);
             ui->progressBar_Smeter->setValue(-54);
             ui->progressBar_Smeter->resetPeakValue();
+            ui->label_hiSWR->setVisible(false);
             //if (rigSet.meter == RIG_LEVEL_SWR) ui->progressBar_subMeter->setValue(1.0);
             //else ui->progressBar_subMeter->setValue(0.0);
             //ui->progressBar_subMeter->resetPeakValue();
