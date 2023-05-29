@@ -110,6 +110,7 @@ MainWindow::MainWindow(QWidget *parent)
     rigCom.netRigctl = configFile.value("netRigctl", false).toBool();
     rigCom.rigRefresh = configFile.value("rigRefresh", 100).toInt();
     rigCom.fullPoll = configFile.value("fullPolling", true).toBool();
+    rigCom.autoPowerOn = configFile.value("autoPowerOn", false).toBool();
     guiConf.vfoDisplayMode = configFile.value("vfoDisplayMode", 0).toInt();
     guiConf.darkTheme = configFile.value("darkTheme", false).toBool();
     guiConf.peakHold = configFile.value("peakHold", true).toBool();
@@ -768,8 +769,8 @@ void MainWindow::on_pushButton_Connect_toggled(bool checked)
             if (rigCap.onoff == 0 || rigGet.onoff == RIG_POWER_ON || rigGet.onoff == RIG_POWER_UNKNOWN)
             {
                 freq_t retfreq;
-                retcode = rig_get_freq(my_rig, RIG_VFO_CURR, &retfreq); //double check if rig is on by getting the current frequency
-                if (retcode == RIG_OK)
+                retcode = rig_get_freq(my_rig, RIG_VFO_CURR, &retfreq); //double check if rig is on, by getting the current frequency
+                if (retcode==RIG_OK && retfreq!=0)
                 {
                     rigGet.onoff = RIG_POWER_ON;    //force it for rigCap.onoff = 0 || rigGet.onoff = RIG_POWER_UNKNOWN
                     timer->start(rigCom.rigRefresh);

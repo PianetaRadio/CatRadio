@@ -158,8 +158,8 @@
      <property name="title">
       <string>Options</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout">
-      <item>
+     <layout class="QFormLayout" name="formLayout_3">
+      <item row="0" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
          <widget class="QLabel" name="label_RefreshRate">
@@ -202,10 +202,20 @@
         </item>
        </layout>
       </item>
-      <item>
+      <item row="0" column="1">
        <widget class="QCheckBox" name="checkBox_fullPoll">
         <property name="text">
          <string>Full polling</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QCheckBox" name="checkBox_autoPowerOn">
+        <property name="text">
+         <string>Auto Power ON</string>
         </property>
        </widget>
       </item>
@@ -230,7 +240,6 @@
   <tabstop>comboBox_serialSpeed</tabstop>
   <tabstop>lineEdit_civAddr</tabstop>
   <tabstop>spinBox_RefreshRate</tabstop>
-  <tabstop>checkBox_fullPoll</tabstop>
   <tabstop>checkBox_netRigctl</tabstop>
   <tabstop>lineEdit_ip</tabstop>
  </tabstops>

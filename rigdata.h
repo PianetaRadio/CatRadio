@@ -35,6 +35,7 @@ typedef struct {
     unsigned rigRefresh;    //GUI refresh interval (ms)
     int connected;  //connected flag
     bool fullPoll;  //full polling flag
+    bool autoPowerOn;   //Auto Power ON flag
 } rigConnect;
 
 typedef struct {

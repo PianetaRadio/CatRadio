@@ -66,7 +66,6 @@ RIG *RigDaemon::rigConnect(int *retcode)
             //myport.type.rig = RIG_PORT_NETWORK;
             strncpy(my_rig->state.rigport.pathname, rigCom.rigPort.toLatin1(), HAMLIB_FILPATHLEN - 1);
             my_rig->state.vfo_opt = 1;
-            my_rig->state.auto_power_on = 1;
             //strncpy(my_rig->state.rigport.pathname, RIG_FILE, HAMLIB_FILPATHLEN - 1);
         }
         else
@@ -85,6 +84,8 @@ RIG *RigDaemon::rigConnect(int *retcode)
                 rig_set_conf(my_rig, rig_token_lookup(my_rig, "civaddr"), civaddr);
             }
         }
+
+        if (rigCom.autoPowerOn) my_rig->state.auto_power_on = 1;
 
         *retcode = rig_open(my_rig);
 

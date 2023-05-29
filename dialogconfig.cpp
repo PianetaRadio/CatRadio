@@ -108,6 +108,7 @@ DialogConfig::DialogConfig(QWidget *parent) :
     }
     ui->spinBox_RefreshRate->setValue(rigCom.rigRefresh);
     ui->checkBox_fullPoll->setChecked(rigCom.fullPoll);
+    ui->checkBox_autoPowerOn->setChecked(rigCom.autoPowerOn);
 }
 
 DialogConfig::~DialogConfig()
@@ -172,6 +173,7 @@ void DialogConfig::on_buttonBox_accepted()
 
     rigCom.rigRefresh = ui->spinBox_RefreshRate->value();
     rigCom.fullPoll = ui->checkBox_fullPoll->isChecked();
+    rigCom.autoPowerOn = ui->checkBox_autoPowerOn->isChecked();
 
     //* Save settings in catradio.ini
     QSettings configFile(QString("catradio.ini"), QSettings::IniFormat);
@@ -182,6 +184,7 @@ void DialogConfig::on_buttonBox_accepted()
     configFile.setValue("netRigctl", ui->checkBox_netRigctl->isChecked());
     configFile.setValue("rigRefresh", ui->spinBox_RefreshRate->value());
     configFile.setValue("fullPolling", ui->checkBox_fullPoll->isChecked());
+    configFile.setValue("autoPowerOn", ui->checkBox_autoPowerOn->isChecked());
 }
 
 int printRigList(const struct rig_caps *rigCaps, void *data)    //Load rig list from hamlib and save into file rig.lst
