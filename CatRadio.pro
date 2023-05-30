@@ -53,10 +53,11 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 LIBS += -L$$PWD/hamlib/ -lhamlib
 INCLUDEPATH += $$PWD/hamlib
 
+# RESOURCES += theme/breeze.qrc
 RESOURCES += qdarkstyle/dark/darkstyle.qrc
 # RESOURCES += qdarkstyle/light/lightstyle.qrc
 
-VERSION = 1.3.0
+VERSION = 1.4.0
 
 RC_ICONS = catradio.ico
 

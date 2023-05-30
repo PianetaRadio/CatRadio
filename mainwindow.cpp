@@ -420,8 +420,8 @@ void MainWindow::guiUpdate()
     ui->label_vfoSub->setText(rig_strvfo(rigGet.vfoSub));
 
     //* Mode
-    ui->comboBox_Mode->setCurrentText(rig_strrmode(rigGet.mode));
-    ui->comboBox_ModeSub->setCurrentText(rig_strrmode(rigGet.modeSub));
+    if (!rigCmd.mode) ui->comboBox_Mode->setCurrentText(rig_strrmode(rigGet.mode));
+    if (!rigCmd.modeSub) ui->comboBox_ModeSub->setCurrentText(rig_strrmode(rigGet.modeSub));
 
     if (guiCmd.tabList) //Select appropriate mode function tab
     {
@@ -472,7 +472,7 @@ void MainWindow::guiUpdate()
        guiCmd.bwidthList = 0;
     }
 
-    ui->comboBox_BW->setCurrentText(QString::number(rigGet.bwidth));
+    if (!rigCmd.bwidth) ui->comboBox_BW->setCurrentText(QString::number(rigGet.bwidth));
     ui->checkBox_NAR->setChecked(rigGet.bwNarrow);
 
     //* Range list
@@ -546,10 +546,10 @@ void MainWindow::guiUpdate()
     }
 
     //* RF
-    ui->radioButton_Tuner->setChecked(rigGet.tuner);
-    ui->comboBox_AGC->setCurrentText(rig_stragclevel(rigGet.agc));
-    ui->comboBox_Att->setCurrentText(QString::number(rigGet.att));
-    ui->comboBox_Preamp->setCurrentText(QString::number(rigGet.pre));
+    if (!rigCmd.tuner) ui->radioButton_Tuner->setChecked(rigGet.tuner);
+    if (!rigCmd.agc) ui->comboBox_AGC->setCurrentText(rig_stragclevel(rigGet.agc));
+    if (!rigCmd.att) ui->comboBox_Att->setCurrentText(QString::number(rigGet.att));
+    if (!rigCmd.pre) ui->comboBox_Preamp->setCurrentText(QString::number(rigGet.pre));
 
     //* Split
     if (rigGet.split == RIG_SPLIT_ON)
@@ -621,19 +621,19 @@ void MainWindow::guiUpdate()
     if (!ui->verticalSlider_micGain->isSliderDown() && !rigCmd.micGain) ui->verticalSlider_micGain->setValue((int)(rigGet.micGain*100));
     if (!ui->verticalSlider_micMonitor->isSliderDown() && !rigCmd.micMonLevel) ui->verticalSlider_micMonitor->setValue((int)(rigGet.micMonLevel*100));
     if (!ui->verticalSlider_micCompressor->isSliderDown() && !rigCmd.micCompLevel) ui->verticalSlider_micCompressor->setValue((int)(rigGet.micCompLevel*100));
-    ui->checkBox_micCompressor->setChecked(rigGet.micComp);
-    ui->checkBox_micMonitor->setChecked(rigGet.micMon);
+    if (!rigCmd.micComp) ui->checkBox_micCompressor->setChecked(rigGet.micComp);
+    if (!rigCmd.micMon) ui->checkBox_micMonitor->setChecked(rigGet.micMon);
 
     //* Filter
-    ui->checkBox_NB->setChecked(rigGet.noiseBlanker);
-    ui->checkBox_NB2->setChecked(rigGet.noiseBlanker2);
-    ui->checkBox_NR->setChecked(rigGet.noiseReduction);
-    ui->spinBox_NR->setValue(rigGet.noiseReductionLevel);
-    ui->checkBox_NF->setChecked(rigGet.notchFilter);
+    if (!rigCmd.noiseBlanker) ui->checkBox_NB->setChecked(rigGet.noiseBlanker);
+    if (!rigCmd.noiseBlanker2) ui->checkBox_NB2->setChecked(rigGet.noiseBlanker2);
+    if (!rigCmd.noiseReduction) ui->checkBox_NR->setChecked(rigGet.noiseReduction);
+    if (!rigCmd.noiseReductionLevel) ui->spinBox_NR->setValue(rigGet.noiseReductionLevel);
+    if (!rigCmd.notchFilter) ui->checkBox_NF->setChecked(rigGet.notchFilter);
     if (!ui->horizontalSlider_IFshift->isSliderDown() && !rigCmd.ifShift) ui->horizontalSlider_IFshift->setValue(rigGet.ifShift);
 
     //* Clarifier
-    ui->checkBox_clar->setChecked(rigGet.clar);
+    if (!rigCmd.clar) ui->checkBox_clar->setChecked(rigGet.clar);
     if (rigSet.xit)
     {
         ui->radioButton_clarXIT->setChecked(true);
@@ -646,15 +646,15 @@ void MainWindow::guiUpdate()
     }
 
     //* CW
-    ui->checkBox_BKIN->setChecked(rigGet.bkin);
-    ui->checkBox_APF->setChecked(rigGet.apf);
-    ui->spinBox_WPM->setValue(rigGet.wpm);
+    if (!rigCmd.bkin) ui->checkBox_BKIN->setChecked(rigGet.bkin);
+    if (!rigCmd.apf) ui->checkBox_APF->setChecked(rigGet.apf);
+    if (!rigCmd.wpm) ui->spinBox_WPM->setValue(rigGet.wpm);
 
     //* FM
-    if (rigGet.rptShift == RIG_RPT_SHIFT_MINUS) ui->radioButton_RPTshiftMinus->setChecked(true);    //-
-    else if (rigGet.rptShift == RIG_RPT_SHIFT_PLUS) ui->radioButton_RPTshiftPlus->setChecked(true); //+
+    if (rigGet.rptShift == RIG_RPT_SHIFT_MINUS && !rigCmd.rptShift) ui->radioButton_RPTshiftMinus->setChecked(true);    //-
+    else if (rigGet.rptShift == RIG_RPT_SHIFT_PLUS && !rigCmd.rptShift) ui->radioButton_RPTshiftPlus->setChecked(true); //+
     else ui->radioButton_RPTshiftSimplex->setChecked(true); //Simplex
-    ui->spinBox_RPToffset->setValue(rigGet.rptOffset/1000);  //Offset (kHz)
+    if (!rigCmd.rptOffset) ui->spinBox_RPToffset->setValue(rigGet.rptOffset/1000);  //Offset (kHz)
 
     switch (rigGet.toneType)
     {

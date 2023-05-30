@@ -27,7 +27,7 @@
 
 #define RELEASE_DATE __DATE__
 #define VERSION_MAJ 1
-#define VERSION_MIN 3
+#define VERSION_MIN 4
 #define VERSION_MIC 0
 
 
