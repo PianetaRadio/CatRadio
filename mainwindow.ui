@@ -1765,7 +1765,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="tab_clar">
      <property name="autoFillBackground">
@@ -1978,6 +1978,9 @@
          <widget class="QSpinBox" name="spinBox_RPToffset">
           <property name="maximum">
            <number>10000</number>
+          </property>
+          <property name="singleStep">
+           <number>100</number>
           </property>
          </widget>
         </item>
