@@ -453,10 +453,11 @@ void RigDaemon::rigUpdate(RIG *my_rig)
 
             if (rigCmd.noiseReductionLevel)
             {
-                retvalue.i = rigSet.noiseReductionLevel;
+                retvalue.f = rigSet.noiseReductionLevel/15.0;
                 retcode = rig_set_level(my_rig, RIG_VFO_CURR, RIG_LEVEL_NR, retvalue);
                 if (retcode == RIG_OK) rigGet.noiseReductionLevel = rigSet.noiseReductionLevel;
                 rigCmd.noiseReductionLevel = 0;
+                //qDebug()<<"set "<<retvalue.f;
             }
 
             //* NF notch filter
@@ -745,7 +746,8 @@ void RigDaemon::rigUpdate(RIG *my_rig)
             if (rig_has_get_level(my_rig, RIG_LEVEL_NR))
             {
                 rig_get_level(my_rig, RIG_VFO_CURR, RIG_LEVEL_NR, &retvalue);
-                rigGet.noiseReductionLevel = retvalue.i;
+                rigGet.noiseReductionLevel = (retvalue.f + 0.003) * 15.0;
+                //qDebug()<<"get "<<retvalue.f<<"  "<<rigGet.noiseReductionLevel;
             }
         }
 
