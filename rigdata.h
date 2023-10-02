@@ -68,7 +68,8 @@ typedef struct {
     int wpm;    //CW Keyer speed WPM
     int apf;    //Audio Peak Filter
     int noiseBlanker, noiseBlanker2;    //NB
-    int noiseReduction, noiseReductionLevel;    //NR
+    int noiseReduction;     //NR
+    float noiseReductionLevel;    //NR level
     int notchFilter;    //NF
     int ifShift;
     int clar, rit, xit;   //Clarifier Rx or Tx

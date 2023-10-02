@@ -65,8 +65,6 @@ RIG *RigDaemon::rigConnect(int *retcode)
         {
             //myport.type.rig = RIG_PORT_NETWORK;
             strncpy(my_rig->state.rigport.pathname, rigCom.rigPort.toLatin1(), HAMLIB_FILPATHLEN - 1);
-            my_rig->state.vfo_opt = 1;
-            //strncpy(my_rig->state.rigport.pathname, RIG_FILE, HAMLIB_FILPATHLEN - 1);
         }
         else
         {
@@ -453,11 +451,10 @@ void RigDaemon::rigUpdate(RIG *my_rig)
 
             if (rigCmd.noiseReductionLevel)
             {
-                retvalue.f = rigSet.noiseReductionLevel/15.0;
+                retvalue.f = rigSet.noiseReductionLevel;
                 retcode = rig_set_level(my_rig, RIG_VFO_CURR, RIG_LEVEL_NR, retvalue);
                 if (retcode == RIG_OK) rigGet.noiseReductionLevel = rigSet.noiseReductionLevel;
                 rigCmd.noiseReductionLevel = 0;
-                //qDebug()<<"set "<<retvalue.f;
             }
 
             //* NF notch filter
@@ -746,8 +743,7 @@ void RigDaemon::rigUpdate(RIG *my_rig)
             if (rig_has_get_level(my_rig, RIG_LEVEL_NR))
             {
                 rig_get_level(my_rig, RIG_VFO_CURR, RIG_LEVEL_NR, &retvalue);
-                rigGet.noiseReductionLevel = (retvalue.f + 0.003) * 15.0;
-                //qDebug()<<"get "<<retvalue.f<<"  "<<rigGet.noiseReductionLevel;
+                rigGet.noiseReductionLevel = retvalue.f;
             }
         }
 

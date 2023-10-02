@@ -40,6 +40,7 @@
 #include <QCoreApplication>
 #include <QDir>
 
+#include <cwchar>
 #include <rig.h>    //Hamlib
 
 //RIG *my_rig;
@@ -56,6 +57,8 @@ int retcode;    //Return code from function
 int i;  //Index
 int prevDial;   //Previous dial value
 int fastDial;   //Fast pushbutton state
+
+const float fudge = 0.003;
 
 FILE* debugFile;
 
@@ -322,8 +325,44 @@ void MainWindow::guiInit()
     //* Filter
     if (!rig_has_set_func(my_rig, RIG_FUNC_NB)) ui->checkBox_NB->setEnabled(false);
     if (!rig_has_set_func(my_rig, RIG_FUNC_NB2)) ui->checkBox_NB2->setEnabled(false);
-    if (!rig_has_set_func(my_rig, RIG_FUNC_NR)) {ui->checkBox_NR->setEnabled(false); ui->spinBox_NR->setEnabled(false);}
     if (!rig_has_set_func(my_rig, RIG_FUNC_ANF)) ui->checkBox_NF->setEnabled(false);
+    if (rig_has_set_func(my_rig, RIG_FUNC_NR))
+    {
+        int max, min, step;
+
+        for (i = 0; i < RIG_SETTING_MAX; i++)
+        {
+            //qDebug()<<i<<rig_idx2setting(i)<<rig_strparm(rig_idx2setting(i));
+            if (RIG_LEVEL_NR & rig_idx2setting(i)) break;
+        }
+        //qDebug()<<rig_strparm(RIG_LEVEL_NR & rig_idx2setting(i));
+        //qDebug()<<i;
+
+        if (RIG_LEVEL_IS_FLOAT(rig_idx2setting(i))) //float 0..1
+        {
+            float stepf = 1/my_rig->state.level_gran[i].step.f;
+            max = (int)(my_rig->state.level_gran[i].max.f*stepf+fudge);
+            step = (int)(stepf+fudge);
+            min = max-step+1;
+            step = max/step;
+        }
+        else    //integer
+        {
+            step = my_rig->state.level_gran[i].step.i;
+            max = my_rig->state.level_gran[i].max.i;
+            min = my_rig->state.level_gran[i].min.i;
+        }
+        //qDebug()<<max<<min<<step;
+
+        ui->spinBox_NR->setMaximum(max);
+        ui->spinBox_NR->setMinimum(min);
+        ui->spinBox_NR->setSingleStep(step);
+    }
+    else
+    {
+        ui->checkBox_NR->setEnabled(false);
+        ui->spinBox_NR->setEnabled(false);
+    }
 
     //* Clarifier
     rigSet.rit = 1;
@@ -612,15 +651,15 @@ void MainWindow::guiUpdate()
     }
 
     //* Levels
-    if (!ui->verticalSlider_RFpower->isSliderDown() && !rigCmd.rfPower) ui->verticalSlider_RFpower->setValue((int)(rigGet.rfPower*100));
-    if (!ui->verticalSlider_RFgain->isSliderDown() && !rigCmd.rfGain) ui->verticalSlider_RFgain->setValue((int)(rigGet.rfGain*100));
-    if (!ui->verticalSlider_AFGain->isSliderDown() && !rigCmd.afGain) ui->verticalSlider_AFGain->setValue((int)(rigGet.afGain*100));
-    if (!ui->verticalSlider_Squelch->isSliderDown() && !rigCmd.squelch) ui->verticalSlider_Squelch->setValue((int)(rigGet.squelch*100));
+    if (!ui->verticalSlider_RFpower->isSliderDown() && !rigCmd.rfPower) ui->verticalSlider_RFpower->setValue((int)(rigGet.rfPower*100+fudge));
+    if (!ui->verticalSlider_RFgain->isSliderDown() && !rigCmd.rfGain) ui->verticalSlider_RFgain->setValue((int)(rigGet.rfGain*100+fudge));
+    if (!ui->verticalSlider_AFGain->isSliderDown() && !rigCmd.afGain) ui->verticalSlider_AFGain->setValue((int)(rigGet.afGain*100+fudge));
+    if (!ui->verticalSlider_Squelch->isSliderDown() && !rigCmd.squelch) ui->verticalSlider_Squelch->setValue((int)(rigGet.squelch*100+fudge));
 
     //* MIC
-    if (!ui->verticalSlider_micGain->isSliderDown() && !rigCmd.micGain) ui->verticalSlider_micGain->setValue((int)(rigGet.micGain*100));
-    if (!ui->verticalSlider_micMonitor->isSliderDown() && !rigCmd.micMonLevel) ui->verticalSlider_micMonitor->setValue((int)(rigGet.micMonLevel*100));
-    if (!ui->verticalSlider_micCompressor->isSliderDown() && !rigCmd.micCompLevel) ui->verticalSlider_micCompressor->setValue((int)(rigGet.micCompLevel*100));
+    if (!ui->verticalSlider_micGain->isSliderDown() && !rigCmd.micGain) ui->verticalSlider_micGain->setValue((int)(rigGet.micGain*100+fudge));
+    if (!ui->verticalSlider_micMonitor->isSliderDown() && !rigCmd.micMonLevel) ui->verticalSlider_micMonitor->setValue((int)(rigGet.micMonLevel*100+fudge));
+    if (!ui->verticalSlider_micCompressor->isSliderDown() && !rigCmd.micCompLevel) ui->verticalSlider_micCompressor->setValue((int)(rigGet.micCompLevel*100+fudge));
     if (!rigCmd.micComp) ui->checkBox_micCompressor->setChecked(rigGet.micComp);
     if (!rigCmd.micMon) ui->checkBox_micMonitor->setChecked(rigGet.micMon);
 
@@ -628,7 +667,7 @@ void MainWindow::guiUpdate()
     if (!rigCmd.noiseBlanker) ui->checkBox_NB->setChecked(rigGet.noiseBlanker);
     if (!rigCmd.noiseBlanker2) ui->checkBox_NB2->setChecked(rigGet.noiseBlanker2);
     if (!rigCmd.noiseReduction) ui->checkBox_NR->setChecked(rigGet.noiseReduction);
-    if (!rigCmd.noiseReductionLevel) ui->spinBox_NR->setValue(rigGet.noiseReductionLevel);
+    if (!rigCmd.noiseReductionLevel) ui->spinBox_NR->setValue((int)(rigGet.noiseReductionLevel*ui->spinBox_NR->maximum()+fudge));
     if (!rigCmd.notchFilter) ui->checkBox_NF->setChecked(rigGet.notchFilter);
     if (!ui->horizontalSlider_IFshift->isSliderDown() && !rigCmd.ifShift) ui->horizontalSlider_IFshift->setValue(rigGet.ifShift);
 
@@ -665,7 +704,7 @@ void MainWindow::guiUpdate()
     default: ui->comboBox_toneType->setCurrentText(""); break;
     }
 
-    if (rigGet.toneType == 2 || rigGet.toneType ==3) ui->comboBox_toneFreq->setCurrentText(QString::number(rigGet.tone/10.0));  //CTCSS
+    if (rigGet.toneType == 2 || rigGet.toneType == 3) ui->comboBox_toneFreq->setCurrentText(QString::number(rigGet.tone/10.0));  //CTCSS
     else if (rigGet.toneType == 4) ui->comboBox_toneFreq->setCurrentText(QString::number(rigGet.tone));  //DCS
 }
 
@@ -1326,7 +1365,7 @@ void MainWindow::on_spinBox_NR_valueChanged(int arg1)
 {
     if (!rigCmd.noiseReductionLevel)
     {
-        rigSet.noiseReductionLevel = arg1;
+        rigSet.noiseReductionLevel = (float)(arg1) / ui->spinBox_NR->maximum();
         rigCmd.noiseReductionLevel = 1;
     }
 }
