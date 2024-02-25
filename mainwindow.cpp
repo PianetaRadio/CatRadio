@@ -1,6 +1,6 @@
 /**
  ** This file is part of the CatRadio project.
- ** Copyright 2022 Gianfranco Sordetti IZ8EWD <iz8ewd@pianetaradio.it>.
+ ** Copyright 2022-2024 Gianfranco Sordetti IZ8EWD <iz8ewd@pianetaradio.it>.
  **
  ** This program is free software: you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -217,8 +217,8 @@ MainWindow::~MainWindow()
 void MainWindow::guiInit()
 {
     //* Power on/off cap
-    //if (rig_has_set_func(my_rig, RIG_FUNCTION_SET_POWERSTAT)==0)
-    if (my_rig->caps->set_powerstat == NULL)
+    if (rig_has_set_func(my_rig, RIG_FUNCTION_SET_POWERSTAT)==0)
+    //if (my_rig->caps->set_powerstat == NULL)
     {
         ui->pushButton_Power->setDisabled(true);    //Power pushbutton disabled
         rigCap.onoff = 0;
@@ -230,8 +230,8 @@ void MainWindow::guiInit()
     }
 
     //* PTT cap
-    //if (rig_has_set_func(my_rig, RIG_FUNCTION_SET_PTT)==0)
-    if (my_rig->caps->set_ptt == NULL)
+    if (rig_has_set_func(my_rig, RIG_FUNCTION_SET_PTT)==0)
+    //if (my_rig->caps->set_ptt == NULL)
     {
         ui->pushButton_PTT->setDisabled(true);  //PTT pushbutton disabled
         rigCap.ptt = 0;
@@ -268,16 +268,24 @@ void MainWindow::guiInit()
         guiCmd.bwidthList = 1;  //Command to populate BW combobox in guiUpdate()
     }
 
+    //* ANT comboBox
+    ui->comboBox_Ant->clear();
+    if (!rig_has_set_func(my_rig, RIG_FUNCTION_SET_ANT)) ui->comboBox_Ant->setEnabled(false);
+
     //* AGC level comboBox
     ui->comboBox_AGC->clear();
-    for (i = 0; i < HAMLIB_MAX_AGC_LEVELS && i < my_rig->caps->agc_level_count; i++) ui->comboBox_AGC->addItem(rig_stragclevel(my_rig->caps->agc_levels[i]));
-    if (i==0)   //Print all levels if list is not specified
+    if (!rig_has_set_level(my_rig, RIG_LEVEL_AGC)) ui->comboBox_AGC->setEnabled(false);
+    else
     {
-        ui->comboBox_AGC->addItem(rig_stragclevel(RIG_AGC_OFF));
-        ui->comboBox_AGC->addItem(rig_stragclevel(RIG_AGC_AUTO));
-        ui->comboBox_AGC->addItem(rig_stragclevel(RIG_AGC_FAST));
-        ui->comboBox_AGC->addItem(rig_stragclevel(RIG_AGC_MEDIUM));
-        ui->comboBox_AGC->addItem(rig_stragclevel(RIG_AGC_SLOW));
+        for (i = 0; i < HAMLIB_MAX_AGC_LEVELS && i < my_rig->state.agc_level_count; i++) ui->comboBox_AGC->addItem(rig_stragclevel(my_rig->state.agc_levels[i]));
+        if (i==0)   //Print all levels if list is not specified
+        {
+            ui->comboBox_AGC->addItem(rig_stragclevel(RIG_AGC_OFF));
+            ui->comboBox_AGC->addItem(rig_stragclevel(RIG_AGC_AUTO));
+            ui->comboBox_AGC->addItem(rig_stragclevel(RIG_AGC_FAST));
+            ui->comboBox_AGC->addItem(rig_stragclevel(RIG_AGC_MEDIUM));
+            ui->comboBox_AGC->addItem(rig_stragclevel(RIG_AGC_SLOW));
+        }
     }
 
     //* Meters & Sub-meter comboBox
@@ -296,6 +304,7 @@ void MainWindow::guiInit()
 
     //* Attenuator comboBox
     ui->comboBox_Att->clear();
+    if (!rig_has_set_level(my_rig, RIG_LEVEL_ATT)) ui->comboBox_Att->setEnabled(false);
     ui->comboBox_Att->addItem("0");
     for (i = 0; i < HAMLIB_MAXDBLSTSIZ && my_rig->state.attenuator[i] != 0; i++)
     {
@@ -304,6 +313,7 @@ void MainWindow::guiInit()
 
     //* Preamp comboBox
     ui->comboBox_Preamp->clear();
+     if (!rig_has_set_level(my_rig, RIG_LEVEL_PREAMP)) ui->comboBox_Preamp->setEnabled(false);
     ui->comboBox_Preamp->addItem("0");
     for (i = 0; i < HAMLIB_MAXDBLSTSIZ && my_rig->state.preamp[i] != 0; i++)
     {
@@ -519,6 +529,7 @@ void MainWindow::guiUpdate()
     {
         for (i=0; i<HAMLIB_FRQRANGESIZ; i++)    //Tx range list
         {
+            //qDebug()<<rigGet.freqMain<<my_rig->state.tx_range_list[i].startf<<my_rig->state.tx_range_list[i].endf;
             if (rigGet.freqMain >= my_rig->state.tx_range_list[i].startf && rigGet.freqMain <= my_rig->state.tx_range_list[i].endf) break;
         }
         rigGet.rangeListTxIndex = i;
@@ -537,7 +548,8 @@ void MainWindow::guiUpdate()
     if (guiCmd.antList)
     {
         ui->comboBox_Ant->clear();
-        if (my_rig->state.tx_range_list[rigGet.rangeListRxIndex].ant == RIG_ANT_NONE) ui->comboBox_Ant->addItem("NONE");  //RIG_ANT_NONE
+        if (!rig_has_get_func(my_rig, RIG_FUNCTION_GET_ANT)) ui->comboBox_Ant->addItem("");
+        else if (my_rig->state.tx_range_list[rigGet.rangeListRxIndex].ant == RIG_ANT_NONE) ui->comboBox_Ant->addItem("NONE");  //RIG_ANT_NONE
         else for (i=0; i < RIG_ANT_MAX; i++)
         {
             if (my_rig->state.tx_range_list[rigGet.rangeListRxIndex].ant & (1UL << i))
@@ -804,7 +816,7 @@ void MainWindow::on_pushButton_Connect_toggled(bool checked)
             rigCom.connected = 1;
             guiInit();
             connectMsg = "Connected to ";
-            connectMsg.append(my_rig->caps->model_name);
+            connectMsg.append(my_rig->state.model_name);
             if (rigCap.onoff == 0 || rigGet.onoff == RIG_POWER_ON || rigGet.onoff == RIG_POWER_UNKNOWN)
             {
                 freq_t retfreq;

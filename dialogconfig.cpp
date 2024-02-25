@@ -187,13 +187,23 @@ void DialogConfig::on_buttonBox_accepted()
     configFile.setValue("autoPowerOn", ui->checkBox_autoPowerOn->isChecked());
 }
 
-int printRigList(const struct rig_caps *rigCaps, void *data)    //Load rig list from hamlib and save into file rig.lst
+#ifdef RIGCAPS_NOT_CONST    //rig_caps is no longer constant starting from hamlib v.4.6
+int printRigList(struct rig_caps *rigCaps, void *data)    //Load rig list from hamlib and save into file rig.lst
 {
     if (data) return 0;
     QTextStream stream(&rigFile);
     stream << rigCaps->rig_model << " " << rigCaps->mfg_name << " " << rigCaps->model_name << "\n";
     return 1;
 }
+#else
+int printRigList(const struct rig_caps *rigCaps, void *data)
+{
+    if (data) return 0;
+    QTextStream stream(&rigFile);
+    stream << rigCaps->rig_model << " " << rigCaps->mfg_name << " " << rigCaps->model_name << "\n";
+    return 1;
+}
+#endif
 
 bool createRigFile()
 {

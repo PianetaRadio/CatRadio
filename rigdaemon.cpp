@@ -90,7 +90,8 @@ RIG *RigDaemon::rigConnect(int *retcode)
         if (*retcode != RIG_OK) return nullptr;  //Rig not connected
         else    //Rig connected
         {
-            if (my_rig->caps->get_powerstat != NULL) rig_get_powerstat(my_rig, &rigGet.onoff);
+            if (rig_has_get_func(my_rig, RIG_FUNCTION_GET_POWERSTAT)) rig_get_powerstat(my_rig, &rigGet.onoff);
+            //if (my_rig->caps->get_powerstat != NULL) rig_get_powerstat(my_rig, &rigGet.onoff);
             else rigGet.onoff = RIG_POWER_UNKNOWN;
             return my_rig;
         }
@@ -225,7 +226,7 @@ void RigDaemon::rigUpdate(RIG *my_rig)
             //* VFO Exchange
             if (rigCmd.vfoXchange)
             {
-                if (my_rig->caps->vfo_ops & RIG_OP_XCHG)
+                if (my_rig->state.vfo_ops & RIG_OP_XCHG)
                 {
                     mode_t tempMode = rigGet.mode;
                     retcode = rig_vfo_op(my_rig, RIG_VFO_CURR, RIG_OP_XCHG);
@@ -237,7 +238,7 @@ void RigDaemon::rigUpdate(RIG *my_rig)
                     }
                 }
 
-                else if (my_rig->caps->vfo_ops & RIG_OP_TOGGLE)
+                else if (my_rig->state.vfo_ops & RIG_OP_TOGGLE)
                 {
                     freq_t tempFreq = rigGet.freqMain;
                     mode_t tempMode = rigGet.mode;
@@ -256,7 +257,7 @@ void RigDaemon::rigUpdate(RIG *my_rig)
             //* VFO Copy
             if (rigCmd.vfoCopy)
             {
-                if (my_rig->caps->vfo_ops & RIG_OP_CPY)
+                if (my_rig->state.vfo_ops & RIG_OP_CPY)
                 {
                     retcode = rig_vfo_op(my_rig, RIG_VFO_CURR, RIG_OP_CPY);
                     if (retcode == RIG_OK)
@@ -285,7 +286,7 @@ void RigDaemon::rigUpdate(RIG *my_rig)
             //* Band Up
             if (rigCmd.bandUp)
             {
-                if (my_rig->caps->vfo_ops & RIG_OP_BAND_UP)
+                if (my_rig->state.vfo_ops & RIG_OP_BAND_UP)
                 {
                     retcode = rig_vfo_op(my_rig, RIG_VFO_CURR, RIG_OP_BAND_UP);
                     if (retcode == RIG_OK) indexCmd = 21;
@@ -296,7 +297,7 @@ void RigDaemon::rigUpdate(RIG *my_rig)
             //* Band Down
             if (rigCmd.bandDown)
             {
-                if (my_rig->caps->vfo_ops & RIG_OP_BAND_DOWN)
+                if (my_rig->state.vfo_ops & RIG_OP_BAND_DOWN)
                 {
                     retcode = rig_vfo_op(my_rig, RIG_VFO_CURR, RIG_OP_BAND_DOWN);
                     if (retcode == RIG_OK) indexCmd = 21;
@@ -323,7 +324,7 @@ void RigDaemon::rigUpdate(RIG *my_rig)
             //* Tune
             if (rigCmd.tune)
             {
-                if (my_rig->caps->vfo_ops & RIG_OP_TUNE) rig_vfo_op(my_rig, RIG_VFO_CURR, RIG_OP_TUNE);
+                if (my_rig->state.vfo_ops & RIG_OP_TUNE) rig_vfo_op(my_rig, RIG_VFO_CURR, RIG_OP_TUNE);
                 rigCmd.tune = 0;
             }
 
@@ -541,7 +542,8 @@ void RigDaemon::rigUpdate(RIG *my_rig)
             //* Repeater shift
             if (rigCmd.rptShift)
             {
-                if (my_rig->caps->set_rptr_shift)
+                if (rig_has_set_func(my_rig, RIG_FUNCTION_SET_RPTR_SHIFT))
+                //if (my_rig->caps->set_rptr_shift)
                 {
                     retcode = rig_set_rptr_shift(my_rig, RIG_VFO_CURR, rigSet.rptShift);
                     if (retcode == RIG_OK) rigGet.rptShift = rigSet.rptShift;
@@ -551,7 +553,8 @@ void RigDaemon::rigUpdate(RIG *my_rig)
             //* Repeater offset
             if (rigCmd.rptOffset)
             {
-                if (my_rig->caps->set_rptr_offs)
+                if (rig_has_set_func(my_rig, RIG_FUNCTION_SET_RPTR_OFFS))
+                //if (my_rig->caps->set_rptr_offs)
                 {
                     retcode = rig_set_rptr_offs(my_rig, RIG_VFO_CURR, rigSet.rptOffset);
                     if (retcode == RIG_OK) rigGet.rptOffset = rigSet.rptOffset;
@@ -651,55 +654,79 @@ void RigDaemon::rigUpdate(RIG *my_rig)
         if ((indexCmd == 3 && !rigGet.ptt && rigCom.fullPoll) || indexCmd == 0) rig_get_func(my_rig, RIG_VFO_CURR, RIG_FUNC_TUNER, &rigGet.tuner);
 
         //* Antenna
-        if ((indexCmd == 4 && !rigGet.ptt && rigCom.fullPoll) || indexCmd == 0) rig_get_ant(my_rig, RIG_VFO_CURR, RIG_ANT_CURR, &retvalue, &rigGet.ant, &rigGet.antTx, &rigGet.antRx);
+        if ((indexCmd == 4 && !rigGet.ptt && rigCom.fullPoll) || indexCmd == 0)
+        {
+            if (rig_has_get_func(my_rig, RIG_FUNCTION_GET_ANT)) rig_get_ant(my_rig, RIG_VFO_CURR, RIG_ANT_CURR, &retvalue, &rigGet.ant, &rigGet.antTx, &rigGet.antRx);
+        }
 
         //* AGC
         if ((indexCmd == 5 && !rigGet.ptt && rigCom.fullPoll) || indexCmd == 0)
         {
-            rig_get_level(my_rig, RIG_VFO_CURR, RIG_LEVEL_AGC, &retvalue);
-            rigGet.agc = levelagcvalue(retvalue.i);
+            if (rig_has_get_level(my_rig, RIG_LEVEL_AGC))
+            {
+                rig_get_level(my_rig, RIG_VFO_CURR, RIG_LEVEL_AGC, &retvalue);
+                rigGet.agc = levelagcvalue(retvalue.i);
+            }
         }
 
         //* Attenuator
         if ((indexCmd == 6 && !rigGet.ptt && rigCom.fullPoll) || indexCmd == 0)
         {
-            rig_get_level(my_rig, RIG_VFO_CURR, RIG_LEVEL_ATT, &retvalue);
-            rigGet.att = retvalue.i;
+            if (rig_has_get_level(my_rig, RIG_LEVEL_ATT))
+            {
+                rig_get_level(my_rig, RIG_VFO_CURR, RIG_LEVEL_ATT, &retvalue);
+                rigGet.att = retvalue.i;
+            }
         }
 
         //* Preamp
         if ((indexCmd == 7 && !rigGet.ptt && rigCom.fullPoll) || indexCmd == 0)
         {
-            rig_get_level(my_rig, RIG_VFO_CURR, RIG_LEVEL_PREAMP, &retvalue);
-            rigGet.pre = retvalue.i;
+            if (rig_has_get_level(my_rig, RIG_LEVEL_PREAMP))
+            {
+                rig_get_level(my_rig, RIG_VFO_CURR, RIG_LEVEL_PREAMP, &retvalue);
+                rigGet.pre = retvalue.i;
+            }
         }
 
         //* RF power
         if ((indexCmd == 8 && !rigGet.ptt && rigCom.fullPoll) || indexCmd == 0)
         {
-            rig_get_level(my_rig, RIG_VFO_CURR, RIG_LEVEL_RFPOWER, &retvalue);
-            rigGet.rfPower = retvalue.f;
+            if (rig_has_get_level(my_rig, RIG_LEVEL_RFPOWER))
+            {
+                rig_get_level(my_rig, RIG_VFO_CURR, RIG_LEVEL_RFPOWER, &retvalue);
+                rigGet.rfPower = retvalue.f;
+            }
         }
 
         //* RF gain
         if ((indexCmd == 9 && !rigGet.ptt && rigCom.fullPoll) || indexCmd == 0)
         {
-            rig_get_level(my_rig, RIG_VFO_CURR, RIG_LEVEL_RF, &retvalue);
-            rigGet.rfGain = retvalue.f;
+            if (rig_has_get_level(my_rig, RIG_LEVEL_RF))
+            {
+                rig_get_level(my_rig, RIG_VFO_CURR, RIG_LEVEL_RF, &retvalue);
+                rigGet.rfGain = retvalue.f;
+            }
         }
 
         //* AF gain
         if ((indexCmd == 10 && !rigGet.ptt && rigCom.fullPoll) || indexCmd == 0)
         {
-            rig_get_level(my_rig, RIG_VFO_CURR, RIG_LEVEL_AF, &retvalue);
-            rigGet.afGain = retvalue.f;
+            if (rig_has_get_level(my_rig, RIG_LEVEL_AF))
+            {
+                rig_get_level(my_rig, RIG_VFO_CURR, RIG_LEVEL_AF, &retvalue);
+                rigGet.afGain = retvalue.f;
+            }
         }
 
         //* Squelch
         if ((indexCmd == 11 && !rigGet.ptt && rigCom.fullPoll) || indexCmd == 0)
         {
-            rig_get_level(my_rig, RIG_VFO_CURR, RIG_LEVEL_SQL, &retvalue);
-            rigGet.squelch = retvalue.f;
+            if (rig_has_get_level(my_rig, RIG_LEVEL_SQL))
+            {
+                rig_get_level(my_rig, RIG_VFO_CURR, RIG_LEVEL_SQL, &retvalue);
+                rigGet.squelch = retvalue.f;
+            }
         }
 
         //* MIC
