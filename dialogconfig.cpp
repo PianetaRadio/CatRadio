@@ -1,6 +1,6 @@
 /**
  ** This file is part of the CatRadio project.
- ** Copyright 2022 Gianfranco Sordetti IZ8EWD <iz8ewd@pianetaradio.it>.
+ ** Copyright 2022-2024 Gianfranco Sordetti IZ8EWD <iz8ewd@pianetaradio.it>.
  **
  ** This program is free software: you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -108,6 +108,7 @@ DialogConfig::DialogConfig(QWidget *parent) :
     }
     ui->spinBox_RefreshRate->setValue(rigCom.rigRefresh);
     ui->checkBox_fullPoll->setChecked(rigCom.fullPoll);
+    ui->checkBox_autoConnect->setChecked(rigCom.autoConnect);
     ui->checkBox_autoPowerOn->setChecked(rigCom.autoPowerOn);
 }
 
@@ -173,6 +174,7 @@ void DialogConfig::on_buttonBox_accepted()
 
     rigCom.rigRefresh = ui->spinBox_RefreshRate->value();
     rigCom.fullPoll = ui->checkBox_fullPoll->isChecked();
+    rigCom.autoConnect = ui->checkBox_autoConnect->isChecked();
     rigCom.autoPowerOn = ui->checkBox_autoPowerOn->isChecked();
 
     //* Save settings in catradio.ini
@@ -184,6 +186,7 @@ void DialogConfig::on_buttonBox_accepted()
     configFile.setValue("netRigctl", ui->checkBox_netRigctl->isChecked());
     configFile.setValue("rigRefresh", ui->spinBox_RefreshRate->value());
     configFile.setValue("fullPolling", ui->checkBox_fullPoll->isChecked());
+    configFile.setValue("autoConnect", ui->checkBox_autoConnect->isChecked());
     configFile.setValue("autoPowerOn", ui->checkBox_autoPowerOn->isChecked());
 }
 

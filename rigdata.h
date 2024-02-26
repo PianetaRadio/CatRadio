@@ -1,6 +1,6 @@
 /**
  ** This file is part of the CatRadio project.
- ** Copyright 2022 Gianfranco Sordetti IZ8EWD <iz8ewd@pianetaradio.it>.
+ ** Copyright 2022-2024 Gianfranco Sordetti IZ8EWD <iz8ewd@pianetaradio.it>.
  **
  ** This program is free software: you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@ typedef struct {
     unsigned rigRefresh;    //GUI refresh interval (ms)
     int connected;  //connected flag
     bool fullPoll;  //full polling flag
+    bool autoConnect; //Auto-connect flag
     bool autoPowerOn;   //Auto Power ON flag
 } rigConnect;
 

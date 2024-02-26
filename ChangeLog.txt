@@ -2,7 +2,8 @@ CatRadio
 
 (+ New, * Updated, - Removed)
 
-1.4.0 - 2023-mm-dd
+1.4.0 - 2024-mm-dd
+	+ Auto Connect option
 	+ Auto Power-on option
 	+ High SWR indicator
 	+ Meter peak hold indicator

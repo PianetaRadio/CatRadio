@@ -113,6 +113,7 @@ MainWindow::MainWindow(QWidget *parent)
     rigCom.netRigctl = configFile.value("netRigctl", false).toBool();
     rigCom.rigRefresh = configFile.value("rigRefresh", 100).toInt();
     rigCom.fullPoll = configFile.value("fullPolling", true).toBool();
+    rigCom.autoConnect = configFile.value("autoConnect", false).toBool();
     rigCom.autoPowerOn = configFile.value("autoPowerOn", false).toBool();
     guiConf.vfoDisplayMode = configFile.value("vfoDisplayMode", 0).toInt();
     guiConf.darkTheme = configFile.value("darkTheme", false).toBool();
@@ -184,6 +185,8 @@ MainWindow::MainWindow(QWidget *parent)
     //VFO
     ui->lineEdit_vfoMain->setValue(0);
     ui->lineEdit_vfoSub->setValue(0);
+
+    if (rigCom.autoConnect) ui->pushButton_Connect->toggle(); //Auto connect
 }
 
 MainWindow::~MainWindow()
