@@ -30,6 +30,10 @@ typedef struct {
     unsigned rigModel;  //Hamlib rig model
     QString rigPort;    //COM port or IP address
     unsigned serialSpeed;   //Serial port baud rate
+    unsigned serialDataBits; //Serial port data bit
+    unsigned serialParity;   //Serial port parity (serial_parity_e RIG_PARITY_NONE = 0, RIG_PARITY_ODD, RIG_PARITY_EVEN)
+    unsigned serialStopBits;
+    unsigned serialHandshake; //Serial port handshake (serial_handshake_e RIG_HANDSHAKE_NONE = 0, RIG_HANDSHAKE_XONXOFF, RIG_HANDSHAKE_HARDWARE)
     int civAddr;  //CI-V address (decimal, Icom radio)
     bool netRigctl; //TCP NET Rigctl
     unsigned rigRefresh;    //GUI refresh interval (ms)

@@ -105,6 +105,7 @@ DialogConfig::DialogConfig(QWidget *parent) :
         ui->comboBox_comPort->setCurrentText(rigCom.rigPort);
         ui->comboBox_serialSpeed->setCurrentText(QString::number(rigCom.serialSpeed));
         if (rigCom.civAddr) ui->lineEdit_civAddr->setText(QString::number(rigCom.civAddr,16));
+        setDialogSerialConfig(rigCom.serialDataBits, rigCom.serialParity, rigCom.serialStopBits, rigCom.serialHandshake);
     }
     ui->spinBox_RefreshRate->setValue(rigCom.rigRefresh);
     ui->checkBox_fullPoll->setChecked(rigCom.fullPoll);
@@ -116,6 +117,63 @@ DialogConfig::~DialogConfig()
 {
     delete ui;
 }
+
+
+int DialogConfig::findRigModel(QString rigModel)
+{
+    QRegularExpression regexp("[0-9]+");
+    QRegularExpressionMatch rigNumber = regexp.match(rigModel);
+    return rigNumber.captured(0).toInt();
+}
+
+
+void DialogConfig::setDialogSerialConfig(int dataBits, int parity, int stopBits, int handshake)
+{
+    switch (dataBits)
+    {
+    case 7: ui->radioButton_dataBits7->setChecked(true); break;
+    case 8: ui->radioButton_dataBits8->setChecked(true); break;
+    }
+
+    switch (parity)
+    {
+    case 0: ui->radioButton_parityNone->setChecked(true); break;
+    case 1: ui->radioButton_parityOdd->setChecked(true); break;
+    case 2: ui->radioButton_parityEven->setChecked(true); break;
+    }
+
+    switch (stopBits)
+    {
+    case 1: ui->radioButton_stopBits1->setChecked(true); break;
+    case 2: ui->radioButton_stopBits2->setChecked(true); break;
+    }
+
+    switch (handshake)
+    {
+    case 0: ui->radioButton_handshakeNone->setChecked(true); break;
+    case 1: ui->radioButton_handshakeXonXoff->setChecked(true); break;
+    case 2: ui->radioButton_handshakeHardware->setChecked(true); break;
+    }
+}
+
+
+void DialogConfig::setRigSerialConfigFromDialog()
+{
+    if (ui->radioButton_dataBits7->isChecked()) rigCom.serialDataBits = 7;
+    else rigCom.serialDataBits = 8;
+
+    if (ui->radioButton_parityOdd->isChecked()) rigCom.serialParity = RIG_PARITY_ODD;
+    else if (ui->radioButton_parityEven->isChecked()) rigCom.serialParity = RIG_PARITY_EVEN;
+    else rigCom.serialParity = RIG_PARITY_NONE;
+
+    if (ui->radioButton_stopBits1->isChecked()) rigCom.serialStopBits = 1;
+    else rigCom.serialStopBits = 2;
+
+    if (ui->radioButton_handshakeXonXoff->isChecked()) rigCom.serialHandshake = RIG_HANDSHAKE_XONXOFF;
+    else if (ui->radioButton_handshakeHardware->isChecked()) rigCom.serialHandshake = RIG_HANDSHAKE_HARDWARE;
+    else rigCom.serialHandshake = RIG_HANDSHAKE_NONE;
+}
+
 
 void DialogConfig::on_buttonBox_accepted()
 {
@@ -134,9 +192,10 @@ void DialogConfig::on_buttonBox_accepted()
     else
     {
         QString rigModel = ui->comboBox_rigModel->currentText();
-        QRegularExpression regexp("[0-9]+");
-        QRegularExpressionMatch rigNumber = regexp.match(rigModel);
-        rigCom.rigModel = rigNumber.captured(0).toInt();
+        //QRegularExpression regexp("[0-9]+");
+        //QRegularExpressionMatch rigNumber = regexp.match(rigModel);
+        //rigCom.rigModel = rigNumber.captured(0).toInt();
+        rigCom.rigModel = findRigModel(rigModel);
 
         if (ui->checkBox_netRigctl->isChecked())   //TCP port
         {
@@ -159,6 +218,7 @@ void DialogConfig::on_buttonBox_accepted()
             rigCom.rigPort = ui->comboBox_comPort->currentText();
             rigCom.serialSpeed = ui->comboBox_serialSpeed->currentText().toInt();
             rigCom.civAddr = ui->lineEdit_civAddr->text().toInt(&civAddrConv,16);
+            setRigSerialConfigFromDialog();
 
             if (rigCom.rigPort == "" && rigCom.rigModel != 1 && rigCom.rigModel != 6)
             {
@@ -183,6 +243,10 @@ void DialogConfig::on_buttonBox_accepted()
     configFile.setValue("rigPort", rigCom.rigPort);
     configFile.setValue("serialSpeed", ui->comboBox_serialSpeed->currentText());
     configFile.setValue("civAddress", ui->lineEdit_civAddr->text().toInt(&civAddrConv,16));
+    configFile.setValue("serialDataBits", rigCom.serialDataBits);
+    configFile.setValue("serialParity", rigCom.serialParity);
+    configFile.setValue("serialStopBits", rigCom.serialStopBits);
+    configFile.setValue("serialHandshake", rigCom.serialHandshake);
     configFile.setValue("netRigctl", ui->checkBox_netRigctl->isChecked());
     configFile.setValue("rigRefresh", ui->spinBox_RefreshRate->value());
     configFile.setValue("fullPolling", ui->checkBox_fullPoll->isChecked());
@@ -232,11 +296,43 @@ void DialogConfig::on_checkBox_netRigctl_toggled(bool checked)
 
 void DialogConfig::on_comboBox_rigModel_currentIndexChanged(int index)
 {
-    if (index == 2 || index == 3 || index == 4)
+    int currentRig = 0;
+    RIG *rig;
+
+    if (index)
     {
-        ui->checkBox_netRigctl->setChecked(true);
-        ui->tabWidget_Config->setCurrentIndex(1);
+        QString rigModel = ui->comboBox_rigModel->currentText();
+        currentRig = findRigModel(rigModel);
     }
+
+    if (currentRig)
+    {
+        rig = rig_init(currentRig);
+        if (rig->caps->port_type == RIG_PORT_SERIAL)
+        {
+            ui->checkBox_netRigctl->setChecked(false);
+            ui->tabWidget_Config->setCurrentIndex(0);
+            setDialogSerialConfig(rig->caps->serial_data_bits, rig->caps->serial_parity, rig->caps->serial_stop_bits, rig->caps->serial_handshake);
+            //qDebug() << rig->caps->serial_data_bits << rig->caps->serial_parity << rig->caps->serial_stop_bits << rig->caps->serial_handshake;
+        }
+        else if (rig->caps->port_type == RIG_PORT_NETWORK)
+        {
+            ui->checkBox_netRigctl->setChecked(true);
+            ui->tabWidget_Config->setCurrentIndex(1);
+        }
+        else if (rig->caps->port_type == RIG_PORT_NONE)
+        {
+            ui->checkBox_netRigctl->setChecked(false);
+            ui->tabWidget_Config->setCurrentIndex(0);
+            ui->comboBox_comPort->clear();
+        }
+    }
+
+    //if (index == 2 || index == 3 || index == 4)
+    //{
+    //    ui->checkBox_netRigctl->setChecked(true);
+    //    ui->tabWidget_Config->setCurrentIndex(1);
+    //}
 }
 
 void DialogConfig::on_comboBox_comPort_currentIndexChanged(int index)

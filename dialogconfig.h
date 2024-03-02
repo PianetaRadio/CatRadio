@@ -45,6 +45,10 @@ private slots:
 
 private:
     Ui::DialogConfig *ui;
+
+    int findRigModel(QString rigModel);  //Find hamlib rig model from the rig selected in the comboBox_rigModel
+    void setDialogSerialConfig(int dataBits, int parity, int stopBits, int handshake);    //Set the serial port configuration on the dialog
+    void setRigSerialConfigFromDialog();    //Set the rigConf serial config from dialog serial settings
 };
 
 int printRigList(const struct rig_caps *rigCaps, void *data);   //Retrives rig list from Hamlib and write to file

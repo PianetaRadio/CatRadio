@@ -8,6 +8,7 @@ CatRadio
 	+ High SWR indicator
 	+ Meter peak hold indicator
 	+ Debug mode
+	* Updated serial port configuration
 	* Bug fix: NR level
 	* Bug fix: Repeater shift
 	* Bug fix: Power status
