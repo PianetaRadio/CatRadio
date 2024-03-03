@@ -1,6 +1,6 @@
 /**
  ** This file is part of the CatRadio project.
- ** Copyright 2022 Gianfranco Sordetti IZ8EWD <iz8ewd@pianetaradio.it>.
+ ** Copyright 2022-2024 Gianfranco Sordetti IZ8EWD <iz8ewd@pianetaradio.it>.
  **
  ** This program is free software: you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -61,19 +61,23 @@ RIG *RigDaemon::rigConnect(int *retcode)
     }
     else
     {
-        if (rigCom.rigModel == 2)   //Rigctld
+        //if (rigCom.rigModel == 2)   //Rigctld
+        if (my_rig->state.port_type == RIG_PORT_NETWORK)
         {
-            //myport.type.rig = RIG_PORT_NETWORK;
             strncpy(my_rig->state.rigport.pathname, rigCom.rigPort.toLatin1(), HAMLIB_FILPATHLEN - 1);
         }
-        else
+        else    //RIG_PORT_SERIAL
         {
-            //myport.type.rig = RIG_PORT_SERIAL;
             strncpy(my_rig->state.rigport.pathname, rigCom.rigPort.toLatin1(), HAMLIB_FILPATHLEN - 1);
             my_rig->state.rigport.parm.serial.rate = rigCom.serialSpeed;
-            //qDebug() << my_rig->state.rigport.parm.serial.stop_bits << my_rig->caps->serial_stop_bits;
-            //qDebug() << my_rig->state.rigport.parm.serial.parity << my_rig->caps->serial_parity;
-            //qDebug() << my_rig->state.rigport.parm.serial.handshake << my_rig->caps->serial_handshake;
+            my_rig->state.rigport.parm.serial.data_bits = rigCom.serialDataBits;
+            if (rigCom.serialParity == 1) my_rig->state.rigport.parm.serial.parity = RIG_PARITY_ODD;
+            else if (rigCom.serialParity == 2) my_rig->state.rigport.parm.serial.parity = RIG_PARITY_EVEN;
+            else my_rig->state.rigport.parm.serial.parity = RIG_PARITY_NONE;
+            my_rig->state.rigport.parm.serial.stop_bits = rigCom.serialStopBits;
+            if (rigCom.serialHandshake == 1) my_rig->state.rigport.parm.serial.handshake = RIG_HANDSHAKE_XONXOFF;
+            else if (rigCom.serialHandshake == 2) my_rig->state.rigport.parm.serial.handshake = RIG_HANDSHAKE_HARDWARE;
+            else my_rig->state.rigport.parm.serial.handshake = RIG_HANDSHAKE_NONE;
 
             if (rigCom.civAddr) //CI-V address Icom
             {
@@ -227,6 +231,7 @@ void RigDaemon::rigUpdate(RIG *my_rig)
             if (rigCmd.vfoXchange)
             {
                 if (my_rig->state.vfo_ops & RIG_OP_XCHG)
+                //if (my_rig->caps->vfo_ops & RIG_OP_XCHG)
                 {
                     mode_t tempMode = rigGet.mode;
                     retcode = rig_vfo_op(my_rig, RIG_VFO_CURR, RIG_OP_XCHG);
@@ -239,6 +244,7 @@ void RigDaemon::rigUpdate(RIG *my_rig)
                 }
 
                 else if (my_rig->state.vfo_ops & RIG_OP_TOGGLE)
+                //else if (my_rig->caps->vfo_ops & RIG_OP_TOGGLE)
                 {
                     freq_t tempFreq = rigGet.freqMain;
                     mode_t tempMode = rigGet.mode;
@@ -258,6 +264,7 @@ void RigDaemon::rigUpdate(RIG *my_rig)
             if (rigCmd.vfoCopy)
             {
                 if (my_rig->state.vfo_ops & RIG_OP_CPY)
+                //if (my_rig->caps->vfo_ops & RIG_OP_CPY)
                 {
                     retcode = rig_vfo_op(my_rig, RIG_VFO_CURR, RIG_OP_CPY);
                     if (retcode == RIG_OK)
@@ -287,6 +294,7 @@ void RigDaemon::rigUpdate(RIG *my_rig)
             if (rigCmd.bandUp)
             {
                 if (my_rig->state.vfo_ops & RIG_OP_BAND_UP)
+                //if (my_rig->caps->vfo_ops & RIG_OP_BAND_UP)
                 {
                     retcode = rig_vfo_op(my_rig, RIG_VFO_CURR, RIG_OP_BAND_UP);
                     if (retcode == RIG_OK) indexCmd = 21;
@@ -298,6 +306,7 @@ void RigDaemon::rigUpdate(RIG *my_rig)
             if (rigCmd.bandDown)
             {
                 if (my_rig->state.vfo_ops & RIG_OP_BAND_DOWN)
+                //if (my_rig->caps->vfo_ops & RIG_OP_BAND_DOWN)
                 {
                     retcode = rig_vfo_op(my_rig, RIG_VFO_CURR, RIG_OP_BAND_DOWN);
                     if (retcode == RIG_OK) indexCmd = 21;
@@ -325,6 +334,7 @@ void RigDaemon::rigUpdate(RIG *my_rig)
             if (rigCmd.tune)
             {
                 if (my_rig->state.vfo_ops & RIG_OP_TUNE) rig_vfo_op(my_rig, RIG_VFO_CURR, RIG_OP_TUNE);
+                //if (my_rig->caps->vfo_ops & RIG_OP_TUNE) rig_vfo_op(my_rig, RIG_VFO_CURR, RIG_OP_TUNE);
                 rigCmd.tune = 0;
             }
 

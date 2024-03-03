@@ -110,10 +110,13 @@ MainWindow::MainWindow(QWidget *parent)
     rigCom.rigPort = configFile.value("rigPort").toString();
     rigCom.serialSpeed = configFile.value("serialSpeed", 9600).toUInt();
     rigCom.civAddr = configFile.value("civAddress", 0).toInt();
-    rigCom.serialDataBits = configFile.value("serialDataBits", 8).toUInt();
-    rigCom.serialParity = configFile.value("serialParity", 0).toUInt();
-    rigCom.serialStopBits = configFile.value("serialStopBits", 2).toUInt();
-    rigCom.serialHandshake = configFile.value("serialHandshake", 0).toUInt();
+    if (configFile.contains("serialDataBits"))  //For backward compatibility with CatRadio v.< 1.4.0
+    {
+        rigCom.serialDataBits = configFile.value("serialDataBits", 8).toUInt();
+        rigCom.serialParity = configFile.value("serialParity", 0).toUInt();
+        rigCom.serialStopBits = configFile.value("serialStopBits", 2).toUInt();
+        rigCom.serialHandshake = configFile.value("serialHandshake", 0).toUInt();
+    }
     rigCom.netRigctl = configFile.value("netRigctl", false).toBool();
     rigCom.rigRefresh = configFile.value("rigRefresh", 100).toInt();
     rigCom.fullPoll = configFile.value("fullPolling", true).toBool();
