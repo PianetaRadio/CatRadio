@@ -310,7 +310,7 @@ void DialogConfig::on_comboBox_rigModel_currentIndexChanged(int index)
         rig = rig_init(currentRig);
         if (rig->caps->port_type == RIG_PORT_SERIAL)
         {
-            ui->checkBox_netRigctl->setChecked(false);
+            //ui->checkBox_netRigctl->setChecked(false);
             ui->tabWidget_Config->setCurrentIndex(0);
             setDialogSerialConfig(rig->caps->serial_data_bits, rig->caps->serial_parity, rig->caps->serial_stop_bits, rig->caps->serial_handshake);
             //qDebug() << rig->caps->serial_data_bits << rig->caps->serial_parity << rig->caps->serial_stop_bits << rig->caps->serial_handshake;
