@@ -216,11 +216,12 @@ void DialogConfig::on_buttonBox_accepted()
         {
             rigCom.netRigctl = false;
             rigCom.rigPort = ui->comboBox_comPort->currentText();
-            rigCom.serialSpeed = ui->comboBox_serialSpeed->currentText().toInt();
-            rigCom.civAddr = ui->lineEdit_civAddr->text().toInt(&civAddrConv,16);
-            setRigSerialConfigFromDialog();
+            //rigCom.serialSpeed = ui->comboBox_serialSpeed->currentText().toInt();
+            //rigCom.civAddr = ui->lineEdit_civAddr->text().toInt(&civAddrConv,16);
+            //setRigSerialConfigFromDialog();
 
-            if (rigCom.rigPort == "" && rigCom.rigModel != 1 && rigCom.rigModel != 6)
+            //if (rigCom.rigPort == "" && rigCom.rigModel != 1 && rigCom.rigModel != 6)
+            if (rigCom.rigPort == "")
             {
                 QMessageBox msgBox; //Show error MessageBox
                 msgBox.setWindowTitle("Warning");
@@ -230,6 +231,10 @@ void DialogConfig::on_buttonBox_accepted()
                 msgBox.exec();
             }
         }
+
+        rigCom.serialSpeed = ui->comboBox_serialSpeed->currentText().toInt();
+        rigCom.civAddr = ui->lineEdit_civAddr->text().toInt(&civAddrConv,16);
+        setRigSerialConfigFromDialog();
     }
 
     rigCom.rigRefresh = ui->spinBox_RefreshRate->value();
@@ -286,11 +291,11 @@ void DialogConfig::on_checkBox_netRigctl_toggled(bool checked)
 {
     if (checked)    //TCP port
     {
-        ui->comboBox_comPort->setCurrentText("");   //clear COM port
+        //ui->comboBox_comPort->setCurrentText("");   //clear COM port
     }
     else    //COM port
     {
-        ui->lineEdit_ip->setText("");   //clear IP address
+        //ui->lineEdit_ip->setText("");   //clear IP address
     }
 }
 
