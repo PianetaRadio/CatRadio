@@ -220,8 +220,7 @@ void DialogConfig::on_buttonBox_accepted()
             //rigCom.civAddr = ui->lineEdit_civAddr->text().toInt(&civAddrConv,16);
             //setRigSerialConfigFromDialog();
 
-            //if (rigCom.rigPort == "" && rigCom.rigModel != 1 && rigCom.rigModel != 6)
-            if (rigCom.rigPort == "")
+            if (rigCom.rigPort == "" && rigCom.rigModel != 1 && rigCom.rigModel != 6)
             {
                 QMessageBox msgBox; //Show error MessageBox
                 msgBox.setWindowTitle("Warning");
