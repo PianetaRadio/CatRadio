@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=CatRadio
+Comment=Radio Control Software
+Icon=/home/pi/CatRadio/catradio.png
+Exec=/home/pi/CatRadio/CatRadio
+Type=Application
+Terminal=false
+Encoding=UTF-8
+Categories=HamRadio;
