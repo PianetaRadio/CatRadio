@@ -10,6 +10,15 @@
 /* Frontend ABI version */
 #define ABI_VERSION 4
 
+/* Frontend Major version */
+#define ABI_VERSION_MAJOR 4
+
+/* Frontend Minor version */
+#define ABI_VERSION_MINOR 6
+
+/* Frontend Patch version */
+#define ABI_VERSION_PATCH 0
+
 /* Define to one of `_getb67', `GETB67', `getb67' for Cray-2 and Cray-YMP
    systems. This function is required for `alloca.c' support on those systems.
    */
@@ -367,7 +376,7 @@
 #define PACKAGE_NAME "Hamlib"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "Hamlib 4.5.5"
+#define PACKAGE_STRING "Hamlib 4.6~git"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "hamlib"
@@ -376,7 +385,7 @@
 #define PACKAGE_URL "http://www.hamlib.org"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "4.5.5"
+#define PACKAGE_VERSION "4.6~git"
 
 /* Define to necessary symbol if this constant uses a non-standard name on
    your system. */
@@ -416,7 +425,7 @@
 
 
 /* Version number of package */
-#define VERSION "4.5.5"
+#define VERSION "4.6~git"
 
 /* Define to 1 if on MINIX. */
 /* #undef _MINIX */
