@@ -57,7 +57,7 @@ INCLUDEPATH += $$PWD/hamlib
 RESOURCES += qdarkstyle/dark/darkstyle.qrc
 # RESOURCES += qdarkstyle/light/lightstyle.qrc
 
-VERSION = 1.4.0
+VERSION = 1.4.1
 
 RC_ICONS = catradio.ico
 
