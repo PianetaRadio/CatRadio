@@ -2,7 +2,7 @@ CatRadio
 
 (+ New, * Updated, - Removed)
 
-1.4.0 - 2024-mm-dd
+1.4.0 - 2024-03-17
 	+ Auto Connect option
 	+ Auto Power-on option
 	+ High SWR indicator
@@ -13,7 +13,7 @@ CatRadio
 	* Bug fix: Repeater shift
 	* Bug fix: Power status
 	* Bug fix: COM port list
-	* Updated to library Hamlib 4.5.5
+	* Updated to library Hamlib 4.6 beta
 
 1.3.0 - 2022-11-24
 	+ Radio info
