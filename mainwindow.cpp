@@ -39,6 +39,7 @@
 #include <QApplication>
 #include <QCoreApplication>
 #include <QDir>
+#include <QMessageBox>
 
 #include <cwchar>
 #include <rig.h>    //Hamlib
@@ -193,7 +194,19 @@ MainWindow::MainWindow(QWidget *parent)
     ui->lineEdit_vfoMain->setValue(0);
     ui->lineEdit_vfoSub->setValue(0);
 
-    if (rigCom.autoConnect) ui->pushButton_Connect->toggle(); //Auto connect
+    //Check Hamlib version
+    if (!checkHamlibVersion(4, 6, 0))
+    {
+        QMessageBox msgBox;
+        msgBox.setWindowTitle("Hamlib");
+        msgBox.setText("Please, update Hamlib libraries to version 4.6 or higher.");
+        msgBox.setIcon(QMessageBox::Warning);
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.exec();
+    }
+
+    //Auto connect
+    if (rigCom.autoConnect) ui->pushButton_Connect->toggle();
 }
 
 MainWindow::~MainWindow()
@@ -799,6 +812,32 @@ void MainWindow::setSubMeter()
     }
 
     ui->progressBar_subMeter->resetPeakValue();
+}
+
+
+bool MainWindow::checkHamlibVersion(int major, int minor, int revision)
+{
+    QString hamlibVer = rig_version();
+    QRegularExpression hamlibVerExp("(?P<major>\\d)\\.(?P<minor>\\d)\\.?(?P<revision>\\d)?");
+
+    QRegularExpressionMatch hamlibVerMatch = hamlibVerExp.match(hamlibVer);
+
+    if (hamlibVerMatch.hasMatch())
+    {
+        int majorVer = hamlibVerMatch.captured("major").toInt();
+        int minorVer = hamlibVerMatch.captured("minor").toInt();
+        int revisionVer = hamlibVerMatch.captured("revision").toInt();
+
+        //qDebug()<<majorVer<<minorVer<<revisionVer;
+
+        if (majorVer > major) return true;
+        else if (majorVer < major) return false;
+        else if (minorVer > minor) return true;    //& majorVer=major
+        else if (minorVer < minor) return false;   //& majorVer=major
+        else if (revisionVer < revision) return false; //& majorVer=major, minorVer=minor
+        else return true;   //revisionVer>=revision & majorVer=major, minorVer=minor
+    }
+    else return false;
 }
 
 

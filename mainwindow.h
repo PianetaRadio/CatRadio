@@ -220,6 +220,8 @@ private:
 
     void guiInit();
     void setSubMeter();
+
+    bool checkHamlibVersion(int major, int minor, int revision);
 };
 
 #endif // MAINWINDOW_H
