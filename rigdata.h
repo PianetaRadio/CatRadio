@@ -71,6 +71,7 @@ typedef struct {
     int tuner;  //Tuner
     int bkin;   //CW Break-in
     int wpm;    //CW Keyer speed WPM
+    char cwMem;     //CW memory keyer
     int apf;    //Audio Peak Filter
     int noiseBlanker, noiseBlanker2;    //NB
     int noiseReduction;     //NR
@@ -109,9 +110,10 @@ typedef struct {
     int tune;
     int bandUp, bandDown;
     int bandChange;
-    int bkin;
-    int wpm;
-    int apf;
+    int bkin;       //CW break-in
+    int wpm;        //CW wpm
+    int cwSend;     //CW send memory (Yaesu only)
+    int apf;        //CW audio peak filter (Yaesu only)
     int noiseBlanker, noiseBlanker2;
     int noiseReduction, noiseReductionLevel;
     int notchFilter;

@@ -116,6 +116,12 @@ void RigDaemon::rigUpdate(RIG *my_rig)
         rigCmd.ptt = 0;
     }
 
+    if (rigCmd.cwSend)
+    {
+        rig_send_morse(my_rig, RIG_VFO_CURR, &rigSet.cwMem);
+        rigCmd.cwSend = 0;
+    }
+
     //* VFO
     if (rigCmd.freqMain)   //VFO Main
     {

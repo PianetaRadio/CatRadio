@@ -1,6 +1,6 @@
 /**
  ** This file is part of the CatRadio project.
- ** Copyright 2022 Gianfranco Sordetti IZ8EWD <iz8ewd@pianetaradio.it>.
+ ** Copyright 2022-2024 Gianfranco Sordetti IZ8EWD <iz8ewd@pianetaradio.it>.
  **
  ** This program is free software: you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@
 
 void set_band (int band);
 void quick_split ();
+void send_cw_mem (int memory);
 agc_level_e levelagcvalue (int agcValue);
 agc_level_e levelagcstr (QString agcString);
 value_t valueagclevel (agc_level_e agcLevel);

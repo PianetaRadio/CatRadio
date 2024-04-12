@@ -39,7 +39,6 @@
 #include <QApplication>
 #include <QCoreApplication>
 #include <QDir>
-#include <QMessageBox>
 
 #include <cwchar>
 #include <rig.h>    //Hamlib
@@ -1078,6 +1077,32 @@ void MainWindow::on_pushButton_BandUp_clicked()
 {
     rigCmd.bandUp = 1;
 }
+
+void MainWindow::on_pushButton_CW1_clicked()
+{
+    send_cw_mem(1);
+}
+
+void MainWindow::on_pushButton_CW2_clicked()
+{
+    send_cw_mem(2);
+}
+
+void MainWindow::on_pushButton_CW3_clicked()
+{
+    send_cw_mem(3);
+}
+
+void MainWindow::on_pushButton_CW4_clicked()
+{
+    send_cw_mem(4);
+}
+
+void MainWindow::on_pushButton_CW5_clicked()
+{
+    send_cw_mem(5);
+}
+
 
 //***** CheckBox *****
 void MainWindow::on_checkBox_micCompressor_toggled(bool checked)

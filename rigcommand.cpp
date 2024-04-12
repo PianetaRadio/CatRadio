@@ -1,6 +1,6 @@
 /**
  ** This file is part of the CatRadio project.
- ** Copyright 2022 Gianfranco Sordetti IZ8EWD <iz8ewd@pianetaradio.it>.
+ ** Copyright 2022-2024 Gianfranco Sordetti IZ8EWD <iz8ewd@pianetaradio.it>.
  **
  ** This program is free software: you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@ extern rigSettings rigSet;
 extern rigCommand rigCmd;
 extern rigCommand rigCap;
 
+//* Set band to default frequency or use band change if radio has capability
 void set_band (int band)
 {
     if (rigCap.bandChange==0)
@@ -84,6 +85,7 @@ void set_band (int band)
     }
 }
 
+//* Set split to 5kHz and activate it
 void quick_split ()
 {
     rigSet.freqSub = rigGet.freqMain + 5000;
@@ -94,6 +96,14 @@ void quick_split ()
     rigCmd.split = 1;
 }
 
+//* Send CW keyer message 1-5, Yaesu only
+void send_cw_mem (int memory)
+{
+    rigSet.cwMem = (char)(memory + '0');
+    rigCmd.cwSend = 1;
+}
+
+//* Convert AGC int value to hamlib enumerated
 agc_level_e levelagcvalue (int agcValue)
 {
     agc_level_e agcLevel;
@@ -113,6 +123,7 @@ agc_level_e levelagcvalue (int agcValue)
     return agcLevel;
 }
 
+//* Convert AGC string to hamlib enumerated
 agc_level_e levelagcstr (QString agcString)
 {
     agc_level_e agcLevel;
@@ -128,6 +139,7 @@ agc_level_e levelagcstr (QString agcString)
     return agcLevel;
 }
 
+//* Convert AGC hamlib enumerated to hamlib value_t
 value_t valueagclevel (agc_level_e agcLevel)
 {
     value_t value;
@@ -143,6 +155,7 @@ value_t valueagclevel (agc_level_e agcLevel)
     return value;
 }
 
+//* Convert antenna string to hamlib ant_t
 ant_t antstr (QString antString)
 {
     ant_t ant;
@@ -160,6 +173,7 @@ ant_t antstr (QString antString)
     return ant;
 }
 
+//* Convert meter type string to hamlib number
 unsigned long long levelmeterstr (QString meterString)
 {
     unsigned long long levelMeter;

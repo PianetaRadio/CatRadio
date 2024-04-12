@@ -1,6 +1,6 @@
 /**
  ** This file is part of the CatRadio project.
- ** Copyright 2022 Gianfranco Sordetti IZ8EWD <iz8ewd@pianetaradio.it>.
+ ** Copyright 2022-2024 Gianfranco Sordetti IZ8EWD <iz8ewd@pianetaradio.it>.
  **
  ** This program is free software: you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -211,6 +211,16 @@ private slots:
     void on_action_RadioInfo_triggered();
 
     void on_action_AboutDarkTheme_triggered();
+
+    void on_pushButton_CW1_clicked();
+
+    void on_pushButton_CW2_clicked();
+
+    void on_pushButton_CW3_clicked();
+
+    void on_pushButton_CW4_clicked();
+
+    void on_pushButton_CW5_clicked();
 
 private:
     Ui::MainWindow *ui;
