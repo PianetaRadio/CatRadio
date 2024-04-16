@@ -116,9 +116,10 @@ void RigDaemon::rigUpdate(RIG *my_rig)
         rigCmd.ptt = 0;
     }
 
-    if (rigCmd.cwSend)
+    if (rigCmd.cwSend && (rigGet.mode == RIG_MODE_CW || rigGet.mode == RIG_MODE_CWN || rigGet.mode == RIG_MODE_CWR))
     {
-        rig_send_morse(my_rig, RIG_VFO_CURR, &rigSet.cwMem);
+        retcode = rig_send_morse(my_rig, RIG_VFO_CURR, &rigSet.cwMem);
+        //if (retcode == RIG_OK) rigGet.ptt = RIG_PTT_ON; //assume PPT on if send_morse is ok
         rigCmd.cwSend = 0;
     }
 
@@ -141,6 +142,12 @@ void RigDaemon::rigUpdate(RIG *my_rig)
     //***** Priority Poll execution *****
     else
     {
+        //* PTT
+        ptt_t retptt;
+        retcode = rig_get_ptt(my_rig, RIG_VFO_CURR, &retptt);
+        if (retcode == RIG_OK) rigGet.ptt = retptt;
+
+        //* VFO
         freq_t retfreq;
         retcode = rig_get_freq(my_rig, RIG_VFO_CURR, &retfreq); //get VFO Main
         if (retcode == RIG_OK) rigGet.freqMain = retfreq;
@@ -149,11 +156,6 @@ void RigDaemon::rigUpdate(RIG *my_rig)
             retcode = rig_get_freq(my_rig, rigGet.vfoSub, &retfreq);
             if (retcode == RIG_OK) rigGet.freqSub = retfreq;
         }
-
-        //* PTT
-        ptt_t retptt;
-        retcode = rig_get_ptt(my_rig, RIG_VFO_CURR, &retptt);
-        if (retcode == RIG_OK) rigGet.ptt = retptt;
 
         //* Meter
         if (rigGet.ptt == 1 || rigSet.ptt == 1)
@@ -819,7 +821,7 @@ void RigDaemon::rigUpdate(RIG *my_rig)
         }
 
         //* CW
-        if ((indexCmd == 19 && !rigGet.ptt && rigCom.fullPoll) || indexCmd == 0) //&& mode=CW
+        if ((indexCmd == 19 && !rigGet.ptt && rigCom.fullPoll && (rigGet.mode == RIG_MODE_CW || rigGet.mode == RIG_MODE_CWN || rigGet.mode == RIG_MODE_CWR)) || indexCmd == 0)
         {
             if (rig_has_get_func(my_rig, RIG_FUNC_FBKIN)) rig_get_func(my_rig, RIG_VFO_CURR, RIG_FUNC_FBKIN, &rigGet.bkin);   //Break-in
             if (rig_has_get_func(my_rig, RIG_FUNC_APF)) rig_get_func(my_rig, RIG_VFO_CURR, RIG_FUNC_APF, &rigGet.apf);      //Audio Peak Filter

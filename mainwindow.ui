@@ -1892,6 +1892,9 @@
         <property name="text">
          <string>2</string>
         </property>
+        <property name="shortcut">
+         <string>2</string>
+        </property>
        </widget>
       </item>
       <item row="0" column="3">
@@ -1912,11 +1915,17 @@
         <property name="text">
          <string>4</string>
         </property>
+        <property name="shortcut">
+         <string>4</string>
+        </property>
        </widget>
       </item>
       <item row="1" column="3">
        <widget class="QPushButton" name="pushButton_CW3">
         <property name="text">
+         <string>3</string>
+        </property>
+        <property name="shortcut">
          <string>3</string>
         </property>
        </widget>
@@ -1946,11 +1955,17 @@
         <property name="text">
          <string>1</string>
         </property>
+        <property name="shortcut">
+         <string>1</string>
+        </property>
        </widget>
       </item>
       <item row="1" column="5">
        <widget class="QPushButton" name="pushButton_CW5">
         <property name="text">
+         <string>5</string>
+        </property>
+        <property name="shortcut">
          <string>5</string>
         </property>
        </widget>

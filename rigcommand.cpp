@@ -96,7 +96,7 @@ void quick_split ()
     rigCmd.split = 1;
 }
 
-//* Send CW keyer message 1-5, Yaesu only
+//* Send CW keyer message 1-5
 void send_cw_mem (int memory)
 {
     rigSet.cwMem = (char)(memory + '0');
@@ -173,7 +173,7 @@ ant_t antstr (QString antString)
     return ant;
 }
 
-//* Convert meter type string to hamlib number
+ //* Convert Submeter combo box string into hamlib RIG_LEVEL constant
 unsigned long long levelmeterstr (QString meterString)
 {
     unsigned long long levelMeter;

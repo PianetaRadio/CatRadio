@@ -34,4 +34,4 @@ agc_level_e levelagcvalue (int agcValue);
 agc_level_e levelagcstr (QString agcString);
 value_t valueagclevel (agc_level_e agcLevel);
 ant_t antstr (QString antString);
-unsigned long long levelmeterstr (QString meterString); //Convert Submeter combo box string into Hamlib RIG_LEVEL constant
+unsigned long long levelmeterstr (QString meterString);
