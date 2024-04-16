@@ -801,7 +801,7 @@ void RigDaemon::rigUpdate(RIG *my_rig)
         //* IF Shift
         if ((indexCmd == 17 && !rigGet.ptt && rigCom.fullPoll) || indexCmd == 0)
         {
-            if (rig_has_get_level(my_rig, RIG_LEVEL_NR))
+            if (rig_has_get_level(my_rig, RIG_LEVEL_IF))
             {
                 rig_get_level(my_rig, RIG_VFO_CURR, RIG_LEVEL_IF, &retvalue);
                 rigGet.ifShift = retvalue.i;
