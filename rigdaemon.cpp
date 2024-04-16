@@ -118,8 +118,9 @@ void RigDaemon::rigUpdate(RIG *my_rig)
 
     if (rigCmd.cwSend && (rigGet.mode == RIG_MODE_CW || rigGet.mode == RIG_MODE_CWN || rigGet.mode == RIG_MODE_CWR))
     {
+        //if (rig_has_get_func(my_rig, RIG_FUNCTION_SEND_MORSE)) rig_send_morse(my_rig, RIG_VFO_CURR, &rigSet.cwMem);
         retcode = rig_send_morse(my_rig, RIG_VFO_CURR, &rigSet.cwMem);
-        //if (retcode == RIG_OK) rigGet.ptt = RIG_PTT_ON; //assume PPT on if send_morse is ok
+        if (retcode == RIG_OK) rigGet.ptt = RIG_PTT_ON; //assume PPT on if send_morse is ok
         rigCmd.cwSend = 0;
     }
 
