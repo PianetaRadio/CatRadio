@@ -830,7 +830,7 @@ void RigDaemon::rigUpdate(RIG *my_rig)
         }
 
         //* FM
-        if ((indexCmd == 20 && !rigGet.ptt && rigCom.fullPoll) || indexCmd == 0) //&& mode=FM
+        if ((indexCmd == 20 && !rigGet.ptt && rigCom.fullPoll && (rigGet.mode == RIG_MODE_FM || rigGet.mode == RIG_MODE_WFM || rigGet.mode == RIG_MODE_FMN)) || indexCmd == 0)
         {
             rig_get_rptr_shift(my_rig, RIG_VFO_CURR, &rigGet.rptShift);     //Repeater Shift
             rig_get_rptr_offs(my_rig, RIG_VFO_CURR, &rigGet.rptOffset);     //Repeater Offset
