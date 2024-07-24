@@ -5,6 +5,7 @@ CatRadio
 1.4.1 - 2024-xx-xx
 	+ CW memory keyer
 	+ Check hamlib version on startup
+	* Display software version in the window title
 	* Bug fix: IF shift
 
 1.4.0 - 2024-03-17

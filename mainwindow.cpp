@@ -78,6 +78,10 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
+    //display name and version in the window title
+    QString version = QString::number(VERSION_MAJ)+"."+QString::number(VERSION_MIN)+"."+QString::number(VERSION_MIC);
+    this->setWindowTitle("CatRadio v."+version);
+
     QDir::setCurrent(QCoreApplication::applicationDirPath());   //set current path = application path
 
     timer = new QTimer(this);   //timer for rigDaemon thread call
