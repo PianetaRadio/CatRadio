@@ -1,5 +1,7 @@
 QT       += core gui
 QT       += serialport
+QT       += multimedia
+
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -12,8 +14,10 @@ CONFIG += c++11
 SOURCES += \
     dialogcommand.cpp \
     dialogconfig.cpp \
+    dialognetrigctl.cpp \
     dialogradioinfo.cpp \
     dialogsetup.cpp \
+    dialogvoicekeyer.cpp \
     guidata.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -27,8 +31,10 @@ SOURCES += \
 HEADERS += \
     dialogcommand.h \
     dialogconfig.h \
+    dialognetrigctl.h \
     dialogradioinfo.h \
     dialogsetup.h \
+    dialogvoicekeyer.h \
     guidata.h \
     mainwindow.h \
     rigcommand.h \
@@ -41,8 +47,10 @@ HEADERS += \
 FORMS += \
     dialogcommand.ui \
     dialogconfig.ui \
+    dialognetrigctl.ui \
     dialogradioinfo.ui \
     dialogsetup.ui \
+    dialogvoicekeyer.ui \
     mainwindow.ui
 
 # Default rules for deployment.
@@ -53,11 +61,9 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 LIBS += -L$$PWD/hamlib/ -lhamlib
 INCLUDEPATH += $$PWD/hamlib
 
-# RESOURCES += theme/breeze.qrc
 RESOURCES += qdarkstyle/dark/darkstyle.qrc
-# RESOURCES += qdarkstyle/light/lightstyle.qrc
 
-VERSION = 1.4.1
+VERSION = 1.5.0
 
 RC_ICONS = catradio.ico
 
