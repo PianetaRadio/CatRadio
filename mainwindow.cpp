@@ -21,8 +21,10 @@
 #include "ui_mainwindow.h"
 #include "dialogconfig.h"
 #include "dialogsetup.h"
+#include "dialogvoicekeyer.h"
 #include "dialogcommand.h"
 #include "dialogradioinfo.h"
+#include "dialognetrigctl.h"
 #include "rigdaemon.h"
 #include "rigdata.h"
 #include "guidata.h"
@@ -31,7 +33,6 @@
 #include <QDebug>
 #include <QMessageBox>
 #include <QThread>
-#include <QSettings>
 #include <QString>
 #include <QtGlobal>
 #include <QDesktopServices>
@@ -52,6 +53,7 @@ extern rigCommand rigCmd;
 extern rigCommand rigCap;
 extern guiConfig guiConf;
 extern guiCommand guiCmd;
+extern voiceKeyerConfig voiceKConf;
 
 int retcode;    //Return code from function
 int i;  //Index
@@ -128,11 +130,15 @@ MainWindow::MainWindow(QWidget *parent)
     rigCom.autoPowerOn = configFile.value("autoPowerOn", false).toBool();
     guiConf.vfoDisplayMode = configFile.value("vfoDisplayMode", 0).toInt();
     guiConf.darkTheme = configFile.value("darkTheme", false).toBool();
+    guiConf.voiceKeyerMode = configFile.value("voiceKeyerMode", 0).toInt();
     guiConf.peakHold = configFile.value("peakHold", true).toBool();
     guiConf.debugMode = configFile.value("debugMode", false).toBool();
     //Window settings
     restoreGeometry(configFile.value("WindowSettings/geometry").toByteArray());
     restoreState(configFile.value("WindowSettings/state").toByteArray());
+    //Voice memory
+    if (guiConf.voiceKeyerMode == 1)
+        audioOutputInit(configFile.fileName());
 
     //* Debug
     if (guiConf.debugMode) rig_set_debug_level(RIG_DEBUG_VERBOSE); //debug verbose
@@ -451,6 +457,39 @@ void MainWindow::guiInit()
     guiCmd.tabList = 1; //select tab
 }
 
+void MainWindow::audioOutputInit(QString configFileName)
+{
+    //Set audio file names associated to keyer memory buttons
+    QSettings configFile(configFileName, QSettings::IniFormat);
+    voiceKConf.memoryFile[0] = configFile.value("VoiceKeyer/voiceMemoryFile1").toString();
+    voiceKConf.memoryFile[1] = configFile.value("VoiceKeyer/voiceMemoryFile2").toString();
+    voiceKConf.memoryFile[2] = configFile.value("VoiceKeyer/voiceMemoryFile3").toString();
+    voiceKConf.memoryFile[3] = configFile.value("VoiceKeyer/voiceMemoryFile4").toString();
+    voiceKConf.memoryFile[4] = configFile.value("VoiceKeyer/voiceMemoryFile5").toString();
+    voiceKConf.audioOutput = configFile.value("VoiceKeyer/audioOutput").toString();
+    voiceKConf.audioOutputVolume = configFile.value("VoiceKeyer/audioOutputVolume").toFloat();
+
+    audioPlayer = new QMediaPlayer(this);
+    audioOutput = new QAudioOutput(this);
+
+    //Connect signal playback state change with slot on_voiceKeyerStateChanged function
+    connect(audioPlayer, &QMediaPlayer::mediaStatusChanged, this, &MainWindow::on_voiceKeyerStateChanged);
+
+    //Select audio output device
+    //QAudioDevice audioDevice = configFile.value("VoiceKeyer/audioOutput", QAudioDevice::Null).value<QAudioDevice>();  //Do not work
+    QAudioDevice audioDevice = QMediaDevices::defaultAudioOutput(); //Select default audio output device as first attempt
+    //Search in the system audio output devices for a device with the selected name
+    audioDevices = new QMediaDevices(this);
+    const QList<QAudioDevice> devices = audioDevices->audioOutputs();
+    for (const QAudioDevice &deviceInfo : devices)
+        if (voiceKConf.audioOutput == deviceInfo.description()) audioDevice = deviceInfo;
+    audioOutput->setDevice(audioDevice);
+    audioPlayer->setAudioOutput(audioOutput);
+
+    //Set output volume
+    audioOutput->setVolume(voiceKConf.audioOutputVolume);    //Float 0 min - 1 max
+}
+
 void MainWindow::guiUpdate()
 {
     //* Power button
@@ -657,6 +696,7 @@ void MainWindow::guiUpdate()
         if (rigGet.vfoTx == rigGet.vfoSub) ui->label_vfoSub->setStyleSheet("QLabel {background-color: red}");
         else ui->label_vfoMain->setStyleSheet("QLabel {background-color: red}");
 
+        //Smeter and subMeter
         if (!ui->progressBar_Smeter->getTx())
         {
             ui->progressBar_Smeter->setTx(true);
@@ -666,6 +706,9 @@ void MainWindow::guiUpdate()
         ui->progressBar_Smeter->setValue(rigGet.powerMeter.f*100);
         ui->progressBar_subMeter->setValue(rigGet.subMeter.f);
         if (rigGet.hiSWR.f > 2) ui->label_hiSWR->setVisible(true);
+
+        //Voice keyer
+        if (guiConf.voiceKeyerMode == 1 && rigCmd.voiceSend) audioPlayer->play();
     }
     else    //RIG_PTT_OFF
     {
@@ -815,6 +858,31 @@ void MainWindow::setSubMeter()
     }
 
     ui->progressBar_subMeter->resetPeakValue();
+}
+
+
+void MainWindow::on_voiceKeyerStateChanged()
+{
+    if (rigCmd.voiceSend >= 1)
+    {
+        if (audioPlayer->mediaStatus() == 2 &&  audioPlayer->source() == QUrl::fromLocalFile(voiceKConf.memoryFile[rigCmd.voiceSend - 1]))    //LoadedMedia
+        {
+            ui->pushButton_PTT->toggle();
+            ui->statusbar->showMessage("Playing audio...");
+        }
+
+        else if (audioPlayer->mediaStatus() == 0 || audioPlayer->mediaStatus() == 7)    //NoMedia or InvalidMedia
+        {
+            rigCmd.voiceSend = 0;
+            ui->statusbar->showMessage("Audio file error!", 5000);
+        }
+        else if (audioPlayer->mediaStatus() == 6 && rigGet.ptt) //EndOfMedia
+        {
+            rigCmd.voiceSend = 0;
+            ui->pushButton_PTT->toggle();
+            ui->statusbar->clearMessage();
+         }
+    }
 }
 
 
@@ -1002,6 +1070,7 @@ void MainWindow::on_pushButton_clarClear_clicked()
     rigCmd.clar = 1;
 }
 
+//Band
 void MainWindow::on_pushButton_Band160_clicked()
 {
     set_band(160);
@@ -1082,6 +1151,7 @@ void MainWindow::on_pushButton_BandUp_clicked()
     rigCmd.bandUp = 1;
 }
 
+//CW keyer
 void MainWindow::on_pushButton_CW1_clicked()
 {
     send_cw_mem(1);
@@ -1107,8 +1177,59 @@ void MainWindow::on_pushButton_CW5_clicked()
     send_cw_mem(5);
 }
 
+//Voice keyer
+void MainWindow::on_pushButton_VoiceK1_clicked()
+{
+    if (guiConf.voiceKeyerMode == 0) send_voice_mem(1); //Radio voice keyer
+    else if (rigCmd.voiceSend == 0)  //CatRadio voice keyer
+    {
+        rigCmd.voiceSend = 1;
+        audioPlayer->setSource(QUrl::fromLocalFile(voiceKConf.memoryFile[0]));  //Load audio file
+    }
+}
 
-//***** CheckBox *****
+void MainWindow::on_pushButton_VoiceK2_clicked()
+{
+    if (guiConf.voiceKeyerMode == 0) send_voice_mem(2);
+    else if (rigCmd.voiceSend == 0)
+    {
+        rigCmd.voiceSend = 2;
+        audioPlayer->setSource(QUrl::fromLocalFile(voiceKConf.memoryFile[1]));
+    }
+}
+
+void MainWindow::on_pushButton_VoiceK3_clicked()
+{
+    if (guiConf.voiceKeyerMode == 0) send_voice_mem(3);
+    else if (rigCmd.voiceSend == 0)
+    {
+        rigCmd.voiceSend = 3;
+        audioPlayer->setSource(QUrl::fromLocalFile(voiceKConf.memoryFile[2]));
+    }
+}
+
+void MainWindow::on_pushButton_VoiceK4_clicked()
+{
+    if (guiConf.voiceKeyerMode == 0) send_voice_mem(4);
+    else if (rigCmd.voiceSend == 0)
+    {
+        rigCmd.voiceSend = 4;
+        audioPlayer->setSource(QUrl::fromLocalFile(voiceKConf.memoryFile[3]));
+    }
+}
+
+void MainWindow::on_pushButton_VoiceK5_clicked()
+{
+    if (guiConf.voiceKeyerMode == 0) send_voice_mem(5);
+    else if (rigCmd.voiceSend == 0)
+    {
+        rigCmd.voiceSend = 5;
+        audioPlayer->setSource(QUrl::fromLocalFile(voiceKConf.memoryFile[4]));
+    }
+}
+
+
+//***** CheckBox ***==
 void MainWindow::on_checkBox_micCompressor_toggled(bool checked)
 {
     if (checked && !rigGet.micComp)
@@ -1687,6 +1808,15 @@ void MainWindow::on_action_Setup_triggered()
     ui->lineEdit_vfoSub->setMode(guiConf.vfoDisplayMode);
 }
 
+void MainWindow::on_action_Voice_Keyer_triggered()
+{
+    DialogVoiceKeyer voiceKeyer;
+    voiceKeyer.setModal(true);
+    voiceKeyer.exec();
+
+    audioOutputInit("catradio.ini");
+}
+
 void MainWindow::on_action_RadioInfo_triggered()
 {
     if (!radioInfo) radioInfo = new DialogRadioInfo(my_rig, this);
@@ -1708,6 +1838,13 @@ void MainWindow::on_action_Command_triggered()
     command->show();
     command->raise();
     command->activateWindow();
+}
+
+void MainWindow::on_actionNET_rigctl_triggered()
+{
+    DialogNetRigctl configNetRigctl;
+    configNetRigctl.setModal(true);
+    configNetRigctl.exec();
 }
 
 void MainWindow::on_action_AboutCatRadio_triggered()
@@ -1771,3 +1908,4 @@ void MainWindow::on_action_CatRadioHomepage_triggered()
     QUrl homepage("https://www.pianetaradio.it/blog/catradio/");
     QDesktopServices::openUrl(homepage);
 }
+

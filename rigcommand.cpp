@@ -19,6 +19,7 @@
 
 #include "rigcommand.h"
 #include "rigdata.h"
+#include "guidata.h"
 
 #include <rig.h>    //Hamlib
 
@@ -28,6 +29,7 @@ extern rigSettings rigGet;
 extern rigSettings rigSet;
 extern rigCommand rigCmd;
 extern rigCommand rigCap;
+extern guiConfig guiConf;
 
 //* Set band to default frequency or use band change if radio has capability
 void set_band (int band)
@@ -102,6 +104,15 @@ void send_cw_mem (int memory)
     rigSet.cwMem = (char)(memory + '0');
     rigCmd.cwSend = 1;
 }
+
+
+//* Send Voice memory message 1-5
+void send_voice_mem (int memory)
+{
+    rigSet.voiceMem = (char)(memory + '0');
+    rigCmd.voiceSend = 1;
+}
+
 
 //* Convert AGC int value to hamlib enumerated
 agc_level_e levelagcvalue (int agcValue)

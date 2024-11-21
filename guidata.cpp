@@ -21,3 +21,4 @@
 
 guiConfig guiConf;
 guiCommand guiCmd;
+voiceKeyerConfig voiceKConf;

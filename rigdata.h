@@ -86,6 +86,7 @@ typedef struct {
     tone_t tone;    //CTCSS or DCS tone
     int micComp, micMon;    //Flag MIC Compressor, MIC Monitor
     float micGain, micMonLevel, micCompLevel;  //Level MIC Gain, MIC Monitor, MIC Compressor
+    int voiceMem;   //Voice memory keyer
 } rigSettings;
 
 typedef struct {
@@ -123,4 +124,5 @@ typedef struct {
     int tone;
     int micComp, micMon;
     int micGain, micMonLevel, micCompLevel;
+    int voiceSend;  //Voice send memory
 } rigCommand;

@@ -17,22 +17,42 @@
  **/
 
 
-#ifndef RIGCOMMAND_H
-#define RIGCOMMAND_H
+#ifndef DIALOGVOICEKEYER_H
+#define DIALOGVOICEKEYER_H
 
-#endif // RIGCOMMAND_H
+#include <QDialog>
+#include <QMediaDevices>
+#include <QAudioDevice>
 
-#include <QString>
+namespace Ui {
+class DialogVoiceKeyer;
+}
 
-#include <rig.h>
+class DialogVoiceKeyer : public QDialog
+{
+    Q_OBJECT
 
+public:
+    explicit DialogVoiceKeyer(QWidget *parent = nullptr);
+    ~DialogVoiceKeyer();
 
-void set_band (int band);
-void quick_split ();
-void send_cw_mem (int memory);
-void send_voice_mem (int memory);
-agc_level_e levelagcvalue (int agcValue);
-agc_level_e levelagcstr (QString agcString);
-value_t valueagclevel (agc_level_e agcLevel);
-ant_t antstr (QString antString);
-unsigned long long levelmeterstr (QString meterString);
+private slots:
+    void on_pushButton_voiceK1_clicked();
+
+    void on_buttonBox_accepted();
+
+    void on_pushButton_voiceK2_clicked();
+
+    void on_pushButton_voiceK3_clicked();
+
+    void on_pushButton_voiceK4_clicked();
+
+    void on_pushButton_voiceK5_clicked();
+
+private:
+    Ui::DialogVoiceKeyer *ui;
+
+    QMediaDevices *audioDevices;
+};
+
+#endif // DIALOGVOICEKEYER_H
