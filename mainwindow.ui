@@ -2237,11 +2237,20 @@
    </property>
   </action>
   <action name="actionNET_rigctl">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>NET rigctl</string>
    </property>
   </action>
   <action name="action_Voice_Keyer">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Voice Keyer</string>
    </property>

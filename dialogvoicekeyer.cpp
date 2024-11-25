@@ -39,11 +39,13 @@ DialogVoiceKeyer::DialogVoiceKeyer(QWidget *parent)
     ui->lineEdit_voiceK4->setText(voiceKConf.memoryFile[3]);
     ui->lineEdit_voiceK5->setText(voiceKConf.memoryFile[4]);
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     audioDevices = new QMediaDevices(this);
     const QList<QAudioDevice> devices = audioDevices->audioOutputs();
     for (const QAudioDevice &deviceInfo : devices)
         ui->comboBox_audioDevice->addItem(deviceInfo.description(), QVariant::fromValue(deviceInfo));
     ui->comboBox_audioDevice->setCurrentText(voiceKConf.audioOutput);
+#endif
 
     connect(ui->horizontalSlider_audioLevel, &QAbstractSlider::valueChanged, ui->label_audioLevel, QOverload<int>::of(&QLabel::setNum));
     ui->horizontalSlider_audioLevel->setValue(voiceKConf.audioOutputVolume*10);
@@ -104,8 +106,10 @@ void DialogVoiceKeyer::on_buttonBox_accepted()
     configFile.setValue("VoiceKeyer/voiceMemoryFile4", voiceKConf.memoryFile[3]);
     configFile.setValue("VoiceKeyer/voiceMemoryFile5", voiceKConf.memoryFile[4]);
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     QAudioDevice audioDevice = ui->comboBox_audioDevice->itemData(ui->comboBox_audioDevice->currentIndex()).value<QAudioDevice>();
     configFile.setValue("VoiceKeyer/audioOutput", QVariant::fromValue(audioDevice.description()));
+#endif
 
     voiceKConf.audioOutputVolume = (float)(ui->horizontalSlider_audioLevel->value())/10;
     configFile.setValue("VoiceKeyer/audioOutputVolume", voiceKConf.audioOutputVolume);

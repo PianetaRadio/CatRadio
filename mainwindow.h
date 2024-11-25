@@ -24,7 +24,9 @@
 #include <QTimer>
 #include <QMediaPlayer>
 #include <QAudioOutput>
-#include <QMediaDevices>
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    #include <QMediaDevices>
+#endif
 #include <QSettings>
 
 #include "rig.h"
@@ -221,7 +223,9 @@ private:
 
     QMediaPlayer *audioPlayer;
     QAudioOutput *audioOutput;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     QMediaDevices *audioDevices;
+#endif
 
     RIG *my_rig;
 

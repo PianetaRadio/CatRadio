@@ -138,7 +138,10 @@ MainWindow::MainWindow(QWidget *parent)
     restoreState(configFile.value("WindowSettings/state").toByteArray());
     //Voice memory
     if (guiConf.voiceKeyerMode == 1)
-        audioOutputInit(configFile.fileName());
+    {
+        ui->action_Voice_Keyer->setEnabled(true);   //enable Voice Keyer menu
+        audioOutputInit(configFile.fileName());     //init audio
+    }
 
     //* Debug
     if (guiConf.debugMode) rig_set_debug_level(RIG_DEBUG_VERBOSE); //debug verbose
@@ -461,19 +464,21 @@ void MainWindow::audioOutputInit(QString configFileName)
 {
     //Set audio file names associated to keyer memory buttons
     QSettings configFile(configFileName, QSettings::IniFormat);
-    voiceKConf.memoryFile[0] = configFile.value("VoiceKeyer/voiceMemoryFile1").toString();
-    voiceKConf.memoryFile[1] = configFile.value("VoiceKeyer/voiceMemoryFile2").toString();
-    voiceKConf.memoryFile[2] = configFile.value("VoiceKeyer/voiceMemoryFile3").toString();
-    voiceKConf.memoryFile[3] = configFile.value("VoiceKeyer/voiceMemoryFile4").toString();
-    voiceKConf.memoryFile[4] = configFile.value("VoiceKeyer/voiceMemoryFile5").toString();
+    voiceKConf.memoryFile[0] = configFile.value("VoiceKeyer/voiceMemoryFile1", "").toString();
+    voiceKConf.memoryFile[1] = configFile.value("VoiceKeyer/voiceMemoryFile2", "").toString();
+    voiceKConf.memoryFile[2] = configFile.value("VoiceKeyer/voiceMemoryFile3", "").toString();
+    voiceKConf.memoryFile[3] = configFile.value("VoiceKeyer/voiceMemoryFile4", "").toString();
+    voiceKConf.memoryFile[4] = configFile.value("VoiceKeyer/voiceMemoryFile5", "").toString();
     voiceKConf.audioOutput = configFile.value("VoiceKeyer/audioOutput").toString();
-    voiceKConf.audioOutputVolume = configFile.value("VoiceKeyer/audioOutputVolume").toFloat();
+    voiceKConf.audioOutputVolume = configFile.value("VoiceKeyer/audioOutputVolume", 1).toFloat();
 
     audioPlayer = new QMediaPlayer(this);
-    audioOutput = new QAudioOutput(this);
-
     //Connect signal playback state change with slot on_voiceKeyerStateChanged function
     connect(audioPlayer, &QMediaPlayer::mediaStatusChanged, this, &MainWindow::on_voiceKeyerStateChanged);
+
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    audioOutput = new QAudioOutput(this);
 
     //Select audio output device
     //QAudioDevice audioDevice = configFile.value("VoiceKeyer/audioOutput", QAudioDevice::Null).value<QAudioDevice>();  //Do not work
@@ -488,6 +493,9 @@ void MainWindow::audioOutputInit(QString configFileName)
 
     //Set output volume
     audioOutput->setVolume(voiceKConf.audioOutputVolume);    //Float 0 min - 1 max
+#else
+    audioPlayer->setVolume((int)voiceKConf.audioOutputVolume*100);    //Int 0 min - 100 max
+#endif
 }
 
 void MainWindow::guiUpdate()
@@ -865,7 +873,11 @@ void MainWindow::on_voiceKeyerStateChanged()
 {
     if (rigCmd.voiceSend >= 1)
     {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
         if (audioPlayer->mediaStatus() == 2 &&  audioPlayer->source() == QUrl::fromLocalFile(voiceKConf.memoryFile[rigCmd.voiceSend - 1]))    //LoadedMedia
+#else
+        if (audioPlayer->mediaStatus() == 2 &&  audioPlayer->media() == QUrl::fromLocalFile(voiceKConf.memoryFile[rigCmd.voiceSend - 1]))
+#endif
         {
             ui->pushButton_PTT->toggle();
             ui->statusbar->showMessage("Playing audio...");
@@ -1181,50 +1193,72 @@ void MainWindow::on_pushButton_CW5_clicked()
 void MainWindow::on_pushButton_VoiceK1_clicked()
 {
     if (guiConf.voiceKeyerMode == 0) send_voice_mem(1); //Radio voice keyer
-    else if (rigCmd.voiceSend == 0)  //CatRadio voice keyer
+    else if (rigCmd.voiceSend == 0 && voiceKConf.memoryFile[0]!="")  //CatRadio voice keyer
     {
         rigCmd.voiceSend = 1;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        qDebug() << audioPlayer->mediaStatus();
         audioPlayer->setSource(QUrl::fromLocalFile(voiceKConf.memoryFile[0]));  //Load audio file
+        qDebug() << audioPlayer->source() << audioPlayer->error() << audioPlayer->mediaStatus();
+#else
+        audioPlayer->setMedia(QUrl::fromLocalFile(voiceKConf.memoryFile[0]));
+#endif
     }
 }
 
 void MainWindow::on_pushButton_VoiceK2_clicked()
 {
     if (guiConf.voiceKeyerMode == 0) send_voice_mem(2);
-    else if (rigCmd.voiceSend == 0)
+    else if (rigCmd.voiceSend == 0 && voiceKConf.memoryFile[1]!="")
     {
         rigCmd.voiceSend = 2;
-        audioPlayer->setSource(QUrl::fromLocalFile(voiceKConf.memoryFile[1]));
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        audioPlayer->setSource(QUrl::fromLocalFile(voiceKConf.memoryFile[1]));  //Load audio file
+#else
+        audioPlayer->setMedia(QUrl::fromLocalFile(voiceKConf.memoryFile[1]));
+#endif
     }
 }
 
 void MainWindow::on_pushButton_VoiceK3_clicked()
 {
     if (guiConf.voiceKeyerMode == 0) send_voice_mem(3);
-    else if (rigCmd.voiceSend == 0)
+    else if (rigCmd.voiceSend == 0 && voiceKConf.memoryFile[2]!="")
     {
         rigCmd.voiceSend = 3;
-        audioPlayer->setSource(QUrl::fromLocalFile(voiceKConf.memoryFile[2]));
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        audioPlayer->setSource(QUrl::fromLocalFile(voiceKConf.memoryFile[2]));  //Load audio file
+#else
+        audioPlayer->setMedia(QUrl::fromLocalFile(voiceKConf.memoryFile[2]));
+#endif
     }
 }
 
 void MainWindow::on_pushButton_VoiceK4_clicked()
 {
     if (guiConf.voiceKeyerMode == 0) send_voice_mem(4);
-    else if (rigCmd.voiceSend == 0)
+    else if (rigCmd.voiceSend == 0 && voiceKConf.memoryFile[3]!="")
     {
         rigCmd.voiceSend = 4;
-        audioPlayer->setSource(QUrl::fromLocalFile(voiceKConf.memoryFile[3]));
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        audioPlayer->setSource(QUrl::fromLocalFile(voiceKConf.memoryFile[3]));  //Load audio file
+#else
+        audioPlayer->setMedia(QUrl::fromLocalFile(voiceKConf.memoryFile[3]));
+#endif
     }
 }
 
 void MainWindow::on_pushButton_VoiceK5_clicked()
 {
     if (guiConf.voiceKeyerMode == 0) send_voice_mem(5);
-    else if (rigCmd.voiceSend == 0)
+    else if (rigCmd.voiceSend == 0 && voiceKConf.memoryFile[4]!="")
     {
         rigCmd.voiceSend = 5;
-        audioPlayer->setSource(QUrl::fromLocalFile(voiceKConf.memoryFile[4]));
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        audioPlayer->setSource(QUrl::fromLocalFile(voiceKConf.memoryFile[4]));  //Load audio file
+#else
+        audioPlayer->setMedia(QUrl::fromLocalFile(voiceKConf.memoryFile[4]));
+#endif
     }
 }
 
@@ -1806,6 +1840,13 @@ void MainWindow::on_action_Setup_triggered()
 
     ui->lineEdit_vfoMain->setMode(guiConf.vfoDisplayMode);
     ui->lineEdit_vfoSub->setMode(guiConf.vfoDisplayMode);
+
+    if (guiConf.voiceKeyerMode == 1)
+    {
+        ui->action_Voice_Keyer->setEnabled(true);
+        audioOutputInit("catradio.ini");
+    }
+    else ui->action_Voice_Keyer->setEnabled(false);
 }
 
 void MainWindow::on_action_Voice_Keyer_triggered()
