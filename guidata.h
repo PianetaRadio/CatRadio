@@ -47,5 +47,5 @@ typedef struct {
 typedef struct {
     QString memoryFile[5];  //Audio files
     QString audioOutput;    //Audio output device name
-    float audioOutputVolume;    //Audio output volume float 0..1
+    int audioOutputVolume;    //Audio output volume integer 0..10
 } voiceKeyerConfig;

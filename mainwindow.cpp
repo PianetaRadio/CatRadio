@@ -470,12 +470,11 @@ void MainWindow::audioOutputInit(QString configFileName)
     voiceKConf.memoryFile[3] = configFile.value("VoiceKeyer/voiceMemoryFile4", "").toString();
     voiceKConf.memoryFile[4] = configFile.value("VoiceKeyer/voiceMemoryFile5", "").toString();
     voiceKConf.audioOutput = configFile.value("VoiceKeyer/audioOutput").toString();
-    voiceKConf.audioOutputVolume = configFile.value("VoiceKeyer/audioOutputVolume", 1).toFloat();
+    voiceKConf.audioOutputVolume = configFile.value("VoiceKeyer/audioOutputVolume", 10).toInt();
 
     audioPlayer = new QMediaPlayer(this);
     //Connect signal playback state change with slot on_voiceKeyerStateChanged function
     connect(audioPlayer, &QMediaPlayer::mediaStatusChanged, this, &MainWindow::on_voiceKeyerStateChanged);
-
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     audioOutput = new QAudioOutput(this);
@@ -492,9 +491,10 @@ void MainWindow::audioOutputInit(QString configFileName)
     audioPlayer->setAudioOutput(audioOutput);
 
     //Set output volume
-    audioOutput->setVolume(voiceKConf.audioOutputVolume);    //Float 0 min - 1 max
+    audioOutput->setVolume((float)(voiceKConf.audioOutputVolume/10));    //Float 0 min - 1 max
 #else
-    audioPlayer->setVolume((int)voiceKConf.audioOutputVolume*100);    //Int 0 min - 100 max
+    audioPlayer->setVolume((int)(voiceKConf.audioOutputVolume*10));    //Int 0 min - 100 max
+    qDebug() << audioPlayer->volume() << voiceKConf.audioOutputVolume;
 #endif
 }
 
@@ -871,24 +871,25 @@ void MainWindow::setSubMeter()
 
 void MainWindow::on_voiceKeyerStateChanged()
 {
+    qDebug() << audioPlayer->mediaStatus() << rigCmd.voiceSend << rigGet.ptt;
     if (rigCmd.voiceSend >= 1)
     {
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-        if (audioPlayer->mediaStatus() == 2 &&  audioPlayer->source() == QUrl::fromLocalFile(voiceKConf.memoryFile[rigCmd.voiceSend - 1]))    //LoadedMedia
+        if (audioPlayer->mediaStatus() == QMediaPlayer::LoadedMedia &&  audioPlayer->source() == QUrl::fromLocalFile(voiceKConf.memoryFile[rigCmd.voiceSend - 1]))    //LoadedMedia
 #else
-        if (audioPlayer->mediaStatus() == 2 &&  audioPlayer->media() == QUrl::fromLocalFile(voiceKConf.memoryFile[rigCmd.voiceSend - 1]))
+        if (audioPlayer->mediaStatus() == QMediaPlayer::LoadedMedia &&  audioPlayer->media() == QUrl::fromLocalFile(voiceKConf.memoryFile[rigCmd.voiceSend - 1]))
 #endif
         {
             ui->pushButton_PTT->toggle();
             ui->statusbar->showMessage("Playing audio...");
         }
 
-        else if (audioPlayer->mediaStatus() == 0 || audioPlayer->mediaStatus() == 7)    //NoMedia or InvalidMedia
+        else if (audioPlayer->mediaStatus() == QMediaPlayer::NoMedia || audioPlayer->mediaStatus() == QMediaPlayer::InvalidMedia)    //NoMedia or InvalidMedia
         {
             rigCmd.voiceSend = 0;
             ui->statusbar->showMessage("Audio file error!", 5000);
         }
-        else if (audioPlayer->mediaStatus() == 6 && rigGet.ptt) //EndOfMedia
+        else if (audioPlayer->mediaStatus() == QMediaPlayer::EndOfMedia && rigGet.ptt) //EndOfMedia
         {
             rigCmd.voiceSend = 0;
             ui->pushButton_PTT->toggle();
@@ -1197,9 +1198,7 @@ void MainWindow::on_pushButton_VoiceK1_clicked()
     {
         rigCmd.voiceSend = 1;
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-        qDebug() << audioPlayer->mediaStatus();
         audioPlayer->setSource(QUrl::fromLocalFile(voiceKConf.memoryFile[0]));  //Load audio file
-        qDebug() << audioPlayer->source() << audioPlayer->error() << audioPlayer->mediaStatus();
 #else
         audioPlayer->setMedia(QUrl::fromLocalFile(voiceKConf.memoryFile[0]));
 #endif

@@ -48,7 +48,7 @@ DialogVoiceKeyer::DialogVoiceKeyer(QWidget *parent)
 #endif
 
     connect(ui->horizontalSlider_audioLevel, &QAbstractSlider::valueChanged, ui->label_audioLevel, QOverload<int>::of(&QLabel::setNum));
-    ui->horizontalSlider_audioLevel->setValue(voiceKConf.audioOutputVolume*10);
+    ui->horizontalSlider_audioLevel->setValue(voiceKConf.audioOutputVolume);
 }
 
 DialogVoiceKeyer::~DialogVoiceKeyer()
@@ -111,6 +111,6 @@ void DialogVoiceKeyer::on_buttonBox_accepted()
     configFile.setValue("VoiceKeyer/audioOutput", QVariant::fromValue(audioDevice.description()));
 #endif
 
-    voiceKConf.audioOutputVolume = (float)(ui->horizontalSlider_audioLevel->value())/10;
+    voiceKConf.audioOutputVolume = ui->horizontalSlider_audioLevel->value();
     configFile.setValue("VoiceKeyer/audioOutputVolume", voiceKConf.audioOutputVolume);
 }
