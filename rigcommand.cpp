@@ -109,7 +109,7 @@ void send_cw_mem (int memory)
 //* Send Voice memory message 1-5
 void send_voice_mem (int memory)
 {
-    rigSet.voiceMem = (char)(memory + '0');
+    rigSet.voiceMem = memory;
     rigCmd.voiceSend = 1;
 }
 

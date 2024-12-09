@@ -881,7 +881,7 @@ void MainWindow::setSubMeter()
 
 void MainWindow::on_voiceKeyerStateChanged()
 {
-    qDebug() << audioPlayer->mediaStatus() << rigCmd.voiceSend << rigGet.ptt;
+    //qDebug() << audioPlayer->mediaStatus() << rigCmd.voiceSend << rigGet.ptt;
     if (rigCmd.voiceSend >= 1)
     {
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)

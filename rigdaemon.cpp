@@ -116,12 +116,21 @@ void RigDaemon::rigUpdate(RIG *my_rig)
         rigCmd.ptt = 0;
     }
 
+    //* CW memory keyer (rig)
     if (rigCmd.cwSend && (rigGet.mode == RIG_MODE_CW || rigGet.mode == RIG_MODE_CWN || rigGet.mode == RIG_MODE_CWR))
     {
         //if (rig_has_get_func(my_rig, RIG_FUNCTION_SEND_MORSE)) rig_send_morse(my_rig, RIG_VFO_CURR, &rigSet.cwMem);
         retcode = rig_send_morse(my_rig, RIG_VFO_CURR, &rigSet.cwMem);
         if (retcode == RIG_OK) rigGet.ptt = RIG_PTT_ON; //assume PPT on if send_morse is ok
         rigCmd.cwSend = 0;
+    }
+
+    //* Voice memory keyer (rig)
+    if (rigCmd.voiceSend && (rigGet.mode == RIG_MODE_SSB || rigGet.mode == RIG_MODE_USB || rigGet.mode == RIG_MODE_LSB || rigGet.mode == RIG_MODE_AM || rigGet.mode == RIG_MODE_FM))
+    {
+        retcode = rig_send_voice_mem(my_rig, RIG_VFO_CURR, rigSet.voiceMem);
+        if (retcode == RIG_OK) rigGet.ptt = RIG_PTT_ON; //assume PPT on if send_voice_mem is ok
+        rigCmd.voiceSend = 0;
     }
 
     //* VFO

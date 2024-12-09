@@ -4,7 +4,7 @@ Change log
 (+ New, * Updated, - Removed)
 
 1.5.0 - 2024-xx-xx
-	+ Voice memory keyer (CatRadio)
+	+ Voice memory keyer (radio or CatRadio)
 	+ CW memory keyer (radio)
 	+ Check hamlib version on startup
 	* Display software version in the window title
