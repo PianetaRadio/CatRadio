@@ -39,22 +39,31 @@ DialogVoiceKeyer::DialogVoiceKeyer(QWidget *parent)
     ui->lineEdit_voiceK4->setText(voiceKConf.memoryFile[3]);
     ui->lineEdit_voiceK5->setText(voiceKConf.memoryFile[4]);
 
+//Query for audio devices that are currently available on the system
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     audioDevices = new QMediaDevices(this);
     const QList<QAudioDevice> devices = audioDevices->audioOutputs();
     for (const QAudioDevice &deviceInfo : devices)
         ui->comboBox_audioDevice->addItem(deviceInfo.description(), QVariant::fromValue(deviceInfo));
-    ui->comboBox_audioDevice->setCurrentText(voiceKConf.audioOutput);
+#else
+    //QT5, QMediaPlayer use only the default audio output
+    const QAudioDeviceInfo &defaultDeviceInfo = QAudioDeviceInfo::defaultOutputDevice();
+    ui->comboBox_audioDevice->addItem(defaultDeviceInfo.deviceName(), QVariant::fromValue(defaultDeviceInfo));
+    //for (QAudioDeviceInfo &deviceInfo: QAudioDeviceInfo::availableDevices(QAudio::AudioOutput))
+    //    ui->comboBox_audioDevice->addItem(deviceInfo.deviceName(), QVariant::fromValue(deviceInfo));
 #endif
+    ui->comboBox_audioDevice->setCurrentText(voiceKConf.audioOutput);
 
     connect(ui->horizontalSlider_audioLevel, &QAbstractSlider::valueChanged, ui->label_audioLevel, QOverload<int>::of(&QLabel::setNum));
     ui->horizontalSlider_audioLevel->setValue(voiceKConf.audioOutputVolume);
 }
 
+
 DialogVoiceKeyer::~DialogVoiceKeyer()
 {
     delete ui;
 }
+
 
 void DialogVoiceKeyer::on_pushButton_voiceK1_clicked()
 {
@@ -109,6 +118,9 @@ void DialogVoiceKeyer::on_buttonBox_accepted()
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     QAudioDevice audioDevice = ui->comboBox_audioDevice->itemData(ui->comboBox_audioDevice->currentIndex()).value<QAudioDevice>();
     configFile.setValue("VoiceKeyer/audioOutput", QVariant::fromValue(audioDevice.description()));
+#else
+    QAudioDeviceInfo audioDevice = ui->comboBox_audioDevice->itemData(ui->comboBox_audioDevice->currentIndex()).value<QAudioDeviceInfo>();
+    configFile.setValue("VoiceKeyer/audioOutput", QVariant::fromValue(audioDevice.deviceName()));
 #endif
 
     voiceKConf.audioOutputVolume = ui->horizontalSlider_audioLevel->value();

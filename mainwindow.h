@@ -26,6 +26,8 @@
 #include <QAudioOutput>
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     #include <QMediaDevices>
+#else
+    #include <QAudioDeviceInfo>
 #endif
 #include <QSettings>
 
@@ -225,6 +227,9 @@ private:
     QAudioOutput *audioOutput;
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     QMediaDevices *audioDevices;
+#else
+    //QAudioDeviceInfo audioDeviceInfo;
+    //QScopedPointer<QAudioOutput> m_audioOutput;
 #endif
 
     RIG *my_rig;

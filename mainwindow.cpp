@@ -493,8 +493,18 @@ void MainWindow::audioOutputInit(QString configFileName)
     //Set output volume
     audioOutput->setVolume((float)(voiceKConf.audioOutputVolume/10));    //Float 0 min - 1 max
 #else
+    /* QT5 QMediaPlayer, is not possible to play sound other than the default audio device
+     * possible solution using obsolete class QAudioOutputSelectorControl or play sound with QAudioOutput
+    for (QAudioDeviceInfo &deviceInfo: QAudioDeviceInfo::availableDevices(QAudio::AudioOutput))
+        if (voiceKConf.audioOutput == deviceInfo.deviceName())
+        {
+            m_audioOutput.reset(new QAudioOutput(deviceInfo, deviceInfo.preferredFormat()));
+            audioDeviceInfo = deviceInfo;
+            qDebug() << audioDeviceInfo.deviceName();
+        }
+    */
+
     audioPlayer->setVolume((int)(voiceKConf.audioOutputVolume*10));    //Int 0 min - 100 max
-    qDebug() << audioPlayer->volume() << voiceKConf.audioOutputVolume;
 #endif
 }
 
