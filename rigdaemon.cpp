@@ -1,6 +1,6 @@
 /**
  ** This file is part of the CatRadio project.
- ** Copyright 2022-2024 Gianfranco Sordetti IZ8EWD <iz8ewd@pianetaradio.it>.
+ ** Copyright 2022-2025 Gianfranco Sordetti IZ8EWD <iz8ewd@pianetaradio.it>.
  **
  ** This program is free software: you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -33,6 +33,7 @@ extern rigSettings rigGet;
 extern rigSettings rigSet;
 extern rigCommand rigCmd;
 extern rigCommand rigCap;
+extern guiConfig guiConf;
 extern guiCommand guiCmd;
 
 int indexCmd = 0;
@@ -126,7 +127,7 @@ void RigDaemon::rigUpdate(RIG *my_rig)
     }
 
     //* Voice memory keyer (rig)
-    if (rigCmd.voiceSend && (rigGet.mode == RIG_MODE_SSB || rigGet.mode == RIG_MODE_USB || rigGet.mode == RIG_MODE_LSB || rigGet.mode == RIG_MODE_AM || rigGet.mode == RIG_MODE_FM))
+    if (guiConf.voiceKeyerMode == 0 && rigCmd.voiceSend && (rigGet.mode == RIG_MODE_SSB || rigGet.mode == RIG_MODE_USB || rigGet.mode == RIG_MODE_LSB || rigGet.mode == RIG_MODE_AM || rigGet.mode == RIG_MODE_FM))
     {
         retcode = rig_send_voice_mem(my_rig, RIG_VFO_CURR, rigSet.voiceMem);
         if (retcode == RIG_OK) rigGet.ptt = RIG_PTT_ON; //assume PPT on if send_voice_mem is ok

@@ -1,6 +1,6 @@
 /**
  ** This file is part of the CatRadio project.
- ** Copyright 2022-2024 Gianfranco Sordetti IZ8EWD <iz8ewd@pianetaradio.it>.
+ ** Copyright 2022-2025 Gianfranco Sordetti IZ8EWD <iz8ewd@pianetaradio.it>.
  **
  ** This program is free software: you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -885,15 +885,14 @@ void MainWindow::on_voiceKeyerStateChanged()
     if (rigCmd.voiceSend >= 1)
     {
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-        if (audioPlayer->mediaStatus() == QMediaPlayer::LoadedMedia &&  audioPlayer->source() == QUrl::fromLocalFile(voiceKConf.memoryFile[rigCmd.voiceSend - 1]))    //LoadedMedia
+        if (audioPlayer->mediaStatus() == QMediaPlayer::LoadedMedia && audioPlayer->source() == QUrl::fromLocalFile(voiceKConf.memoryFile[rigCmd.voiceSend - 1]))    //LoadedMedia
 #else
-        if (audioPlayer->mediaStatus() == QMediaPlayer::LoadedMedia &&  audioPlayer->media() == QUrl::fromLocalFile(voiceKConf.memoryFile[rigCmd.voiceSend - 1]))
+        if (audioPlayer->mediaStatus() == QMediaPlayer::LoadedMedia && audioPlayer->media() == QUrl::fromLocalFile(voiceKConf.memoryFile[rigCmd.voiceSend - 1]))
 #endif
         {
             ui->pushButton_PTT->toggle();
             ui->statusbar->showMessage("Playing audio...");
         }
-
         else if (audioPlayer->mediaStatus() == QMediaPlayer::NoMedia || audioPlayer->mediaStatus() == QMediaPlayer::InvalidMedia)    //NoMedia or InvalidMedia
         {
             rigCmd.voiceSend = 0;
@@ -904,7 +903,7 @@ void MainWindow::on_voiceKeyerStateChanged()
             rigCmd.voiceSend = 0;
             ui->pushButton_PTT->toggle();
             ui->statusbar->clearMessage();
-         }
+        }
     }
 }
 
