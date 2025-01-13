@@ -61,10 +61,12 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 LIBS += -L$$PWD/hamlib/ -lhamlib
 INCLUDEPATH += $$PWD/hamlib
 
-RESOURCES += qdarkstyle/dark/darkstyle.qrc
+QMAKE_RPATHDIR += $$PWD/hamlib  #Unix only. Specifies a list of library paths that are added to the executable at link time so that the paths will be preferentially searched at runtime.
+
+RESOURCES += qdarkstyle/dark/darkstyle.qrc  #Include darkstyle
 
 VERSION = 1.5.0
 
 RC_ICONS = catradio.ico
 
-QMAKE_LFLAGS += -no-pie
+QMAKE_LFLAGS += -no-pie #No Position Indipendent Executable
