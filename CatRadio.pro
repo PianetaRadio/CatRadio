@@ -61,7 +61,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 LIBS += -L$$PWD/hamlib/ -lhamlib
 INCLUDEPATH += $$PWD/hamlib
 
-QMAKE_RPATHDIR += $$PWD/hamlib  #Unix only. Specifies a list of library paths that are added to the executable at link time so that the paths will be preferentially searched at runtime.
+QMAKE_LFLAGS += -Wl,-rpath,\\$\$ORIGIN/hamlib/ #Set runtime shared libraries path to use local hamlib library
 
 RESOURCES += qdarkstyle/dark/darkstyle.qrc  #Include darkstyle
 
