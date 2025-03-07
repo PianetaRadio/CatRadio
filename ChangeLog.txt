@@ -3,12 +3,14 @@ CatRadio
 Change log
 (+ New, * Updated, - Removed)
 
-1.5.0 - 2024-xx-xx
+1.5.0 - 2025-xx-xx
 	+ Voice memory keyer (radio or CatRadio)
 	+ CW memory keyer (radio)
 	+ Check hamlib version on startup
+	* Improved Setup window
 	* Display software version in the window title
 	* Bug fix: IF shift
+	* Updated to library Hamlib 4.6
 
 1.4.0 - 2024-03-17
 	+ Auto Connect option
