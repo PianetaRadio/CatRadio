@@ -1,6 +1,6 @@
 /**
  ** This file is part of the CatRadio project.
- ** Copyright 2022-2024 Gianfranco Sordetti IZ8EWD <iz8ewd@pianetaradio.it>.
+ ** Copyright 2022-2025 Gianfranco Sordetti IZ8EWD <iz8ewd@pianetaradio.it>.
  **
  ** This program is free software: you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -27,6 +27,15 @@
 
 typedef struct {
     int vfoDisplayMode; //0: use Left/Right mouse button, 1: click digit Up or Down
+    int vfoDialStep[6][4];  //VFO dial step
+                            //           0      1            2      3
+                            //           Single Page    Fast Single Page
+                            //0 Current
+                            //1 SSB
+                            //2 CW
+                            //3 DIGI
+                            //4 FM
+                            //5 AM
     bool darkTheme; //flag for Dark theme
     bool peakHold;  //meters peak hold
     bool debugMode; //flag for debug log
@@ -36,11 +45,12 @@ typedef struct {
 
 
 typedef struct {
-    int bwidthList;
-    int antList;
-    int rangeList;
-    int tabList;
-    int toneList;
+    int bwidthList; //Flag to command the update of the filter bandwidth combo box list
+    int antList;    //Flag to command the update of the antenna combo box list
+    int rangeList;  //Flag to command the  update the rig range list
+    int tabList;    //Flag to select the right function tab
+    int toneList;   //Flag to command the update of the tone combo box list
+    int dialConf;   //Flag to command the update of the tuning dial step configuration
 } guiCommand;
 
 

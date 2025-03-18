@@ -111,36 +111,13 @@ MainWindow::MainWindow(QWidget *parent)
     workerThread.start();
 
     //* Load settings from catradio.ini
-    QSettings configFile(QString("catradio.ini"), QSettings::IniFormat);
-    rigCom.rigModel = configFile.value("rigModel", 0).toUInt();
-    rigCom.rigPort = configFile.value("rigPort").toString();
-    rigCom.serialSpeed = configFile.value("serialSpeed", 9600).toUInt();
-    rigCom.civAddr = configFile.value("civAddress", 0).toInt();
-    if (configFile.contains("serialDataBits"))  //For backward compatibility with CatRadio v.< 1.4.0
-    {
-        rigCom.serialDataBits = configFile.value("serialDataBits", 8).toUInt();
-        rigCom.serialParity = configFile.value("serialParity", 0).toUInt();
-        rigCom.serialStopBits = configFile.value("serialStopBits", 2).toUInt();
-        rigCom.serialHandshake = configFile.value("serialHandshake", 0).toUInt();
-    }
-    rigCom.netRigctl = configFile.value("netRigctl", false).toBool();
-    rigCom.rigRefresh = configFile.value("rigRefresh", 100).toInt();
-    rigCom.fullPoll = configFile.value("fullPolling", true).toBool();
-    rigCom.autoConnect = configFile.value("autoConnect", false).toBool();
-    rigCom.autoPowerOn = configFile.value("autoPowerOn", false).toBool();
-    guiConf.vfoDisplayMode = configFile.value("vfoDisplayMode", 0).toInt();
-    guiConf.darkTheme = configFile.value("darkTheme", false).toBool();
-    guiConf.voiceKeyerMode = configFile.value("voiceKeyerMode", 0).toInt();
-    guiConf.peakHold = configFile.value("peakHold", true).toBool();
-    guiConf.debugMode = configFile.value("debugMode", false).toBool();
-    //Window settings
-    restoreGeometry(configFile.value("WindowSettings/geometry").toByteArray());
-    restoreState(configFile.value("WindowSettings/state").toByteArray());
+    loadGuiConfig("catradio.ini");
+    loadRigConfig("catradio.ini");
     //Voice memory
     if (guiConf.voiceKeyerMode == 1)
     {
         ui->action_Voice_Keyer->setEnabled(true);   //enable Voice Keyer menu
-        audioOutputInit(configFile.fileName());     //init audio
+        audioOutputInit("catradio.ini");     //init audio
     }
 
     //* Debug
@@ -459,6 +436,52 @@ void MainWindow::guiInit()
     guiCmd.toneList = 1;    //update tone list
     guiCmd.tabList = 1; //select tab
 }
+
+
+void MainWindow::loadGuiConfig(QString configFileName)
+{
+    QSettings configFile(configFileName, QSettings::IniFormat);
+
+    guiConf.vfoDisplayMode = configFile.value("vfoDisplayMode", 0).toInt();
+    guiConf.darkTheme = configFile.value("darkTheme", false).toBool();
+    guiConf.voiceKeyerMode = configFile.value("voiceKeyerMode", 0).toInt();
+    guiConf.peakHold = configFile.value("peakHold", true).toBool();
+    guiConf.debugMode = configFile.value("debugMode", false).toBool();
+
+    //for (size_t i=0; i<4; i++)
+    guiConf.vfoDialStep[0][0] = 10;
+    guiConf.vfoDialStep[0][1] = 100;
+    guiConf.vfoDialStep[0][2] = 100;
+    guiConf.vfoDialStep[0][3] = 500;
+
+    //Window settings
+    restoreGeometry(configFile.value("WindowSettings/geometry").toByteArray());
+    restoreState(configFile.value("WindowSettings/state").toByteArray());
+}
+
+
+void MainWindow::loadRigConfig(QString configFileName)
+{
+    QSettings configFile(configFileName, QSettings::IniFormat);
+
+    rigCom.rigModel = configFile.value("rigModel", 0).toUInt();
+    rigCom.rigPort = configFile.value("rigPort").toString();
+    rigCom.serialSpeed = configFile.value("serialSpeed", 9600).toUInt();
+    rigCom.civAddr = configFile.value("civAddress", 0).toInt();
+    if (configFile.contains("serialDataBits"))  //For backward compatibility with CatRadio v.< 1.4.0
+    {
+        rigCom.serialDataBits = configFile.value("serialDataBits", 8).toUInt();
+        rigCom.serialParity = configFile.value("serialParity", 0).toUInt();
+        rigCom.serialStopBits = configFile.value("serialStopBits", 2).toUInt();
+        rigCom.serialHandshake = configFile.value("serialHandshake", 0).toUInt();
+    }
+    rigCom.netRigctl = configFile.value("netRigctl", false).toBool();
+    rigCom.rigRefresh = configFile.value("rigRefresh", 100).toInt();
+    rigCom.fullPoll = configFile.value("fullPolling", true).toBool();
+    rigCom.autoConnect = configFile.value("autoConnect", false).toBool();
+    rigCom.autoPowerOn = configFile.value("autoPowerOn", false).toBool();
+}
+
 
 void MainWindow::audioOutputInit(QString configFileName)
 {
@@ -1483,20 +1506,36 @@ void MainWindow::on_radioButton_RPTshiftPlus_toggled(bool checked)
 void MainWindow::on_dial_valueChanged(int value)
 {
     int step;
+    int freqStep;
 
     step = value - prevDial;
-    if (step<=99 && step>50) step = value - 100 - prevDial;
-    if (step>=-99 && step<-50) step = value + 100 - prevDial;
-    prevDial = value;
+
+    if (step<=99 && step>50) step = value - 100 - prevDial; //More than half turn CW
+    else if (step>=-99 && step<-50) step = value + 100 - prevDial;  //More than half turn CCW
+
+    prevDial = value;   //Store actual dial value
+
+    if (step == 10) //Page step CW
+        if (fastDial) freqStep = guiConf.vfoDialStep[0][3]; //Fast
+        else freqStep = guiConf.vfoDialStep[0][1];  //Normal
+    else if (step == -10) //Page step CCW
+        if (fastDial) freqStep = -guiConf.vfoDialStep[0][3]; //Fast
+        else freqStep = -guiConf.vfoDialStep[0][1];  //Normal
+    else if (fastDial) freqStep=guiConf.vfoDialStep[0][2] * step; //Single step Fast
+    else freqStep=guiConf.vfoDialStep[0][0] * step; //Single step Normal
+
+    //if (fastDial) freqStep = freqStep * guiConf.vfoDialStep[0][2]; //Fast activated
+
+    //qDebug() << value << step << freqStep;
 
     if (ui->radioButton_VFOSub->isChecked()) //dial VFO Sub
     {
-        rigSet.freqSub = rigGet.freqSub + step*(!fastDial*10+fastDial*100);
+        rigSet.freqSub = rigGet.freqSub + freqStep;
         rigCmd.freqSub = 1;
     }
     else    //dial VFO Main
     {
-        rigSet.freqMain = rigGet.freqMain + step*(!fastDial*10+fastDial*100);
+        rigSet.freqMain = rigGet.freqMain + freqStep;
         rigCmd.freqMain = 1;
     }
 }
@@ -1903,7 +1942,7 @@ void MainWindow::on_action_AboutCatRadio_triggered()
     msgBox.setTextFormat(Qt::RichText);
     QString version = QString::number(VERSION_MAJ)+"."+QString::number(VERSION_MIN)+"."+QString::number(VERSION_MIC);
     msgBox.setText("<b>CatRadio</b> <i>Radio control software</i><br/>version "+version+" "+RELEASE_DATE);
-    msgBox.setInformativeText("<p>Copyright (C) 2022-2024 Gianfranco Sordetti IZ8EWD<br/>"
+    msgBox.setInformativeText("<p>Copyright (C) 2022-2025 Gianfranco Sordetti IZ8EWD<br/>"
                               "<a href='https://www.pianetaradio.it' style='color: #668fb8'>www.pianetaradio.it</a></p>"
                               "<p>This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.<br/>"
                               "This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.<br/>"

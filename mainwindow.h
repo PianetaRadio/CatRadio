@@ -1,6 +1,6 @@
 /**
  ** This file is part of the CatRadio project.
- ** Copyright 2022-2024 Gianfranco Sordetti IZ8EWD <iz8ewd@pianetaradio.it>.
+ ** Copyright 2022-2025 Gianfranco Sordetti IZ8EWD <iz8ewd@pianetaradio.it>.
  **
  ** This program is free software: you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -199,10 +199,10 @@ private slots:
     void on_checkBox_micMonitor_toggled(bool checked);
 
     void on_action_Command_triggered();
-
     void on_action_RadioInfo_triggered();
-
     void on_action_AboutDarkTheme_triggered();
+    void on_actionNET_rigctl_triggered();
+    void on_action_Voice_Keyer_triggered();
 
     void on_pushButton_CW1_clicked();
     void on_pushButton_CW2_clicked();
@@ -210,9 +210,6 @@ private slots:
     void on_pushButton_CW4_clicked();
     void on_pushButton_CW5_clicked();
 
-    void on_actionNET_rigctl_triggered();
-
-    void on_action_Voice_Keyer_triggered();
     void on_pushButton_VoiceK1_clicked();
     void on_pushButton_VoiceK2_clicked();
     void on_pushButton_VoiceK3_clicked();
@@ -235,8 +232,13 @@ private:
     RIG *my_rig;
 
     void guiInit();
+
+    void loadGuiConfig(QString configFileName);
+    void loadRigConfig(QString configFileName);
     void audioOutputInit(QString configFileName);
+
     void setSubMeter();
+
     bool checkHamlibVersion(int major, int minor, int revision);
 };
 
