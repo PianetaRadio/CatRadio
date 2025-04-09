@@ -17,9 +17,28 @@
  **/
 
 
-#include "guidata.h"
+#ifndef WINKEYER_H
+#define WINKEYER_H
 
-guiConfig guiConf;
-guiCommand guiCmd;
-voiceKeyerConfig voiceKConf;
-cwKeyerConfig cwKConf;
+#include <QSerialPort>
+
+
+class WinKeyer
+{
+public:
+    int version;    //WinKeyer version
+    bool isOpen;    //WinKeyer open flag
+
+    int init(QString portName);
+    int open();
+    void close();
+    void setWpmSpeed(int wpm);
+    void sendString(QByteArray string);
+
+private:
+    QSerialPort *serial = nullptr;
+
+    QByteArray intToByte (int value);    //Convert int (0 - 255) into a 1 byte QByteArray
+};
+
+#endif // WINKEYER_H

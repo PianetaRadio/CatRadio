@@ -22,13 +22,16 @@
 #include "dialogconfig.h"
 #include "dialogsetup.h"
 #include "dialogvoicekeyer.h"
+#include "dialogcwkeyer.h"
 #include "dialogcommand.h"
 #include "dialogradioinfo.h"
 #include "dialognetrigctl.h"
+
 #include "rigdaemon.h"
 #include "rigdata.h"
 #include "guidata.h"
 #include "rigcommand.h"
+#include "winkeyer.h"
 
 #include <QDebug>
 #include <QMessageBox>
@@ -41,7 +44,7 @@
 #include <QCoreApplication>
 #include <QDir>
 
-#include <cwchar>
+#include <cwchar>   //c++ string library
 #include <rig.h>    //Hamlib
 
 //RIG *my_rig;
@@ -54,6 +57,7 @@ extern rigCommand rigCap;
 extern guiConfig guiConf;
 extern guiCommand guiCmd;
 extern voiceKeyerConfig voiceKConf;
+extern cwKeyerConfig cwKConf;
 
 int retcode;    //Return code from function
 int i;  //Index
@@ -71,6 +75,8 @@ RigDaemon *rigDaemon = new RigDaemon;
 QDialog *command = nullptr;
 QDialog *radioInfo = nullptr;
 
+WinKeyer *winkeyer = nullptr;
+
 
 //***** MainWindow *****
 
@@ -82,7 +88,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     //display name and version in the window title
     QString version = QString::number(VERSION_MAJ)+"."+QString::number(VERSION_MIN)+"."+QString::number(VERSION_MIC);
-    this->setWindowTitle("CatRadio v."+version);
+    this->setWindowTitle("CatRadio v."+version+" (Beta)");
 
     QDir::setCurrent(QCoreApplication::applicationDirPath());   //set current path = application path
 
@@ -111,13 +117,19 @@ MainWindow::MainWindow(QWidget *parent)
     workerThread.start();
 
     //* Load settings from catradio.ini
-    loadGuiConfig("catradio.ini");
-    loadRigConfig("catradio.ini");
+    loadGuiConfig("catradio.ini");  //load GUI config
+    loadRigConfig("catradio.ini");  //load Rig config
     //Voice memory
     if (guiConf.voiceKeyerMode == 1)
     {
         ui->action_Voice_Keyer->setEnabled(true);   //enable Voice Keyer menu
         audioOutputInit("catradio.ini");     //init audio
+    }
+    //CW keyer
+    if (guiConf.cwKeyerMode == 1)
+    {
+        ui->actionCW_Keyer->setEnabled(true);   //enable CW Keyer menu
+        loadCwKeyerConfig("catradio.ini");  //load CW Keyer config
     }
 
     //* Debug
@@ -209,11 +221,24 @@ MainWindow::~MainWindow()
 
         rigCom.connected = 0;
         rig_close(my_rig);  //Close the communication to the rig
+        rig_cleanup(my_rig);    //Release rig handle and free associated memory
     }
 
-    rig_cleanup(my_rig);    //Release rig handle and free associated memory
-
     fclose(debugFile);  //Close debug.log
+
+    if (guiConf.cwKeyerMode == 1)
+    {
+        qDebug()<<winkeyer<<"Distructor 5";
+        if (winkeyer && winkeyer->isOpen) winkeyer->close();
+        if (winkeyer)
+        {
+            delete winkeyer;
+            qDebug()<<"Delete";
+        }
+    }
+
+    if (command) delete command;    //deallocate *command
+    if (radioInfo) delete radioInfo;  //deallocate *radioInfo
 
     //* Save window settings
     QSettings configFile(QString("catradio.ini"), QSettings::IniFormat);
@@ -393,7 +418,7 @@ void MainWindow::guiInit()
     //* CW
     if (!rig_has_set_func(my_rig, RIG_FUNC_FBKIN)) ui->checkBox_BKIN->setEnabled(false);
     if (!rig_has_set_func(my_rig, RIG_FUNC_APF)) ui->checkBox_APF->setEnabled(false);
-    if (!rig_has_set_level(my_rig, RIG_LEVEL_KEYSPD)) ui->spinBox_WPM->setEnabled(false);
+    if (guiConf.cwKeyerMode == 0 && !rig_has_set_level(my_rig, RIG_LEVEL_KEYSPD)) ui->spinBox_WPM->setEnabled(false);
 
     //* FM
     ui->comboBox_toneType->clear();
@@ -444,6 +469,7 @@ void MainWindow::loadGuiConfig(QString configFileName)
 
     guiConf.vfoDisplayMode = configFile.value("vfoDisplayMode", 0).toInt();
     guiConf.darkTheme = configFile.value("darkTheme", false).toBool();
+    guiConf.cwKeyerMode = configFile.value("cwKeyerMode", 0).toInt();
     guiConf.voiceKeyerMode = configFile.value("voiceKeyerMode", 0).toInt();
     guiConf.peakHold = configFile.value("peakHold", true).toBool();
     guiConf.debugMode = configFile.value("debugMode", false).toBool();
@@ -530,6 +556,25 @@ void MainWindow::audioOutputInit(QString configFileName)
     audioPlayer->setVolume((int)(voiceKConf.audioOutputVolume*10));    //Int 0 min - 100 max
 #endif
 }
+
+
+void MainWindow::loadCwKeyerConfig(QString configFileName)
+{
+    QSettings configFile(configFileName, QSettings::IniFormat);
+
+    //Set keyer COM port name
+    cwKConf.comPort = configFile.value("CWKeyer/comPort", "").toString();
+
+    //Set CW strings associated to keyer memory buttons
+    cwKConf.memoryString[0] = configFile.value("CWKeyer/cwMemoryString1", "").toByteArray();
+    cwKConf.memoryString[1] = configFile.value("CWKeyer/cwMemoryString2", "").toByteArray();
+    cwKConf.memoryString[2] = configFile.value("CWKeyer/cwMemoryString3", "").toByteArray();
+    cwKConf.memoryString[3] = configFile.value("CWKeyer/cwMemoryString4", "").toByteArray();
+    cwKConf.memoryString[4] = configFile.value("CWKeyer/cwMemoryString5", "").toByteArray();
+
+    if (!winkeyer) winkeyer = new WinKeyer;
+}
+
 
 void MainWindow::guiUpdate()
 {
@@ -809,7 +854,7 @@ void MainWindow::guiUpdate()
     //* CW
     if (!rigCmd.bkin) ui->checkBox_BKIN->setChecked(rigGet.bkin);
     if (!rigCmd.apf) ui->checkBox_APF->setChecked(rigGet.apf);
-    if (!rigCmd.wpm) ui->spinBox_WPM->setValue(rigGet.wpm);
+    if (guiConf.cwKeyerMode == 0 && !rigCmd.wpm) ui->spinBox_WPM->setValue(rigGet.wpm);
 
     //* FM
     if (rigGet.rptShift == RIG_RPT_SHIFT_MINUS && !rigCmd.rptShift) ui->radioButton_RPTshiftMinus->setChecked(true);    //-
@@ -1199,27 +1244,57 @@ void MainWindow::on_pushButton_BandUp_clicked()
 //CW keyer
 void MainWindow::on_pushButton_CW1_clicked()
 {
-    send_cw_mem(1);
+    if (guiConf.cwKeyerMode == 0) send_cw_mem(1);   //Radio CW keyer
+    else if (guiConf.cwKeyerMode == 1 && winkeyer->isOpen && rigCmd.cwSend == 0 && cwKConf.memoryString[0]!="")  //WinKeyer
+    {
+        rigCmd.cwSend = 1;
+        winkeyer->sendString(cwKConf.memoryString[0]);
+        rigCmd.cwSend = 0;
+    }
 }
 
 void MainWindow::on_pushButton_CW2_clicked()
 {
-    send_cw_mem(2);
+    if (guiConf.cwKeyerMode == 0) send_cw_mem(2);
+    else if (guiConf.cwKeyerMode == 1 && winkeyer->isOpen && rigCmd.cwSend == 0 && cwKConf.memoryString[1]!="")
+    {
+        rigCmd.cwSend = 1;
+        winkeyer->sendString(cwKConf.memoryString[1]);
+        rigCmd.cwSend = 0;
+    }
 }
 
 void MainWindow::on_pushButton_CW3_clicked()
 {
-    send_cw_mem(3);
+    if (guiConf.cwKeyerMode == 0) send_cw_mem(3);
+    else if (guiConf.cwKeyerMode == 1 && winkeyer->isOpen && rigCmd.cwSend == 0 && cwKConf.memoryString[2]!="")
+    {
+        rigCmd.cwSend = 1;
+        winkeyer->sendString(cwKConf.memoryString[2]);
+        rigCmd.cwSend = 0;
+    }
 }
 
 void MainWindow::on_pushButton_CW4_clicked()
 {
-    send_cw_mem(4);
+    if (guiConf.cwKeyerMode == 0) send_cw_mem(4);
+    else if (guiConf.cwKeyerMode == 1 && winkeyer->isOpen && rigCmd.cwSend == 0 && cwKConf.memoryString[3]!="")
+    {
+        rigCmd.cwSend = 1;
+        winkeyer->sendString(cwKConf.memoryString[3]);
+        rigCmd.cwSend = 0;
+    }
 }
 
 void MainWindow::on_pushButton_CW5_clicked()
 {
-    send_cw_mem(5);
+    if (guiConf.cwKeyerMode == 0) send_cw_mem(5);
+    else if (guiConf.cwKeyerMode == 1 && winkeyer->isOpen && rigCmd.cwSend == 0 && cwKConf.memoryString[4]!="")
+    {
+        rigCmd.cwSend = 1;
+        winkeyer->sendString(cwKConf.memoryString[4]);
+        rigCmd.cwSend = 0;
+    }
 }
 
 //Voice keyer
@@ -1664,10 +1739,14 @@ void MainWindow::on_spinBox_NR_valueChanged(int arg1)
 
 void MainWindow::on_spinBox_WPM_valueChanged(int arg1)
 {
-    if (!rigCmd.wpm)
+    if (guiConf.cwKeyerMode == 0 && !rigCmd.wpm)
     {
         rigSet.wpm = arg1;
         rigCmd.wpm = 1;
+    }
+    else if (guiConf.cwKeyerMode == 1 && winkeyer->isOpen && rigCmd.cwSend == 0)
+    {
+        winkeyer->setWpmSpeed(arg1);
     }
 }
 
@@ -1888,6 +1967,13 @@ void MainWindow::on_action_Setup_triggered()
     ui->lineEdit_vfoMain->setMode(guiConf.vfoDisplayMode);
     ui->lineEdit_vfoSub->setMode(guiConf.vfoDisplayMode);
 
+    if (guiConf.cwKeyerMode == 1)
+    {
+        ui->actionCW_Keyer->setEnabled(true);
+        loadCwKeyerConfig("catradio.ini");
+    }
+    else ui->action_Voice_Keyer->setEnabled(false);
+
     if (guiConf.voiceKeyerMode == 1)
     {
         ui->action_Voice_Keyer->setEnabled(true);
@@ -1903,6 +1989,15 @@ void MainWindow::on_action_Voice_Keyer_triggered()
     voiceKeyer.exec();
 
     audioOutputInit("catradio.ini");
+}
+
+void MainWindow::on_actionCW_Keyer_triggered()
+{
+    DialogCWKeyer cwKeyer(winkeyer);
+    cwKeyer.setModal(true);
+    cwKeyer.exec();
+
+    loadCwKeyerConfig("catradio.ini");
 }
 
 void MainWindow::on_action_RadioInfo_triggered()
@@ -1996,4 +2091,3 @@ void MainWindow::on_action_CatRadioHomepage_triggered()
     QUrl homepage("https://www.pianetaradio.it/blog/catradio/");
     QDesktopServices::openUrl(homepage);
 }
-

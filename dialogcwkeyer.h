@@ -17,9 +17,34 @@
  **/
 
 
-#include "guidata.h"
+#ifndef DIALOGCWKEYER_H
+#define DIALOGCWKEYER_H
 
-guiConfig guiConf;
-guiCommand guiCmd;
-voiceKeyerConfig voiceKConf;
-cwKeyerConfig cwKConf;
+#include <QDialog>
+
+#include "winkeyer.h"
+
+
+namespace Ui {
+class DialogCWKeyer;
+}
+
+class DialogCWKeyer : public QDialog
+{
+    Q_OBJECT
+
+public:
+    explicit DialogCWKeyer(WinKeyer *winkeyer, QWidget *parent = nullptr);
+    ~DialogCWKeyer();
+
+private slots:
+    void on_pushButton_Connect_toggled(bool checked);
+    void on_buttonBox_accepted();
+
+private:
+    Ui::DialogCWKeyer *ui;
+
+    WinKeyer *wk;
+};
+
+#endif // DIALOGCWKEYER_H

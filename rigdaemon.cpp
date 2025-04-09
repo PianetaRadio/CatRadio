@@ -118,7 +118,7 @@ void RigDaemon::rigUpdate(RIG *my_rig)
     }
 
     //* CW memory keyer (rig)
-    if (rigCmd.cwSend && (rigGet.mode == RIG_MODE_CW || rigGet.mode == RIG_MODE_CWN || rigGet.mode == RIG_MODE_CWR))
+    if (guiConf.cwKeyerMode == 0 && rigCmd.cwSend && (rigGet.mode == RIG_MODE_CW || rigGet.mode == RIG_MODE_CWN || rigGet.mode == RIG_MODE_CWR))
     {
         //if (rig_has_get_func(my_rig, RIG_FUNCTION_SEND_MORSE)) rig_send_morse(my_rig, RIG_VFO_CURR, &rigSet.cwMem);
         retcode = rig_send_morse(my_rig, RIG_VFO_CURR, &rigSet.cwMem);
@@ -205,7 +205,8 @@ void RigDaemon::rigUpdate(RIG *my_rig)
                 {
                     guiCmd.bwidthList = 1;  //Command update of BW list
                     guiCmd.tabList = 1;     //Command selection of appropriate mode function tab
-                    indexCmd = 0;
+                    guiCmd.dialConf = 1;    //Command the tuning dial step configuration
+                    indexCmd = 0;   //Update all
                     //rig_get_mode(my_rig, RIG_VFO_CURR, &rigGet.mode, &rigGet.bwidth);   //Get BW
                 }
                 rigCmd.mode = 0;
@@ -661,6 +662,7 @@ void RigDaemon::rigUpdate(RIG *my_rig)
             {
                 guiCmd.bwidthList = 1;  //Command update of BW list
                 guiCmd.tabList = 1;     //Command selection of appropriate mode function tab
+                guiCmd.dialConf = 1;    //Command the tuning dial step configuration
             }
 
             rigGet.mode = tempMode;
@@ -836,7 +838,7 @@ void RigDaemon::rigUpdate(RIG *my_rig)
         {
             if (rig_has_get_func(my_rig, RIG_FUNC_FBKIN)) rig_get_func(my_rig, RIG_VFO_CURR, RIG_FUNC_FBKIN, &rigGet.bkin);   //Break-in
             if (rig_has_get_func(my_rig, RIG_FUNC_APF)) rig_get_func(my_rig, RIG_VFO_CURR, RIG_FUNC_APF, &rigGet.apf);      //Audio Peak Filter
-            if (rig_has_get_level(my_rig, RIG_LEVEL_KEYSPD)) rig_get_level(my_rig, RIG_VFO_CURR, RIG_LEVEL_KEYSPD, &retvalue);   //Keyer speed WPM
+            if (guiConf.cwKeyerMode == 0 && rig_has_get_level(my_rig, RIG_LEVEL_KEYSPD)) rig_get_level(my_rig, RIG_VFO_CURR, RIG_LEVEL_KEYSPD, &retvalue);   //Keyer speed WPM
             rigGet.wpm = retvalue.i;
         }
 

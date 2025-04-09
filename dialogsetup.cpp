@@ -1,6 +1,6 @@
 /**
  ** This file is part of the CatRadio project.
- ** Copyright 2022-2024 Gianfranco Sordetti IZ8EWD <iz8ewd@pianetaradio.it>.
+ ** Copyright 2022-2025 Gianfranco Sordetti IZ8EWD <iz8ewd@pianetaradio.it>.
  **
  ** This program is free software: you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@ DialogSetup::DialogSetup(QWidget *parent) :
 
    if (guiConf.vfoDisplayMode == 1) ui->radioButton_vfoDispMode_UD->setChecked(true);
    if (guiConf.darkTheme) ui->radioButton_themeDark->setChecked(true);
+   if (guiConf.cwKeyerMode == 1) ui->radioButton_cwKeyerMode_Keyer->setChecked(true);
    if (guiConf.voiceKeyerMode == 1) ui->radioButton_voiceKeyerMode_CatRadio->setChecked(true);
    if (guiConf.peakHold) ui->checkBox_peakHold->setChecked(true);
    if (guiConf.debugMode) ui->checkBox_debug->setChecked(true);
@@ -62,6 +63,7 @@ void DialogSetup::on_buttonBox_accepted()
 
     guiConf.vfoDisplayMode = ui->radioButton_vfoDispMode_UD->isChecked();
     guiConf.darkTheme = ui->radioButton_themeDark->isChecked();
+    guiConf.cwKeyerMode = ui->radioButton_cwKeyerMode_Keyer->isChecked();
     guiConf.voiceKeyerMode = ui->radioButton_voiceKeyerMode_CatRadio->isChecked();
     guiConf.peakHold = ui->checkBox_peakHold->isChecked();
     guiConf.debugMode = ui->checkBox_debug->isChecked();
@@ -70,6 +72,7 @@ void DialogSetup::on_buttonBox_accepted()
     QSettings configFile(QString("catradio.ini"), QSettings::IniFormat);
     configFile.setValue("vfoDisplayMode", guiConf.vfoDisplayMode);
     configFile.setValue("darkTheme", guiConf.darkTheme);
+    configFile.setValue("cwKeyerMode", guiConf.cwKeyerMode);
     configFile.setValue("voiceKeyerMode", guiConf.voiceKeyerMode);
     configFile.setValue("peakHold", guiConf.peakHold);
     configFile.setValue("debugMode", guiConf.debugMode);

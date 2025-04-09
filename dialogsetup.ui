@@ -152,6 +152,32 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
+        <widget class="QGroupBox" name="groupBox_cwKeyerMode">
+         <property name="title">
+          <string>CW Keyer</string>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_5">
+          <item>
+           <widget class="QRadioButton" name="radioButton_cwKeyerMode_Radio">
+            <property name="text">
+             <string>Radio</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="radioButton_cwKeyerMode_Keyer">
+            <property name="text">
+             <string>Keyer</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
         <widget class="QGroupBox" name="groupBox_voiceKeyerMode">
          <property name="title">
           <string>Voice Keyer</string>

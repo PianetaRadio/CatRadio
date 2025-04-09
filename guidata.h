@@ -39,7 +39,7 @@ typedef struct {
     bool darkTheme; //flag for Dark theme
     bool peakHold;  //meters peak hold
     bool debugMode; //flag for debug log
-    int cwKeyerMode;    //0: Radio
+    int cwKeyerMode;    //0: Radio, 1: WinKeyer
     int voiceKeyerMode; //0: Radio, 1: CatRadio
 } guiConfig;
 
@@ -59,3 +59,10 @@ typedef struct {
     QString audioOutput;    //Audio output device name
     int audioOutputVolume;    //Audio output volume integer 0..10
 } voiceKeyerConfig;
+
+
+typedef struct {
+    QString comPort;    //COM port name
+    QByteArray memoryString[5];   //CW strings
+    int wpm;    //WPM
+} cwKeyerConfig;

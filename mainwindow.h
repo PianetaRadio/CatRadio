@@ -32,6 +32,7 @@
 #include <QSettings>
 
 #include "rig.h"
+#include "winkeyer.h"
 
 #define RELEASE_DATE __DATE__
 #define VERSION_MAJ 1
@@ -74,9 +75,16 @@ private slots:
 
     void on_comboBox_Mode_activated(int index);
     void on_comboBox_ModeSub_activated(int index);
+    void on_comboBox_BW_activated(int index);
+    void on_comboBox_AGC_activated(int index);
+    void on_comboBox_Att_activated(int index);
+    void on_comboBox_Preamp_activated(int index);
+    void on_comboBox_Ant_activated(int index);
+    void on_comboBox_Meter_activated(int index);
+    void on_comboBox_toneType_activated(int index);
+    void on_comboBox_toneFreq_activated(int index);
 
     void on_pushButton_Fast_toggled(bool checked);
-
     void on_pushButton_Band160_clicked();
     void on_pushButton_Band80_clicked();
     void on_pushButton_Band60_clicked();
@@ -88,133 +96,80 @@ private slots:
     void on_pushButton_Band12_clicked();
     void on_pushButton_Band10_clicked();
     void on_pushButton_Band6_clicked();
-
-    void on_pushButton_Tune_clicked();
-    void on_radioButton_Tuner_toggled(bool checked);
-
+    void on_pushButton_Band2_clicked();
+    void on_pushButton_Band70_clicked();
+    void on_pushButton_BandGen_clicked();
     void on_pushButton_BandDown_clicked();
     void on_pushButton_BandUp_clicked();
-
     void on_pushButton_QSplit_clicked();
-
-    void on_action_Connection_triggered();
-
-    void on_comboBox_BW_activated(int index);
-
-    void on_checkBox_NAR_toggled(bool checked);
-
-    void on_checkBox_BKIN_toggled(bool checked);
-
-    void on_comboBox_AGC_activated(int index);
-
-    void on_comboBox_Att_activated(int index);
-
-    void on_comboBox_Preamp_activated(int index);
-
-    void on_comboBox_Ant_activated(int index);
-
-    void on_action_AboutCatRadio_triggered();
-
-    void on_checkBox_NB_toggled(bool checked);
-
-    void on_checkBox_NR_toggled(bool checked);
-
-    void on_checkBox_NF_toggled(bool checked);
-
-    void on_comboBox_Meter_activated(int index);
-
-    void on_spinBox_NR_valueChanged(int arg1);
-
-    void on_horizontalSlider_IFshift_valueChanged(int value);
-
-    void on_pushButton_Band2_clicked();
-
-    void on_pushButton_Band70_clicked();
-
-    void on_pushButton_BandGen_clicked();
-
-    void on_action_Setup_triggered();
-    void on_action_CatRadioHomepage_triggered();
-    void on_action_AboutQT_triggered();
-    void on_action_AboutHamLib_triggered();
-
-    void on_verticalSlider_AFGain_valueChanged(int value);
-    void on_verticalSlider_Squelch_valueChanged(int value);
-    void on_verticalSlider_RFpower_valueChanged(int value);
-    void on_verticalSlider_RFgain_valueChanged(int value);
-
-    void on_spinBox_WPM_valueChanged(int arg1);
-
-    void on_checkBox_APF_toggled(bool checked);
-
-    void on_radioButton_RPTshiftSimplex_toggled(bool checked);
-
-    void on_radioButton_RPTshiftMinus_toggled(bool checked);
-
-    void on_radioButton_RPTshiftPlus_toggled(bool checked);
-
-    void on_comboBox_toneType_activated(int index);
-
-    void on_comboBox_toneFreq_activated(int index);
-
-    void on_spinBox_RPToffset_valueChanged(int arg1);
-
+    void on_pushButton_Tune_clicked();
     void on_pushButton_left_clicked();
     void on_pushButton_right_clicked();
-
-    void on_checkBox_clar_toggled(bool checked);
-    void on_pushButton_clarClear_clicked();
-    void on_horizontalSlider_clar_valueChanged(int value);
-    void on_radioButton_clarRIT_toggled(bool checked);
-    void on_radioButton_clarXIT_toggled(bool checked);
-
-    void on_verticalSlider_RFpower_sliderReleased();
-
-    void on_verticalSlider_RFgain_sliderReleased();
-
-    void on_verticalSlider_AFGain_sliderReleased();
-
-    void on_verticalSlider_Squelch_sliderReleased();
-
-    void on_horizontalSlider_IFshift_sliderReleased();
-
-    void on_horizontalSlider_clar_sliderReleased();
-
-    void on_checkBox_NB2_toggled(bool checked);
-
-    void on_verticalSlider_micGain_valueChanged(int value);
-
-    void on_verticalSlider_micGain_sliderReleased();
-
-    void on_verticalSlider_micCompressor_valueChanged(int value);
-
-    void on_verticalSlider_micCompressor_sliderReleased();
-
-    void on_verticalSlider_micMonitor_valueChanged(int value);
-
-    void on_verticalSlider_micMonitor_sliderReleased();
-
-    void on_checkBox_micCompressor_toggled(bool checked);
-
-    void on_checkBox_micMonitor_toggled(bool checked);
-
-    void on_action_Command_triggered();
-    void on_action_RadioInfo_triggered();
-    void on_action_AboutDarkTheme_triggered();
-    void on_actionNET_rigctl_triggered();
-    void on_action_Voice_Keyer_triggered();
-
     void on_pushButton_CW1_clicked();
     void on_pushButton_CW2_clicked();
     void on_pushButton_CW3_clicked();
     void on_pushButton_CW4_clicked();
     void on_pushButton_CW5_clicked();
-
     void on_pushButton_VoiceK1_clicked();
     void on_pushButton_VoiceK2_clicked();
     void on_pushButton_VoiceK3_clicked();
     void on_pushButton_VoiceK4_clicked();
     void on_pushButton_VoiceK5_clicked();
+    void on_pushButton_clarClear_clicked();
+
+    void on_checkBox_NAR_toggled(bool checked);
+    void on_checkBox_BKIN_toggled(bool checked);
+    void on_checkBox_NB_toggled(bool checked);
+    void on_checkBox_NB2_toggled(bool checked);
+    void on_checkBox_NR_toggled(bool checked);
+    void on_checkBox_NF_toggled(bool checked);
+    void on_checkBox_APF_toggled(bool checked);
+    void on_checkBox_micCompressor_toggled(bool checked);
+    void on_checkBox_micMonitor_toggled(bool checked);
+    void on_checkBox_clar_toggled(bool checked);
+
+    void on_spinBox_NR_valueChanged(int arg1);
+    void on_spinBox_WPM_valueChanged(int arg1);
+    void on_spinBox_RPToffset_valueChanged(int arg1);
+
+    void on_radioButton_Tuner_toggled(bool checked);
+    void on_radioButton_RPTshiftSimplex_toggled(bool checked);
+    void on_radioButton_RPTshiftMinus_toggled(bool checked);
+    void on_radioButton_clarRIT_toggled(bool checked);
+    void on_radioButton_clarXIT_toggled(bool checked);
+    void on_radioButton_RPTshiftPlus_toggled(bool checked);
+
+    void on_horizontalSlider_IFshift_sliderReleased();
+    void on_horizontalSlider_clar_sliderReleased();
+    void on_horizontalSlider_clar_valueChanged(int value);
+    void on_horizontalSlider_IFshift_valueChanged(int value);
+    void on_verticalSlider_RFpower_sliderReleased();
+    void on_verticalSlider_RFgain_sliderReleased();
+    void on_verticalSlider_AFGain_sliderReleased();
+    void on_verticalSlider_Squelch_sliderReleased();
+    void on_verticalSlider_micGain_valueChanged(int value);
+    void on_verticalSlider_micGain_sliderReleased();
+    void on_verticalSlider_micCompressor_valueChanged(int value);
+    void on_verticalSlider_micCompressor_sliderReleased();
+    void on_verticalSlider_micMonitor_valueChanged(int value);
+    void on_verticalSlider_micMonitor_sliderReleased();
+    void on_verticalSlider_AFGain_valueChanged(int value);
+    void on_verticalSlider_Squelch_valueChanged(int value);
+    void on_verticalSlider_RFpower_valueChanged(int value);
+    void on_verticalSlider_RFgain_valueChanged(int value);
+
+    void on_action_Connection_triggered();
+    void on_action_Setup_triggered();
+    void on_action_CatRadioHomepage_triggered();
+    void on_action_AboutQT_triggered();
+    void on_action_AboutHamLib_triggered();
+    void on_action_Command_triggered();
+    void on_action_RadioInfo_triggered();
+    void on_action_AboutDarkTheme_triggered();
+    void on_actionNET_rigctl_triggered();
+    void on_action_Voice_Keyer_triggered();
+    void on_actionCW_Keyer_triggered();
+    void on_action_AboutCatRadio_triggered();
 
 private:
     Ui::MainWindow *ui;
@@ -230,12 +185,14 @@ private:
 #endif
 
     RIG *my_rig;
+    //WinKeyer *winkeyer = nullptr;
 
     void guiInit();
 
     void loadGuiConfig(QString configFileName);
     void loadRigConfig(QString configFileName);
     void audioOutputInit(QString configFileName);
+    void loadCwKeyerConfig(QString configFileName);
 
     void setSubMeter();
 

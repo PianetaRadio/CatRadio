@@ -2150,10 +2150,11 @@
     <property name="title">
      <string>Config</string>
     </property>
-    <addaction name="action_Connection"/>
     <addaction name="action_Setup"/>
+    <addaction name="action_Connection"/>
     <addaction name="separator"/>
     <addaction name="action_Voice_Keyer"/>
+    <addaction name="actionCW_Keyer"/>
    </widget>
    <widget class="QMenu" name="menu_Help">
     <property name="title">
@@ -2253,6 +2254,14 @@
    </property>
    <property name="text">
     <string>Voice Keyer</string>
+   </property>
+  </action>
+  <action name="actionCW_Keyer">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>CW Keyer</string>
    </property>
   </action>
  </widget>
