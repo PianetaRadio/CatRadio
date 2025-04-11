@@ -65,4 +65,5 @@ typedef struct {
     QString comPort;    //COM port name
     QByteArray memoryString[5];   //CW strings
     int wpm;    //WPM
+    bool autoConnect; //Auto-connect flag
 } cwKeyerConfig;

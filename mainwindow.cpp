@@ -120,13 +120,13 @@ MainWindow::MainWindow(QWidget *parent)
     loadGuiConfig("catradio.ini");  //load GUI config
     loadRigConfig("catradio.ini");  //load Rig config
     //Voice memory
-    if (guiConf.voiceKeyerMode == 1)
+    if (guiConf.voiceKeyerMode == 1)    //CatRadio Voice Keyer
     {
         ui->action_Voice_Keyer->setEnabled(true);   //enable Voice Keyer menu
         audioOutputInit("catradio.ini");     //init audio
     }
     //CW keyer
-    if (guiConf.cwKeyerMode == 1)
+    if (guiConf.cwKeyerMode == 1)   //WinKeyer
     {
         ui->actionCW_Keyer->setEnabled(true);   //enable CW Keyer menu
         loadCwKeyerConfig("catradio.ini");  //load CW Keyer config
@@ -228,7 +228,6 @@ MainWindow::~MainWindow()
 
     if (guiConf.cwKeyerMode == 1)
     {
-        qDebug()<<winkeyer<<"Distructor 5";
         if (winkeyer && winkeyer->isOpen) winkeyer->close();
         if (winkeyer)
         {
@@ -564,6 +563,9 @@ void MainWindow::loadCwKeyerConfig(QString configFileName)
 
     //Set keyer COM port name
     cwKConf.comPort = configFile.value("CWKeyer/comPort", "").toString();
+
+    //Set auto-connect flag
+    cwKConf.autoConnect = configFile.value("CWKeyer/autoConnect", false).toBool();
 
     //Set CW strings associated to keyer memory buttons
     cwKConf.memoryString[0] = configFile.value("CWKeyer/cwMemoryString1", "").toByteArray();
@@ -1038,27 +1040,53 @@ void MainWindow::on_pushButton_Connect_toggled(bool checked)
                 }
                 else rigGet.onoff = RIG_POWER_OFF;
             }
+
+            if (guiConf.cwKeyerMode && cwKConf.autoConnect) //WinKeyer
+            {
+                if (!winkeyer->init(cwKConf.comPort)) //Open serial port
+                {
+                    //wait 2 seconds, serial port open causes reset in Arduino for K3NG CW keyer
+                    QThread::msleep(2000);
+
+                    winkeyer->version = winkeyer->open();   //Open WinKeyer host
+
+                    if (winkeyer->version)    //Read WinKeyer version
+                    {
+                        connectMsg.append(QString(", WinKeyer v. %1").arg(winkeyer->version));
+                        winkeyer->isOpen = true;
+
+                        winkeyer->setWpmSpeed(ui->spinBox_WPM->value());    //Set WPM speed
+                    }
+                }
+            }
         }
     }
-    else if (rigCom.connected)   //Button unchecked
+    else   //Button unchecked
     {
-        if (rigSet.ptt == RIG_PTT_OFF)  //Disconnect only if PTT off
+        if (rigCom.connected)   //Close RIG
         {
-            rigCom.connected = 0;
-            if(timer->isActive()) timer->stop();
-            rig_close(my_rig);  //Close the communication to the rig
-            connectMsg = "Disconnected";
-            //rig_cleanup(my_rig);    //Release rig handle and free associated memory
+            if (rigSet.ptt == RIG_PTT_OFF)  //Disconnect only if PTT off
+            {
+                rigCom.connected = 0;
+                if(timer->isActive()) timer->stop();
+                rig_close(my_rig);  //Close the communication to the rig
+                connectMsg = "Disconnected";
 
-            //Reset meters
-            ui->progressBar_Smeter->setValue(-54);
-            ui->progressBar_Smeter->resetPeakValue();
-            setSubMeter();
+                //Reset meters
+                ui->progressBar_Smeter->setValue(-54);
+                ui->progressBar_Smeter->resetPeakValue();
+                setSubMeter();
+            }
+            else
+            {
+                ui->pushButton_Connect->setChecked(false);  //Uncheck the button
+                connectMsg = "Warning PTT on!";
+            }
         }
-        else
+
+        if (guiConf.cwKeyerMode == 1)   //Close WinKeyer
         {
-            ui->pushButton_Connect->setChecked(false);  //Uncheck the button
-            connectMsg = "Warning PTT on!";
+            if (winkeyer && winkeyer->isOpen) winkeyer->close();
         }
     }
 

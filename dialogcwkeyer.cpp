@@ -47,6 +47,8 @@ DialogCWKeyer::DialogCWKeyer(WinKeyer *winkeyer, QWidget *parent)
     ui->lineEdit_cwK4->setText(cwKConf.memoryString[3]);
     ui->lineEdit_cwK5->setText(cwKConf.memoryString[4]);
 
+    ui->radioButton_autoConnect->setChecked(cwKConf.autoConnect);
+
     if (wk->isOpen) //WinKeyer already open
     {
         ui->pushButton_Connect->setChecked(true);
@@ -123,6 +125,7 @@ void DialogCWKeyer::on_buttonBox_accepted()
     //* Save settings in catradio.ini
     QSettings configFile(QString("catradio.ini"), QSettings::IniFormat);
     configFile.setValue("CWKeyer/comPort", cwKConf.comPort);
+    configFile.setValue("CWKeyer/autoConnect", ui->radioButton_autoConnect->isChecked());
     configFile.setValue("CWKeyer/cwMemoryString1", cwKConf.memoryString[0]);
     configFile.setValue("CWKeyer/cwMemoryString2", cwKConf.memoryString[1]);
     configFile.setValue("CWKeyer/cwMemoryString3", cwKConf.memoryString[2]);
