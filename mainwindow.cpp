@@ -32,6 +32,7 @@
 #include "guidata.h"
 #include "rigcommand.h"
 #include "winkeyer.h"
+#include "debuglogger.h"
 
 #include <QDebug>
 #include <QMessageBox>
@@ -86,9 +87,15 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
+    //* Debug
+    debugLogger::install("catradio.log");
+    if (guiConf.debugMode) debugLogger::setDebugLevel(QtInfoMsg);
+    else debugLogger::setDebugLevel(QtFatalMsg);
+
     //display name and version in the window title
     QString version = QString::number(VERSION_MAJ)+"."+QString::number(VERSION_MIN)+"."+QString::number(VERSION_MIC);
     this->setWindowTitle("CatRadio v."+version+" (Beta)");
+    qInfo() << "CatRadio v."+version;
 
     QDir::setCurrent(QCoreApplication::applicationDirPath());   //set current path = application path
 
@@ -132,13 +139,13 @@ MainWindow::MainWindow(QWidget *parent)
         loadCwKeyerConfig("catradio.ini");  //load CW Keyer config
     }
 
-    //* Debug
+    //* Debug Hamlib
     if (guiConf.debugMode) rig_set_debug_level(RIG_DEBUG_VERBOSE); //debug verbose
     else rig_set_debug_level(RIG_DEBUG_WARN);  //normal
     //rig_set_debug_level(RIG_DEBUG_VERBOSE); //debug verbose
     //rig_set_debug_level(RIG_DEBUG_TRACE);   //debug trace
     rig_set_debug_time_stamp(true);
-    if ((debugFile=fopen("catradio.log","w+")) == NULL) rig_set_debug_level(RIG_DEBUG_NONE);
+    if ((debugFile=fopen("hamlib.log","w+")) == NULL) rig_set_debug_level(RIG_DEBUG_NONE);
     else rig_set_debug_file(debugFile);
 
     //* Style
@@ -224,7 +231,7 @@ MainWindow::~MainWindow()
         rig_cleanup(my_rig);    //Release rig handle and free associated memory
     }
 
-    fclose(debugFile);  //Close debug.log
+    fclose(debugFile);  //Close hamlib.log
 
     if (guiConf.cwKeyerMode == 1)
     {
@@ -245,6 +252,8 @@ MainWindow::~MainWindow()
     configFile.setValue("WindowSettings/state", saveState());
 
     delete ui;
+
+    qInfo() << "Close CatRadio";
 }
 
 
@@ -252,6 +261,8 @@ MainWindow::~MainWindow()
 
 void MainWindow::guiInit()
 {
+    qInfo() << "guiInit";
+
     //* Power on/off cap
     if (rig_has_set_func(my_rig, RIG_FUNCTION_SET_POWERSTAT)==0)
     //if (my_rig->caps->set_powerstat == NULL)
@@ -1008,6 +1019,8 @@ bool MainWindow::checkHamlibVersion(int major, int minor, int revision)
 
 void MainWindow::on_pushButton_Connect_toggled(bool checked)
 {
+    qInfo() << "Connect" << checked;
+
     QString connectMsg;
 
     if (checked && rigCom.connected == 0)
@@ -1022,6 +1035,8 @@ void MainWindow::on_pushButton_Connect_toggled(bool checked)
             connectMsg = "Connection error: ";
             connectMsg.append(rigerror(retcode));
             ui->pushButton_Connect->setChecked(false);  //Uncheck the button
+
+            qCritical() << connectMsg;
         }
         else    //Rig connected
         {
@@ -1095,6 +1110,8 @@ void MainWindow::on_pushButton_Connect_toggled(bool checked)
 
 void MainWindow::on_pushButton_Power_toggled(bool checked)
 {
+    qInfo() << "Power" << checked;
+
     if (checked && !rigGet.onoff)
     {
         retcode = rig_set_powerstat(my_rig, RIG_POWER_ON);

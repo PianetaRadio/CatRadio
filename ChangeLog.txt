@@ -4,6 +4,7 @@ Change log
 (+ New, * Updated, - Removed)
 
 1.5.0 - 2025-xx-xx
+	+ Debug log file
 	+ Voice memory keyer (radio or CatRadio)
 	+ CW memory keyer (radio or WinKeyer)
 	+ Check hamlib version on startup
