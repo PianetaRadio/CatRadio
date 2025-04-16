@@ -33,7 +33,7 @@
 // Our shared secret password 
 #define HAMLIB_SECRET_LENGTH 32
 
-#define HAMLIB_TRACE rig_debug(RIG_DEBUG_TRACE,"%s%s(%d) trace\n",spaces(rig->state.depth-1), __FILE__, __LINE__)
+#define HAMLIB_TRACE rig_debug(RIG_DEBUG_TRACE,"%s%s(%d) trace\n",spaces(STATE(rig)->depth), __FILE__, __LINE__)
 #define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
 
 #include <stdio.h>
@@ -44,6 +44,7 @@
 // to stop warnings about including winsock2.h before windows.h
 #if defined(_WIN32)
 #include <winsock2.h>
+#include <windows.h>
 #include <ws2tcpip.h>
 #else
 #include <sys/socket.h>
@@ -205,6 +206,7 @@ enum rig_errcode_e {
     RIG_EDEPRECATED,/*!< 18 Function deprecated */
     RIG_ESECURITY,  /*!< 19 Security error */
     RIG_EPOWER,     /*!< 20 Rig not powered on */
+    RIG_ELIMIT,     /*!< 21 Limit exceeded */
     RIG_EEND        // MUST BE LAST ITEM IN LAST
 };
 /**
@@ -617,13 +619,13 @@ typedef unsigned int vfo_t;
 // Compared to older rigs which have one or the other
 // So we need to distinguish between them
 //! @cond Doxygen_Suppress
-#define VFO_HAS_A_B ((rig->state.vfo_list & (RIG_VFO_A|RIG_VFO_B)) == (RIG_VFO_A|RIG_VFO_B))
-#define VFO_HAS_MAIN_SUB ((rig->state.vfo_list & (RIG_VFO_MAIN|RIG_VFO_SUB)) == (RIG_VFO_MAIN|RIG_VFO_SUB))
+#define VFO_HAS_A_B ((STATE(rig)->vfo_list & (RIG_VFO_A|RIG_VFO_B)) == (RIG_VFO_A|RIG_VFO_B))
+#define VFO_HAS_MAIN_SUB ((STATE(rig)->vfo_list & (RIG_VFO_MAIN|RIG_VFO_SUB)) == (RIG_VFO_MAIN|RIG_VFO_SUB))
 #define VFO_HAS_MAIN_SUB_ONLY ((!VFO_HAS_A_B) & VFO_HAS_MAIN_SUB)
 #define VFO_HAS_MAIN_SUB_A_B_ONLY (VFO_HAS_A_B & VFO_HAS_MAIN_SUB)
 #define VFO_HAS_A_B_ONLY (VFO_HAS_A_B & (!VFO_HAS_MAIN_SUB))
 #define VFO_DUAL (RIG_VFO_MAIN_A|RIG_VFO_MAIN_B|RIG_VFO_SUB_A|RIG_VFO_SUB_B)
-#define VFO_HAS_DUAL ((rig->state.vfo_list & VFO_DUAL) == VFO_DUAL)
+#define VFO_HAS_DUAL ((STATE(rig)->vfo_list & VFO_DUAL) == VFO_DUAL)
 //! @endcond
 
 /**
@@ -720,6 +722,12 @@ typedef enum {
     RIG_RESET_MCALL =   (1 << 2),   /*!< Memory clear */
     RIG_RESET_MASTER =  (1 << 3)    /*!< Master reset */
 } reset_t;
+
+typedef enum {
+    RIG_CLIENT_UNKNOWN,
+    RIG_CLIENT_WSJTX,
+    RIG_CLIENT_GPREDICT
+} client_t;
 
 
 /**
@@ -1133,15 +1141,19 @@ enum rig_parm_e {
     RIG_PARM_BAT =          (1 << 6),   /*!< \c BAT -- battery level, float [0.0 ... 1.0] */
     RIG_PARM_KEYLIGHT =     (1 << 7),   /*!< \c KEYLIGHT -- Button backlight, on/off */
     RIG_PARM_SCREENSAVER =  (1 << 8),   /*!< \c SCREENSAVER -- rig specific timeouts */
-    RIG_PARM_AFIF =         (1 << 9),   /*!< \c AFIF -- 0=AF audio, 1=IF audio -- see IC-7300/9700/705 */
+    RIG_PARM_AFIF =         (1 << 9),   /*!< \c AFIF for USB -- 0=AF audio, 1=IF audio -- see IC-7300/9700/705 */
     RIG_PARM_BANDSELECT =   (1 << 10),  /*!< \c BANDSELECT -- e.g. BAND160M, BAND80M, BAND70CM, BAND2CM */
-    RIG_PARM_KEYERTYPE =    (1 << 11)   /*!< \c KEYERTYPE -- 0,1,2 or STRAIGHT PADDLE BUG */
+    RIG_PARM_KEYERTYPE =    (1 << 11),  /*!< \c KEYERTYPE -- 0,1,2 or STRAIGHT PADDLE BUG */
+    RIG_PARM_AFIF_LAN =     (1 << 12),  /*!< \c AFIF for LAN -- 0=AF audi , 1=IF audio -- see IC-9700 */
+    RIG_PARM_AFIF_WLAN =    (1 << 13),  /*!< \c AFIF_WLAN -- 0=AF audio, 1=IF audio -- see IC-705 */
+    RIG_PARM_AFIF_ACC =     (1 << 14)   /*!< \c AFIF_ACC -- 0=AF audio, 1=IF audio -- see IC-9700 */
 };
 
 enum rig_keyertype_e {
     RIG_KEYERTYPE_STRAIGHT = 0,
     RIG_KEYERTYPE_BUG      = (1 << 0),
-    RIG_KEYERTYPE_PADDLE   = (2 << 0)
+    RIG_KEYERTYPE_PADDLE   = (1 << 1),
+    RIG_KEYERTYPE_UNKNOWN  = (1 << 2)
 };
 
 /**
@@ -1660,7 +1672,8 @@ typedef enum {
     RIG_MTYPE_BAND,         /*!< VFO/Band channel */
     RIG_MTYPE_PRIO,         /*!< Priority channel */
 	RIG_MTYPE_VOICE,		/*!< Stored Voice Message */
-	RIG_MTYPE_MORSE			/*!< Morse Message */
+	RIG_MTYPE_MORSE,		/*!< Morse Message */
+	RIG_MTYPE_SPLIT			/*!< Split operations */
 } chan_type_t;
 
 
@@ -1848,6 +1861,22 @@ struct rig_spectrum_line
     size_t spectrum_data_length;     /*!< Number of bytes of 8-bit spectrum data in the data buffer. The amount of data may vary if the rig has multiple spectrum scopes, depending on the scope. */
     unsigned char *spectrum_data; /*!< 8-bit spectrum data covering bandwidth of either the span_freq in center mode or from low edge to high edge in fixed mode. A higher value represents higher signal strength. */
 };
+
+/**
+ * Config item for deferred processing
+ **/
+struct deferred_config_item {
+  struct deferred_config_item *next;
+  hamlib_token_t token;
+  char *value;                  // strdup'ed, must be freed
+};
+typedef struct deferred_config_item deferred_config_item_t;
+
+struct deferred_config_header {
+  struct deferred_config_item *first;   // NULL if none
+  struct deferred_config_item *last;
+};
+typedef struct deferred_config_header deferred_config_header_t;
 
 /**
  * \brief Rig data structure.
@@ -2491,6 +2520,8 @@ typedef hamlib_port_t port_t;
 #define ROTPORT(r) (&r->state.rotport)
 #define ROTPORT2(r) (&r->state.rotport2)
 #define STATE(r) (&r->state)
+#define AMPSTATE(a) (&(a)->state)
+#define ROTSTATE(r) (&(r)->state)
 /* Then when the rigport address is stored as a pointer somewhere else(say,
  *  in the rig structure itself), the definition could be changed to
  *  #define RIGPORT(r) r->somewhereelse
@@ -2506,6 +2537,8 @@ typedef hamlib_port_t port_t;
 #define HAMLIB_ROTPORT(r) ((hamlib_port_t *)rot_data_pointer(r, RIG_PTRX_ROTPORT))
 #define HAMLIB_ROTPORT2(r) ((hamlib_port_t *)rot_data_pointer(r, RIG_PTRX_ROTPORT2))
 #define HAMLIB_STATE(r) ((struct rig_state *)rig_data_pointer(r, RIG_PTRX_STATE))
+#define HAMLIB_AMPSTATE(a) ((struct amp_state *)amp_data_pointer(a, RIG_PTRX_AMPSTATE))
+#define HAMLIB_ROTSTATE(r) ((struct rot_state *)rot_data_pointer(r, RIG_PTRX_ROTSTATE))
 #endif
 
 typedef enum {
@@ -2518,6 +2551,8 @@ typedef enum {
     RIG_PTRX_ROTPORT,
     RIG_PTRX_ROTPORT2,
     RIG_PTRX_STATE,
+    RIG_PTRX_AMPSTATE,
+    RIG_PTRX_ROTSTATE,
 // New entries go directly above this line====================
     RIG_PTRX_MAXIMUM
 } rig_ptrx_t;
@@ -2851,6 +2886,7 @@ struct rig_state {
     int post_ptt_delay;         /*!< delay after PTT to allow for relays and such */
     struct timespec freq_event_elapsed;
     int freq_skip; /*!< allow frequency skip for gpredict RX/TX freq set */
+    client_t client;
 // New rig_state items go before this line ============================================
 };
 
@@ -2865,7 +2901,7 @@ struct rig_state {
  */
 struct rig_state_deprecated {
     /********* ENSURE YOU DO NOT EVER MODIFY THIS STRUCTURE *********/
-    /********* It will remain forever to provide DLL backwards compatiblity ******/
+    /********* It will remain forever to provide DLL backwards compatibility ******/
     /*
      * overridable fields
      */
@@ -3025,7 +3061,7 @@ typedef int (*spectrum_cb_t)(RIG *,
  * \sa rig_set_freq_callback(), rig_set_mode_callback(), rig_set_vfo_callback(),
  *     rig_set_ptt_callback(), rig_set_dcd_callback()
  */
-// Do NOT add/remove from this structure -- it will break DLL backwards compatiblity
+// Do NOT add/remove from this structure -- it will break DLL backwards compatibility
 struct rig_callbacks {
     freq_cb_t freq_event;   /*!< Frequency change event */
     rig_ptr_t freq_arg;     /*!< Frequency change argument */
@@ -3720,6 +3756,7 @@ extern HAMLIB_EXPORT_VAR(char) debugmsgsave[DEBUGMSGSAVE_SIZE];  // last debug m
 extern HAMLIB_EXPORT_VAR(char) debugmsgsave2[DEBUGMSGSAVE_SIZE];  // last-1 debug msg
 // debugmsgsave3 is deprecated
 extern HAMLIB_EXPORT_VAR(char) debugmsgsave3[DEBUGMSGSAVE_SIZE];  // last-2 debug msg
+#define rig_debug_clear() { debugmsgsave[0] = debugmsgsave2[0] = debugmsgsave3[0] = 0; };
 #ifndef __cplusplus
 #ifdef __GNUC__
 // doing the debug macro with a dummy sprintf allows gcc to check the format string
@@ -3729,10 +3766,10 @@ extern HAMLIB_EXPORT_VAR(char) debugmsgsave3[DEBUGMSGSAVE_SIZE];  // last-2 debu
 
 // Measuring elapsed time -- local variable inside function when macro is used
 #define ELAPSED1 struct timespec __begin; elapsed_ms(&__begin, HAMLIB_ELAPSED_SET);
-#define ELAPSED2 rig_debug(RIG_DEBUG_VERBOSE, "%s%d:%s: elapsed=%.0lfms\n", spaces(rig->state.depth-1), rig->state.depth, __func__, elapsed_ms(&__begin, HAMLIB_ELAPSED_GET));
+#define ELAPSED2 rig_debug(RIG_DEBUG_VERBOSE, "%s%d:%s: elapsed=%.0lfms\n", spaces(STATE(rig)->depth), STATE(rig)->depth, __func__, elapsed_ms(&__begin, HAMLIB_ELAPSED_GET));
 
 // use this instead of snprintf for automatic detection of buffer limit
-#define SNPRINTF(s,n,...) { snprintf(s,n,##__VA_ARGS__);if (strlen(s) > n-1) fprintf(stderr,"****** %s(%d): buffer overflow ******\n", __func__, __LINE__); }
+#define SNPRINTF(s,n,...) { if (snprintf(s,n,##__VA_ARGS__) >= (n)) fprintf(stderr,"***** %s(%d): message truncated *****\n", __func__, __LINE__); }
 
 extern HAMLIB_EXPORT(void)
 rig_debug HAMLIB_PARAMS((enum rig_debug_level_e debug_level,

@@ -26,6 +26,8 @@
 //! @cond Doxygen_Suppress
 
 // The rig model number is designed to fit in a 32-bit int
+// As of 2024-07-14 we have 39 backends defined -- need to be careful about generating new ones
+// Perhaps combine them under a MISC entry should work
 // As of 2020-02-18 we have 33 backends defined
 // With a max of 1000 models per backend we get total a model number range of 1001-33001
 // This MAX was 100 prior to 2020-02-18 and Icom was close to running out of the 100 range
@@ -143,6 +145,7 @@
 #define RIG_MODEL_FT710 RIG_MAKE_MODEL(RIG_YAESU, 49)
 #define RIG_MODEL_FT9000OLD RIG_MAKE_MODEL(RIG_YAESU, 50)
 #define RIG_MODEL_Q900 RIG_MAKE_MODEL(RIG_YAESU, 51)
+#define RIG_MODEL_PMR171 RIG_MAKE_MODEL(RIG_YAESU, 52)
 
 /*
  * Kenwood
@@ -204,6 +207,7 @@
 #define RIG_MODEL_FX4 RIG_MAKE_MODEL(RIG_KENWOOD,53)
 #define RIG_MODEL_THETIS RIG_MAKE_MODEL(RIG_KENWOOD, 54)
 #define RIG_MODEL_TRUSDX RIG_MAKE_MODEL(RIG_KENWOOD, 55)
+#define RIG_MODEL_SDRCONSOLE RIG_MAKE_MODEL(RIG_KENWOOD, 56)
 
 /*
  * Icom
@@ -292,6 +296,8 @@
 #define RIG_MODEL_G90 RIG_MAKE_MODEL(RIG_ICOM, 88)    /* Xiegu G90 */
 #define RIG_MODEL_X5105 RIG_MAKE_MODEL(RIG_ICOM, 89)    /* Xiegu X5105 -- G90 compatible */
 #define RIG_MODEL_IC905 RIG_MAKE_MODEL(RIG_ICOM, 90)    
+#define RIG_MODEL_X6200 RIG_MAKE_MODEL(RIG_ICOM, 91)    /* Xiegu X6200 */
+#define RIG_MODEL_IC7760 RIG_MAKE_MODEL(RIG_ICOM, 92)
 
 /*
  * Optoelectronics (CI-V)
@@ -532,6 +538,14 @@
 #define RIG_MODEL_SDR1000RFE RIG_MAKE_MODEL(RIG_FLEXRADIO, 2)
 #define RIG_MODEL_DTTSP RIG_MAKE_MODEL(RIG_FLEXRADIO, 3)
 #define RIG_MODEL_DTTSP_UDP RIG_MAKE_MODEL(RIG_FLEXRADIO, 4)
+#define RIG_MODEL_SMARTSDR_A RIG_MAKE_MODEL(RIG_FLEXRADIO, 5)
+#define RIG_MODEL_SMARTSDR_B RIG_MAKE_MODEL(RIG_FLEXRADIO, 6)
+#define RIG_MODEL_SMARTSDR_C RIG_MAKE_MODEL(RIG_FLEXRADIO, 7)
+#define RIG_MODEL_SMARTSDR_D RIG_MAKE_MODEL(RIG_FLEXRADIO, 8)
+#define RIG_MODEL_SMARTSDR_E RIG_MAKE_MODEL(RIG_FLEXRADIO, 9)
+#define RIG_MODEL_SMARTSDR_F RIG_MAKE_MODEL(RIG_FLEXRADIO, 10)
+#define RIG_MODEL_SMARTSDR_G RIG_MAKE_MODEL(RIG_FLEXRADIO, 11)
+#define RIG_MODEL_SMARTSDR_H RIG_MAKE_MODEL(RIG_FLEXRADIO, 12)
 
 /*
  * VEB Funkwerk Köpenick RFT
@@ -582,7 +596,7 @@
 #define RIG_MODEL_EB200 RIG_MAKE_MODEL(RIG_RS, 2)
 #define RIG_MODEL_XK2100 RIG_MAKE_MODEL(RIG_RS, 3)
 #define RIG_MODEL_EK89X RIG_MAKE_MODEL(RIG_RS, 4)
-
+#define RIG_MODEL_XK852 RIG_MAKE_MODEL(RIG_RS, 5)
 /*
  * Phillips/Simoco PRM80
  */
@@ -671,6 +685,19 @@
 #define RIG_BACKEND_ANYTONE "AnyTone"
 #define RIG_MODEL_ATD578UVIII RIG_MAKE_MODEL(RIG_ANYTONE, 1)
 
+/*
+ * Motorola rigs
+ */
+#define RIG_MOTOROLA 38
+#define RIG_BACKEND_MOTOROLA "Motorola"
+#define RIG_MODEL_MICOM2 RIG_MAKE_MODEL(RIG_MOTOROLA, 1)
+
+/*
+ * Commradio / AeroStream Communications
+ */
+#define RIG_COMMRADIO 39
+#define RIG_BACKEND_COMMRADIO "commradio"
+#define RIG_MODEL_CTX10 RIG_MAKE_MODEL(RIG_COMMRADIO, 1)
 
 //! @endcond
 

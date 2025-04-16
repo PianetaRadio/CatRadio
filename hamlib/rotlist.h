@@ -86,6 +86,8 @@
 //! @endcond
 #define ROT_MODEL_DUMMY ROT_MAKE_MODEL(ROT_DUMMY, 1)
 #define ROT_MODEL_NETROTCTL ROT_MAKE_MODEL(ROT_DUMMY, 2)
+#define ROT_MODEL_PSTROTATOR ROT_MAKE_MODEL(ROT_DUMMY, 3)
+#define ROT_MODEL_SATROTCTL ROT_MAKE_MODEL(ROT_DUMMY, 4)
 
 
 /**
@@ -700,6 +702,18 @@
 //! @endcond
 #define ROT_MODEL_SAEBRTRACK ROT_MAKE_MODEL(ROT_SAEBRTRACK, 1)
 
+/**
+ * \brief A macro that returns the model number of the SKYWATCHER backend.
+ *
+ * \def ROT_MODEL_SKYWATCHER
+ *
+ * The SKYWATCHER backend can be used with SKYWATCHER * rotators.
+ */
+//! @cond Doxygen_Suppress
+#define ROT_SKYWATCHER 28
+#define ROT_BACKEND_SKYWATCHER "SkyWatcher"
+//! @endcond
+#define ROT_MODEL_SKYWATCHER ROT_MAKE_MODEL(ROT_SKYWATCHER, 1)
 
 /**
  * \brief Convenience type definition for a rotator model.
