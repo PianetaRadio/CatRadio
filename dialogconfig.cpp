@@ -61,14 +61,36 @@ DialogConfig::DialogConfig(QWidget *parent) :
         rigFile.readLine();
     }
 
+    QList<QPair<QString, QString>> rigItems; // { rigName, fullLine }
+
     ui->comboBox_rigModel->clear();
     ui->comboBox_rigModel->addItem("");
     while(!rigFile.atEnd())
     {
-        QString line = rigFile.readLine();
-        ui->comboBox_rigModel->addItem(line.trimmed());
+        QString line = rigFile.readLine().trimmed();
+
+        if (line.isEmpty() || line.startsWith("#"))
+            continue;
+
+        // Split at first space only
+        int firstSpace = line.indexOf(' ');
+        QString rigNum = line.left(firstSpace);
+        QString rigName = (firstSpace > 0) ? line.mid(firstSpace + 1).trimmed() : "";
+
+        rigItems.append({rigName, rigNum}); // store full original line
+        // ui->comboBox_rigModel->addItem(line.trimmed());
     }
     rigFile.close();
+
+    std::sort(rigItems.begin(), rigItems.end(),
+              [](const QPair<QString, QString> &a, const QPair<QString, QString> &b) {
+                  return a.first.compare(b.first, Qt::CaseInsensitive) < 0;
+              });
+
+
+    for (const auto &item : rigItems) {
+        ui->comboBox_rigModel->addItem(item.second + "\t" + item.first);
+    }
 
     //* COM port
     ui->comboBox_comPort->clear();

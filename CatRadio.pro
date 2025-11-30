@@ -1,48 +1,46 @@
-QT       += core gui
-QT       += serialport
-QT       += multimedia
+QT += core gui widgets network serialport multimedia
 
-
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-
-CONFIG += c++11
-
-# You can make your code fail to compile if it uses deprecated APIs.
-# In order to do so, uncomment the following line.
-#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
+CONFIG += c++17
+CONFIG += sdk_no_version_check   # silences SDK 15 vs 26 warning
 
 SOURCES += \
-    dialogcommand.cpp \
-    dialogconfig.cpp \
-    dialognetrigctl.cpp \
-    dialogradioinfo.cpp \
-    dialogsetup.cpp \
-    dialogvoicekeyer.cpp \
-    guidata.cpp \
-    main.cpp \
     mainwindow.cpp \
+    guidata.cpp \
     rigcommand.cpp \
-    rigdaemon.cpp \
     rigdata.cpp \
+    rigdaemon.cpp \
+    vfodisplay.cpp \
     smeter.cpp \
     submeter.cpp \
-    vfodisplay.cpp
+    debugLogger.cpp \
+    DialogCWKeyer.cpp \
+    DialogNetRigctl.cpp \
+    DialogVoiceKeyer.cpp \
+    dialogsetup.cpp \
+    dialogconfig.cpp \
+    dialogcommand.cpp \
+    dialogradioinfo.cpp \
+    winkeyer.cpp \
+    main.cpp
 
 HEADERS += \
-    dialogcommand.h \
-    dialogconfig.h \
-    dialognetrigctl.h \
-    dialogradioinfo.h \
-    dialogsetup.h \
-    dialogvoicekeyer.h \
-    guidata.h \
     mainwindow.h \
+    guidata.h \
     rigcommand.h \
-    rigdaemon.h \
     rigdata.h \
+    rigdaemon.h \
+    vfodisplay.h \
     smeter.h \
     submeter.h \
-    vfodisplay.h
+    debugLogger.h \
+    DialogCWKeyer.h \
+    DialogNetRigctl.h \
+    DialogVoiceKeyer.h \
+    dialogsetup.h \
+    dialogconfig.h \
+    dialogcommand.h \
+    dialogradioinfo.h \
+    winkeyer.h
 
 FORMS += \
     dialogcommand.ui \
@@ -51,15 +49,17 @@ FORMS += \
     dialogradioinfo.ui \
     dialogsetup.ui \
     dialogvoicekeyer.ui \
-    mainwindow.ui
+    mainwindow.ui \
+    DialogCWKeyer.ui \
+    DialogNetRigctl.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-LIBS += -L$$PWD/hamlib/ -lhamlib
-INCLUDEPATH += $$PWD/hamlib
+LIBS += -L/opt/homebrew/lib -L$$PWD/hamlib/ -lhamlib
+INCLUDEPATH += -L/opt/homebrew/include $$PWD/hamlib
 
 QMAKE_LFLAGS += -Wl,-rpath,\\$\$ORIGIN/hamlib/ #Set runtime shared libraries path to use local hamlib library
 
