@@ -481,6 +481,7 @@ void MainWindow::loadGuiConfig(QString configFileName)
     guiConf.voiceKeyerMode = configFile.value("voiceKeyerMode", 0).toInt();
     guiConf.peakHold = configFile.value("peakHold", true).toBool();
     guiConf.debugMode = configFile.value("debugMode", false).toBool();
+    guiConf.rigModelSort = configFile.value("rigModelSort", false).toBool();
 
     //for (size_t i=0; i<4; i++)
     guiConf.vfoDialStep[0][0] = 10;

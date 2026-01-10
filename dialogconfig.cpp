@@ -1,6 +1,6 @@
 /**
  ** This file is part of the CatRadio project.
- ** Copyright 2022-2024 Gianfranco Sordetti IZ8EWD <iz8ewd@pianetaradio.it>.
+ ** Copyright 2022-2026 Gianfranco Sordetti IZ8EWD <iz8ewd@pianetaradio.it>.
  **
  ** This program is free software: you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -27,11 +27,13 @@
 #include <QMessageBox>
 
 #include "rigdata.h"
+#include "guidata.h"
 
 #include <hamlib/rig.h>
 
 
 extern rigConnect rigCom;
+extern guiConfig guiConf;
 
 
 QString rigListFile = "rig.lst";    //Text file containing the list of rig supported by hamlib
@@ -45,30 +47,8 @@ DialogConfig::DialogConfig(QWidget *parent) :
     ui->setupUi(this);
 
     //* rigModel comboBox
-    if (!rigFile.exists()) //Create file rig.lst if not exists
-    {
-        createRigFile();
-    }
-    else rigFile.open(QIODevice::ReadOnly);    //Open file rig.lst and populate the combobox
-    rigFile.seek(0);
-
-    QString versionFile = rigFile.readLine();   //Update rigFile if old version
-    if (versionFile.trimmed() != hamlib_version)
-    {
-        rigFile.remove();
-        createRigFile();
-        rigFile.seek(0);
-        rigFile.readLine();
-    }
-
-    ui->comboBox_rigModel->clear();
-    ui->comboBox_rigModel->addItem("");
-    while(!rigFile.atEnd())
-    {
-        QString line = rigFile.readLine();
-        ui->comboBox_rigModel->addItem(line.trimmed());
-    }
-    rigFile.close();
+    if (!checkRigFile()) createRigFile();   //if rigFile does not exist or is not updated, create it
+    setComboBoxRigModel(rigListFile, 0);
 
     //* COM port
     ui->comboBox_comPort->clear();
@@ -94,7 +74,10 @@ DialogConfig::DialogConfig(QWidget *parent) :
     ui->comboBox_serialSpeed->addItem("115200");
 
     //* Update values in the GUI
-    ui->comboBox_rigModel->setCurrentIndex(ui->comboBox_rigModel->findText(QString::number(rigCom.rigModel),Qt::MatchStartsWith));
+    //ui->comboBox_rigModel->setCurrentIndex(ui->comboBox_rigModel->findText(QString::number(rigCom.rigModel),Qt::MatchStartsWith));
+
+    selectComboBoxRigModel(rigCom.rigModel);
+
     if (rigCom.netRigctl)
     {
         ui->checkBox_netRigctl->setChecked(rigCom.netRigctl);
@@ -111,7 +94,9 @@ DialogConfig::DialogConfig(QWidget *parent) :
     ui->checkBox_fullPoll->setChecked(rigCom.fullPoll);
     ui->checkBox_autoConnect->setChecked(rigCom.autoConnect);
     ui->checkBox_autoPowerOn->setChecked(rigCom.autoPowerOn);
+    ui->checkBox_rigModelSort->setChecked(guiConf.rigModelSort);
 }
+
 
 DialogConfig::~DialogConfig()
 {
@@ -124,6 +109,63 @@ int DialogConfig::findRigModel(QString rigModel)
     QRegularExpression regexp("[0-9]+");
     QRegularExpressionMatch rigNumber = regexp.match(rigModel);
     return rigNumber.captured(0).toInt();
+}
+
+
+void DialogConfig::setComboBoxRigModel(QString rigFileName, int sort)
+{
+    ui->comboBox_rigModel->clear(); //clear comboBox content
+    ui->comboBox_rigModel->addItem(""); //first line empty
+
+    QFile rigFile(rigFileName);
+    rigFile.open(QIODevice::ReadOnly);    //Open file rig.lst
+    rigFile.seek(0);    //Goto to begin
+    rigFile.readLine(); //Skip the first line
+
+    QList<QPair<QString, QString>> rigItems;    //rigNum, rigName
+    while(!rigFile.atEnd()) //sort alphabetically
+    {
+        QString line = rigFile.readLine().trimmed();
+
+        if (line.isEmpty() || line.startsWith("#")) continue;
+
+        int firstSpace = line.indexOf(' ');
+        QString rigNum = line.left(firstSpace);
+        QString rigName = (firstSpace > 0) ? line.mid(firstSpace + 1).trimmed() : "";
+
+        rigItems.append({rigName, rigNum}); // store full original line
+    }
+    rigFile.close();
+
+    if (sort == 1)
+    {
+        std::sort(rigItems.begin(), rigItems.end(), [](const QPair<QString, QString> &a, const QPair<QString, QString> &b)
+                  {
+                      return a.first.compare(b.first, Qt::CaseInsensitive) < 0;
+                  });
+    }
+
+    for (const auto &item : rigItems) {
+        ui->comboBox_rigModel->addItem(item.second + ' ' + item.first);
+    }
+}
+
+
+void DialogConfig::selectComboBoxRigModel(int rigModel)
+{
+    int j = 1;
+    while (j < ui->comboBox_rigModel->count())
+    {
+        int firstSpace = ui->comboBox_rigModel->itemText(j).indexOf(' ');
+        QString rigNum = ui->comboBox_rigModel->itemText(j).left(firstSpace);
+
+        if (rigNum.toInt() == rigModel)
+        {
+            ui->comboBox_rigModel->setCurrentIndex(j);
+            break;
+        }
+        else j++;
+    }
 }
 
 
@@ -192,9 +234,6 @@ void DialogConfig::on_buttonBox_accepted()
     else
     {
         QString rigModel = ui->comboBox_rigModel->currentText();
-        //QRegularExpression regexp("[0-9]+");
-        //QRegularExpressionMatch rigNumber = regexp.match(rigModel);
-        //rigCom.rigModel = rigNumber.captured(0).toInt();
         rigCom.rigModel = findRigModel(rigModel);
 
         if (ui->checkBox_netRigctl->isChecked())   //TCP port
@@ -256,7 +295,33 @@ void DialogConfig::on_buttonBox_accepted()
     configFile.setValue("fullPolling", ui->checkBox_fullPoll->isChecked());
     configFile.setValue("autoConnect", ui->checkBox_autoConnect->isChecked());
     configFile.setValue("autoPowerOn", ui->checkBox_autoPowerOn->isChecked());
+    configFile.setValue("rigModelSort", guiConf.rigModelSort);
 }
+
+
+bool checkRigFile()
+{
+    if (!rigFile.exists()) //rig.lst not exist
+    {
+        qWarning() << "rig.lst not exist";
+        return false;
+    }
+    else    //check if rig.lst is updated
+    {
+        rigFile.open(QIODevice::ReadOnly);
+        rigFile.seek(0);
+        QString versionFile = rigFile.readLine();
+        rigFile.close();
+        if (versionFile.trimmed() != hamlib_version)    //rig.lst is old version
+        {
+            rigFile.remove();
+            qWarning() << "rig.lst not updated";
+            return false;
+        }
+    }
+    return true;
+}
+
 
 #ifdef RIGCAPS_NOT_CONST    //rig_caps is no longer constant starting from hamlib v.4.6
 int printRigList(struct rig_caps *rigCaps, void *data)    //Load rig list from hamlib and save into file rig.lst
@@ -276,6 +341,7 @@ int printRigList(const struct rig_caps *rigCaps, void *data)
 }
 #endif
 
+
 bool createRigFile()
 {
     bool ret = rigFile.open(QIODevice::ReadWrite);
@@ -285,6 +351,7 @@ bool createRigFile()
     rig_list_foreach(printRigList, NULL);   //Create and write the rig list
     return ret;
 }
+
 
 void DialogConfig::on_checkBox_netRigctl_toggled(bool checked)
 {
@@ -298,15 +365,17 @@ void DialogConfig::on_checkBox_netRigctl_toggled(bool checked)
     }
 }
 
+
 void DialogConfig::on_comboBox_rigModel_currentIndexChanged(int index)
 {
     int currentRig = 0;
     RIG *rig;
 
-    if (index)
+    if (index > 0)
     {
         QString rigModel = ui->comboBox_rigModel->currentText();
         currentRig = findRigModel(rigModel);
+        rigCom.rigModel = currentRig;
     }
 
     if (currentRig)
@@ -339,7 +408,18 @@ void DialogConfig::on_comboBox_rigModel_currentIndexChanged(int index)
     //}
 }
 
+
 void DialogConfig::on_comboBox_comPort_currentIndexChanged(int index)
 {
     if (index) ui->checkBox_netRigctl->setChecked(false);   //uncheck TCP
+}
+
+
+void DialogConfig::on_checkBox_rigModelSort_toggled(bool checked)
+{
+    if (checked) guiConf.rigModelSort = 1;    //Alphabetically
+    else guiConf.rigModelSort = 0;    //Numerically
+
+    setComboBoxRigModel(rigListFile, guiConf.rigModelSort);
+    selectComboBoxRigModel(rigCom.rigModel);
 }
