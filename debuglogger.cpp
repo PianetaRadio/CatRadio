@@ -1,6 +1,6 @@
 /**
  ** This file is part of the CatRadio project.
- ** Copyright 2022-2025 Gianfranco Sordetti IZ8EWD <iz8ewd@pianetaradio.it>.
+ ** Copyright 2022-2026 Gianfranco Sordetti IZ8EWD <iz8ewd@pianetaradio.it>.
  **
  ** This program is free software: you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -63,7 +63,9 @@ void debugLogger::messageHandler(QtMsgType type, const QMessageLogContext &conte
     {
     case QtDebugMsg:    //0
         fprintf(stderr, "[Debug] %s\n", msg.toLocal8Bit().constData());
-        return;
+        fflush(stderr);
+        txt = QString("%1: [Debug] %2 %3").arg(timestamp, msg, contextInfo);
+        break;
     case QtInfoMsg:     //4
         txt = QString("%1: [Info] %2 %3").arg(timestamp, msg, contextInfo);
         break;
