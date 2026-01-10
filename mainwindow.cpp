@@ -1,6 +1,6 @@
 /**
  ** This file is part of the CatRadio project.
- ** Copyright 2022-2025 Gianfranco Sordetti IZ8EWD <iz8ewd@pianetaradio.it>.
+ ** Copyright 2022-2026 Gianfranco Sordetti IZ8EWD <iz8ewd@pianetaradio.it>.
  **
  ** This program is free software: you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -48,7 +48,6 @@
 #include <cwchar>   //c++ string library
 #include <rig.h>    //Hamlib
 
-//RIG *my_rig;
 
 extern rigConnect rigCom;
 extern rigSettings rigGet;
@@ -86,16 +85,6 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-
-    //* Debug
-    debugLogger::install("catradio.log");
-    if (guiConf.debugMode) debugLogger::setDebugLevel(QtInfoMsg);
-    else debugLogger::setDebugLevel(QtFatalMsg);
-
-    //display name and version in the window title
-    QString version = QString::number(VERSION_MAJ)+"."+QString::number(VERSION_MIN)+"."+QString::number(VERSION_MIC);
-    this->setWindowTitle("CatRadio v."+version+" (Beta)");
-    qInfo() << "CatRadio v."+version;
 
     QDir::setCurrent(QCoreApplication::applicationDirPath());   //set current path = application path
 
@@ -139,7 +128,12 @@ MainWindow::MainWindow(QWidget *parent)
         loadCwKeyerConfig("catradio.ini");  //load CW Keyer config
     }
 
-    //* Debug Hamlib
+    //* Debug
+    debugLogger::install("catradio.log");
+    if (guiConf.debugMode) debugLogger::setDebugLevel(QtInfoMsg);
+    else debugLogger::setDebugLevel(QtFatalMsg);
+
+    //Debug Hamlib
     if (guiConf.debugMode) rig_set_debug_level(RIG_DEBUG_VERBOSE); //debug verbose
     else rig_set_debug_level(RIG_DEBUG_WARN);  //normal
     //rig_set_debug_level(RIG_DEBUG_VERBOSE); //debug verbose
@@ -150,6 +144,11 @@ MainWindow::MainWindow(QWidget *parent)
 
     //* Style
     //ui->pushButton_PTT->setStyleSheet("QPushButton::checked {font: bold; color: red;}");
+
+    //display name and version in the window title
+    QString version = QString::number(VERSION_MAJ)+"."+QString::number(VERSION_MIN)+"."+QString::number(VERSION_MIC);
+    this->setWindowTitle("CatRadio v."+version+" (Beta)");
+    qInfo() << "CatRadio v."+version;
 
     //Dark theme
     if (guiConf.darkTheme)
@@ -239,7 +238,6 @@ MainWindow::~MainWindow()
         if (winkeyer)
         {
             delete winkeyer;
-            qDebug()<<"Delete";
         }
     }
 
@@ -992,6 +990,7 @@ void MainWindow::on_voiceKeyerStateChanged()
 bool MainWindow::checkHamlibVersion(int major, int minor, int revision)
 {
     QString hamlibVer = rig_version();
+    qInfo() << hamlibVer;
     QRegularExpression hamlibVerExp("(?P<major>\\d)\\.(?P<minor>\\d)\\.?(?P<revision>\\d)?");
 
     QRegularExpressionMatch hamlibVerMatch = hamlibVerExp.match(hamlibVer);
@@ -1998,6 +1997,7 @@ void MainWindow::on_horizontalSlider_clar_sliderReleased()
 
 void MainWindow::on_action_Connection_triggered()
 {
+    qInfo() << "DialogConfig";
     DialogConfig config;
     config.setModal(true);
     config.exec();
@@ -2005,6 +2005,7 @@ void MainWindow::on_action_Connection_triggered()
 
 void MainWindow::on_action_Setup_triggered()
 {
+    qInfo() << "DialogSetup";
     DialogSetup setup;
     setup.setModal(true);
     setup.exec();
@@ -2029,6 +2030,7 @@ void MainWindow::on_action_Setup_triggered()
 
 void MainWindow::on_action_Voice_Keyer_triggered()
 {
+    qInfo() << "DialogVoiceKeyer";
     DialogVoiceKeyer voiceKeyer;
     voiceKeyer.setModal(true);
     voiceKeyer.exec();
@@ -2038,6 +2040,7 @@ void MainWindow::on_action_Voice_Keyer_triggered()
 
 void MainWindow::on_actionCW_Keyer_triggered()
 {
+    qInfo() << "DialogCWKeyer";
     DialogCWKeyer cwKeyer(winkeyer);
     cwKeyer.setModal(true);
     cwKeyer.exec();
@@ -2047,6 +2050,7 @@ void MainWindow::on_actionCW_Keyer_triggered()
 
 void MainWindow::on_action_RadioInfo_triggered()
 {
+    qInfo() << "DialogRadioInfo";
     if (!radioInfo) radioInfo = new DialogRadioInfo(my_rig, this);
     radioInfo->setModal(true);
     radioInfo->exec();
@@ -2054,6 +2058,7 @@ void MainWindow::on_action_RadioInfo_triggered()
 
 void MainWindow::on_action_Command_triggered()
 {
+    qInfo() << "DialogCommand";
     //DialogCommand command;
     //command.setModal(true);
     //command.exec();
@@ -2070,6 +2075,7 @@ void MainWindow::on_action_Command_triggered()
 
 void MainWindow::on_actionNET_rigctl_triggered()
 {
+    qInfo() << "DialogNetRigctl";
     DialogNetRigctl configNetRigctl;
     configNetRigctl.setModal(true);
     configNetRigctl.exec();
@@ -2082,7 +2088,7 @@ void MainWindow::on_action_AboutCatRadio_triggered()
     msgBox.setTextFormat(Qt::RichText);
     QString version = QString::number(VERSION_MAJ)+"."+QString::number(VERSION_MIN)+"."+QString::number(VERSION_MIC);
     msgBox.setText("<b>CatRadio</b> <i>Radio control software</i><br/>version "+version+" "+RELEASE_DATE);
-    msgBox.setInformativeText("<p>Copyright (C) 2022-2025 Gianfranco Sordetti IZ8EWD<br/>"
+    msgBox.setInformativeText("<p>Copyright (C) 2022-2026 Gianfranco Sordetti IZ8EWD<br/>"
                               "<a href='https://www.pianetaradio.it' style='color: #668fb8'>www.pianetaradio.it</a></p>"
                               "<p>This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.<br/>"
                               "This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.<br/>"
