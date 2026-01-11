@@ -1,4 +1,5 @@
 QT       += core gui
+QT       += widgets
 QT       += serialport
 QT       += multimedia
 
@@ -12,8 +13,10 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    debuglogger.cpp \
     dialogcommand.cpp \
     dialogconfig.cpp \
+    dialogcwkeyer.cpp \
     dialognetrigctl.cpp \
     dialogradioinfo.cpp \
     dialogsetup.cpp \
@@ -26,11 +29,14 @@ SOURCES += \
     rigdata.cpp \
     smeter.cpp \
     submeter.cpp \
-    vfodisplay.cpp
+    vfodisplay.cpp \
+    winkeyer.cpp
 
 HEADERS += \
+    debuglogger.h \
     dialogcommand.h \
     dialogconfig.h \
+    dialogcwkeyer.h \
     dialognetrigctl.h \
     dialogradioinfo.h \
     dialogsetup.h \
@@ -42,11 +48,13 @@ HEADERS += \
     rigdata.h \
     smeter.h \
     submeter.h \
-    vfodisplay.h
+    vfodisplay.h \
+    winkeyer.h
 
 FORMS += \
     dialogcommand.ui \
     dialogconfig.ui \
+    dialogcwkeyer.ui \
     dialognetrigctl.ui \
     dialogradioinfo.ui \
     dialogsetup.ui \
