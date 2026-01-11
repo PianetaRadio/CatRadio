@@ -32,7 +32,7 @@
 // With a max of 1000 models per backend we get total a model number range of 1001-33001
 // This MAX was 100 prior to 2020-02-18 and Icom was close to running out of the 100 range
 #define  MAX_MODELS_PER_BACKEND 1000
-#define RIG_MAKE_MODEL(a,b) ((a)*MAX_MODELS_PER_BACKEND+(b))
+#define RIG_MAKE_MODEL(a,b) (MAX_MODELS_PER_BACKEND*(a)+(b))
 #define RIG_BACKEND_NUM(a) ((a)/MAX_MODELS_PER_BACKEND)
 
 //! @endcond
@@ -208,6 +208,7 @@
 #define RIG_MODEL_THETIS RIG_MAKE_MODEL(RIG_KENWOOD, 54)
 #define RIG_MODEL_TRUSDX RIG_MAKE_MODEL(RIG_KENWOOD, 55)
 #define RIG_MODEL_SDRCONSOLE RIG_MAKE_MODEL(RIG_KENWOOD, 56)
+#define RIG_MODEL_QRPLABS_QMX RIG_MAKE_MODEL(RIG_KENWOOD,57)
 
 /*
  * Icom
@@ -656,6 +657,7 @@
 #define RIG_BACKEND_CODAN "codan"
 #define RIG_MODEL_CODAN_ENVOY RIG_MAKE_MODEL(RIG_CODAN, 1)
 #define RIG_MODEL_CODAN_NGT RIG_MAKE_MODEL(RIG_CODAN, 2)
+#define RIG_MODEL_CODAN_2110 RIG_MAKE_MODEL(RIG_CODAN, 3)
 
 /*
  * Gomspace

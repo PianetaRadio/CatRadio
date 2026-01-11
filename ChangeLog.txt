@@ -12,7 +12,7 @@ Change log
 	* Improved Setup window
 	* Display software version in the window title
 	* Bug fix: IF shift
-	* Updated to library Hamlib 4.62
+	* Updated to library Hamlib 4.65
 
 1.4.0 - 2024-03-17
 	+ Auto Connect option
