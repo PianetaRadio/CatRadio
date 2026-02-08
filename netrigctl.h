@@ -17,10 +17,28 @@
  **/
 
 
-#include "rigdata.h"
+#ifndef NETRIGCTL_H
+#define NETRIGCTL_H
 
-rigConnection rigCom;
-rigSettings rigGet;
-rigSettings rigSet;
-rigCommand rigCmd;
-rigCommand rigCap;
+#include <QProcess>
+
+
+class netRigCtl
+{
+public:
+    netRigCtl();
+
+    bool isOpen;    //rigctld open flag
+    bool debugMode = false; //flag for debug
+
+    void open();
+    void close();
+    void setRigctldArguments(unsigned rigModel, QString rigPort, unsigned serialSpeed, int civAddr, unsigned rigctldPort);
+
+    QStringList rigctldArguments;
+
+private:
+    QProcess *netrigctld = nullptr;
+};
+
+#endif // NETRIGCTL_H

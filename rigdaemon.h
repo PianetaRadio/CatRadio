@@ -1,6 +1,6 @@
 /**
  ** This file is part of the CatRadio project.
- ** Copyright 2022 Gianfranco Sordetti IZ8EWD <iz8ewd@pianetaradio.it>.
+ ** Copyright 2022-2026 Gianfranco Sordetti IZ8EWD <iz8ewd@pianetaradio.it>.
  **
  ** This program is free software: you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -23,14 +23,16 @@
 #include <QObject>
 #include <rig.h>
 
+
 class RigDaemon : public QObject
 {
     Q_OBJECT
 
 public:
     explicit RigDaemon(QObject *parent = nullptr);
-    RIG *rigConnect(int *retcode);
-    void rigUpdate(RIG *my_rig);
+    RIG *rigConnect(unsigned rigModel, QString rigPort, unsigned serialSpeed, unsigned serialDataBits, unsigned serialParity, unsigned serialStopBits, unsigned serialHandshake, int civAddr, bool autoPowerOn, int *retcode);
+    RIG *rigConnect(unsigned rigModel, QString rigPort, bool autoPowerOn, int *retcode);
+    void rigUpdate(RIG *my_rig, bool fullPoll);
 
 public slots:
 

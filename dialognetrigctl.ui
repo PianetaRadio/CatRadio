@@ -6,12 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>313</width>
-    <height>360</height>
+    <width>400</width>
+    <height>410</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>NET rigctl Setup</string>
+  </property>
+  <property name="toolTip">
+   <string/>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -37,16 +40,42 @@ li.checked::marker { content: &quot;\2612&quot;; }
      </property>
      <layout class="QFormLayout" name="formLayout">
       <item row="0" column="0">
-       <widget class="QLabel" name="label">
+       <widget class="QLabel" name="label_portNumber">
         <property name="text">
          <string>Port Number</string>
+        </property>
+        <property name="buddy">
+         <cstring>lineEdit_portNumber</cstring>
         </property>
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QLineEdit" name="lineEdit">
+       <widget class="QLineEdit" name="lineEdit_portNumber">
+        <property name="toolTip">
+         <string>default 4532</string>
+        </property>
+        <property name="inputMask">
+         <string>99999</string>
+        </property>
         <property name="text">
          <string>4532</string>
+        </property>
+        <property name="placeholderText">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_arguments">
+        <property name="text">
+         <string>Arguments</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="lineEdit_arguments">
+        <property name="enabled">
+         <bool>false</bool>
         </property>
        </widget>
       </item>
@@ -60,13 +89,23 @@ li.checked::marker { content: &quot;\2612&quot;; }
      </property>
      <layout class="QFormLayout" name="formLayout_2">
       <item row="0" column="0">
-       <widget class="QCheckBox" name="checkBox">
+       <widget class="QCheckBox" name="checkBox_startup">
         <property name="text">
          <string>Run on startup</string>
         </property>
        </widget>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="pushButton_start">
+     <property name="text">
+      <string>Start</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
     </widget>
    </item>
    <item>
@@ -81,6 +120,13 @@ li.checked::marker { content: &quot;\2612&quot;; }
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>textBrowser</tabstop>
+  <tabstop>lineEdit_portNumber</tabstop>
+  <tabstop>lineEdit_arguments</tabstop>
+  <tabstop>checkBox_startup</tabstop>
+  <tabstop>pushButton_start</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

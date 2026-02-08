@@ -32,7 +32,7 @@
 #include <hamlib/rig.h>
 
 
-extern rigConnect rigCom;
+extern rigConnection rigCom;
 extern guiConfig guiConf;
 
 

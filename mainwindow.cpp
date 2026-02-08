@@ -32,6 +32,7 @@
 #include "guidata.h"
 #include "rigcommand.h"
 #include "winkeyer.h"
+#include "netrigctl.h"
 #include "debuglogger.h"
 
 #include <QDebug>
@@ -49,7 +50,7 @@
 #include <rig.h>    //Hamlib
 
 
-extern rigConnect rigCom;
+extern rigConnection rigCom;
 extern rigSettings rigGet;
 extern rigSettings rigSet;
 extern rigCommand rigCmd;
@@ -76,6 +77,7 @@ QDialog *command = nullptr;
 QDialog *radioInfo = nullptr;
 
 WinKeyer *winkeyer = nullptr;
+netRigCtl *netrigctl = nullptr;
 
 
 //***** MainWindow *****
@@ -214,6 +216,11 @@ MainWindow::MainWindow(QWidget *parent)
 
     //Auto connect
     if (rigCom.autoConnect) ui->pushButton_Connect->toggle();
+
+    //netrigctl
+    if (!netrigctl) netrigctl = new netRigCtl;
+    netrigctl->debugMode = guiConf.debugMode;
+    netrigctl->setRigctldArguments(rigCom.rigModel, rigCom.rigPort, rigCom.serialSpeed, rigCom.civAddr, guiConf.rigctldPort);
 }
 
 MainWindow::~MainWindow()
@@ -243,6 +250,12 @@ MainWindow::~MainWindow()
 
     if (command) delete command;    //deallocate *command
     if (radioInfo) delete radioInfo;  //deallocate *radioInfo
+
+    if (netrigctl)  //deallocate *netrigctl
+    {
+        netrigctl->close();
+        delete netrigctl;
+    }
 
     //* Save window settings
     QSettings configFile(QString("catradio.ini"), QSettings::IniFormat);
@@ -488,6 +501,10 @@ void MainWindow::loadGuiConfig(QString configFileName)
     guiConf.vfoDialStep[0][1] = 100;
     guiConf.vfoDialStep[0][2] = 100;
     guiConf.vfoDialStep[0][3] = 500;
+
+    //netrigctl
+    guiConf.autoRigctld = configFile.value("autoRigctld", false).toBool();
+    guiConf.rigctldPort = configFile.value("rigctldPort", 4532).toUInt();
 
     //Window settings
     restoreGeometry(configFile.value("WindowSettings/geometry").toByteArray());
@@ -889,7 +906,7 @@ void MainWindow::guiUpdate()
 
 void MainWindow::rigUpdate()
 {
-    rigDaemon->rigUpdate(my_rig);
+    rigDaemon->rigUpdate(my_rig, rigCom.fullPoll);
 }
 
 //* RigDaemon handle results
@@ -1027,7 +1044,8 @@ void MainWindow::on_pushButton_Connect_toggled(bool checked)
     {
         int retcode;
 
-        my_rig = rigDaemon->rigConnect(&retcode);   //Open Rig connection
+        if (netrigctl->isOpen) my_rig = rigDaemon->rigConnect(2, "127.0.0.1:4532", rigCom.autoPowerOn, &retcode);
+        else my_rig = rigDaemon->rigConnect(rigCom.rigModel, rigCom.rigPort, rigCom.serialSpeed, rigCom.serialDataBits, rigCom.serialParity, rigCom.serialStopBits, rigCom.serialHandshake, rigCom.civAddr, rigCom.autoPowerOn, &retcode);   //Open Rig connection
 
         if (retcode != RIG_OK)   //Connection error
         {
@@ -2002,6 +2020,8 @@ void MainWindow::on_action_Connection_triggered()
     DialogConfig config;
     config.setModal(true);
     config.exec();
+
+    if (netrigctl) netrigctl->setRigctldArguments(rigCom.rigModel, rigCom.rigPort, rigCom.serialSpeed, rigCom.civAddr, guiConf.rigctldPort);
 }
 
 void MainWindow::on_action_Setup_triggered()
@@ -2077,9 +2097,14 @@ void MainWindow::on_action_Command_triggered()
 void MainWindow::on_actionNET_rigctl_triggered()
 {
     qInfo() << "DialogNetRigctl";
-    DialogNetRigctl configNetRigctl;
-    configNetRigctl.setModal(true);
-    configNetRigctl.exec();
+    if (netrigctl)
+    {
+        DialogNetRigctl configNetRigctl(netrigctl, this);
+        configNetRigctl.setArguments(netrigctl->rigctldArguments.join(" "));
+        configNetRigctl.setModal(true);
+        configNetRigctl.exec();
+    }
+    else qCritical() << "netrigctl not allocated";
 }
 
 void MainWindow::on_action_AboutCatRadio_triggered()

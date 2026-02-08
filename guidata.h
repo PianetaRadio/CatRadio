@@ -42,6 +42,8 @@ typedef struct {
     int cwKeyerMode;    //0: Radio, 1: WinKeyer
     int voiceKeyerMode; //0: Radio, 1: CatRadio
     int rigModelSort;   //0: Numerically, 1: Alphabetically
+    bool autoRigctld;    //flag for Hamlib NET control rigctld at startup
+    unsigned rigctldPort;   //rigctld TCP listening port number
 } guiConfig;
 
 

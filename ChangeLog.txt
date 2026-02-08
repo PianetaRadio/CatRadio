@@ -4,6 +4,7 @@ Change log
 (+ New, * Updated, - Removed)
 
 1.5.0 - 2026-xx-xx
+	+ Manage Hamlib NET rigctld utility
 	+ Sort rig list
 	+ Debug log file
 	+ Voice memory keyer (radio or CatRadio)

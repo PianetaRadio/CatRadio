@@ -1,6 +1,6 @@
 /**
  ** This file is part of the CatRadio project.
- ** Copyright 2022-2025 Gianfranco Sordetti IZ8EWD <iz8ewd@pianetaradio.it>.
+ ** Copyright 2022-2026 Gianfranco Sordetti IZ8EWD <iz8ewd@pianetaradio.it>.
  **
  ** This program is free software: you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@
 
 #include <rig.h>
 
-extern rigConnect rigCom;
+//extern rigConnection rigCom;
 extern rigSettings rigGet;
 extern rigSettings rigSet;
 extern rigCommand rigCmd;
@@ -44,12 +44,13 @@ RigDaemon::RigDaemon(QObject *parent) : QObject(parent)
 
 }
 
-RIG *RigDaemon::rigConnect(int *retcode)
+RIG *RigDaemon::rigConnect(unsigned rigModel, QString rigPort, unsigned serialSpeed, unsigned serialDataBits, unsigned serialParity, unsigned serialStopBits, unsigned serialHandshake, int civAddr, bool autoPowerOn, int *retcode)
 {
-    RIG *my_rig = rig_init(rigCom.rigModel); //Allocate rig handle
+    RIG *my_rig = rig_init(rigModel); //Allocate rig handle
 
     if (!my_rig)    //Wrong Rig number
     {
+        qWarning() << "Rig model error";
         QMessageBox msgBox; //Show error MessageBox
         msgBox.setWindowTitle("Warning");
         msgBox.setText("Rig model error");
@@ -65,30 +66,30 @@ RIG *RigDaemon::rigConnect(int *retcode)
         //if (rigCom.rigModel == 2)   //Rigctld
         if (my_rig->state.port_type == RIG_PORT_NETWORK)
         {
-            strncpy(my_rig->state.rigport.pathname, rigCom.rigPort.toLatin1(), HAMLIB_FILPATHLEN - 1);
+            strncpy(my_rig->state.rigport.pathname, rigPort.toLatin1(), HAMLIB_FILPATHLEN - 1);
         }
         else    //RIG_PORT_SERIAL
         {
-            strncpy(my_rig->state.rigport.pathname, rigCom.rigPort.toLatin1(), HAMLIB_FILPATHLEN - 1);
-            my_rig->state.rigport.parm.serial.rate = rigCom.serialSpeed;
-            my_rig->state.rigport.parm.serial.data_bits = rigCom.serialDataBits;
-            if (rigCom.serialParity == 1) my_rig->state.rigport.parm.serial.parity = RIG_PARITY_ODD;
-            else if (rigCom.serialParity == 2) my_rig->state.rigport.parm.serial.parity = RIG_PARITY_EVEN;
+            strncpy(my_rig->state.rigport.pathname, rigPort.toLatin1(), HAMLIB_FILPATHLEN - 1);
+            my_rig->state.rigport.parm.serial.rate = serialSpeed;
+            my_rig->state.rigport.parm.serial.data_bits = serialDataBits;
+            if (serialParity == 1) my_rig->state.rigport.parm.serial.parity = RIG_PARITY_ODD;
+            else if (serialParity == 2) my_rig->state.rigport.parm.serial.parity = RIG_PARITY_EVEN;
             else my_rig->state.rigport.parm.serial.parity = RIG_PARITY_NONE;
-            my_rig->state.rigport.parm.serial.stop_bits = rigCom.serialStopBits;
-            if (rigCom.serialHandshake == 1) my_rig->state.rigport.parm.serial.handshake = RIG_HANDSHAKE_XONXOFF;
-            else if (rigCom.serialHandshake == 2) my_rig->state.rigport.parm.serial.handshake = RIG_HANDSHAKE_HARDWARE;
+            my_rig->state.rigport.parm.serial.stop_bits = serialStopBits;
+            if (serialHandshake == 1) my_rig->state.rigport.parm.serial.handshake = RIG_HANDSHAKE_XONXOFF;
+            else if (serialHandshake == 2) my_rig->state.rigport.parm.serial.handshake = RIG_HANDSHAKE_HARDWARE;
             else my_rig->state.rigport.parm.serial.handshake = RIG_HANDSHAKE_NONE;
 
-            if (rigCom.civAddr) //CI-V address Icom
+            if (civAddr) //CI-V address Icom
             {
-                std::string civaddrS = std::to_string(rigCom.civAddr);  //Convert int to string
+                std::string civaddrS = std::to_string(civAddr);  //Convert int to string
                 char const *civaddr = civaddrS.c_str(); //Convert string to char*
                 rig_set_conf(my_rig, rig_token_lookup(my_rig, "civaddr"), civaddr);
             }
         }
 
-        if (rigCom.autoPowerOn) my_rig->state.auto_power_on = 1;
+        if (autoPowerOn) my_rig->state.auto_power_on = 1;
 
         *retcode = rig_open(my_rig);
 
@@ -96,14 +97,54 @@ RIG *RigDaemon::rigConnect(int *retcode)
         else    //Rig connected
         {
             if (rig_has_get_func(my_rig, RIG_FUNCTION_GET_POWERSTAT)) rig_get_powerstat(my_rig, &rigGet.onoff);
-            //if (my_rig->caps->get_powerstat != NULL) rig_get_powerstat(my_rig, &rigGet.onoff);
+            if (my_rig->caps->get_powerstat != NULL) rig_get_powerstat(my_rig, &rigGet.onoff);
             else rigGet.onoff = RIG_POWER_UNKNOWN;
             return my_rig;
         }
      }
 }
 
-void RigDaemon::rigUpdate(RIG *my_rig)
+
+RIG *RigDaemon::rigConnect(unsigned rigModel, QString rigPort, bool autoPowerOn, int *retcode)
+{
+    RIG *my_rig = rig_init(rigModel); //Allocate rig handle
+
+    if (!my_rig)    //Wrong Rig number
+    {
+        qWarning() << "Rig model error";
+        QMessageBox msgBox; //Show error MessageBox
+        msgBox.setWindowTitle("Warning");
+        msgBox.setText("Rig model error");
+        msgBox.setIcon(QMessageBox::Warning);
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.exec();
+
+        *retcode = RIG_EINVAL;   //RIG_EINVAL, Invalid parameter
+        return nullptr;
+    }
+    else
+    {
+        if (my_rig->state.port_type == RIG_PORT_NETWORK)
+        {
+            strncpy(my_rig->state.rigport.pathname, rigPort.toLatin1(), HAMLIB_FILPATHLEN - 1);
+        }
+    }
+    if (autoPowerOn) my_rig->state.auto_power_on = 1;
+
+    *retcode = rig_open(my_rig);
+
+    if (*retcode != RIG_OK) return nullptr;  //Rig not connected
+    else    //Rig connected
+    {
+        if (rig_has_get_func(my_rig, RIG_FUNCTION_GET_POWERSTAT)) rig_get_powerstat(my_rig, &rigGet.onoff);
+        if (my_rig->caps->get_powerstat != NULL) rig_get_powerstat(my_rig, &rigGet.onoff);
+        else rigGet.onoff = RIG_POWER_UNKNOWN;
+        return my_rig;
+    }
+}
+
+
+void RigDaemon::rigUpdate(RIG *my_rig, bool fullPoll)
 {
     int retcode;
     value_t retvalue;
@@ -652,7 +693,7 @@ void RigDaemon::rigUpdate(RIG *my_rig)
 
         //***** Poll execution *****
         //* Mode and BW
-        if ((indexCmd == 1 && !rigGet.ptt && rigCom.fullPoll) || indexCmd == 0)
+        if ((indexCmd == 1 && !rigGet.ptt && fullPoll) || indexCmd == 0)
         {
             rmode_t tempMode;
 
@@ -674,7 +715,7 @@ void RigDaemon::rigUpdate(RIG *my_rig)
         }
 
         //* VFO and Split
-        if ((indexCmd == 2 && !rigGet.ptt && rigCom.fullPoll) || indexCmd == 0)
+        if ((indexCmd == 2 && !rigGet.ptt && fullPoll) || indexCmd == 0)
         {
             rig_get_split_vfo(my_rig, RIG_VFO_CURR, &rigGet.split, &rigGet.vfoTx);            
 
@@ -682,16 +723,16 @@ void RigDaemon::rigUpdate(RIG *my_rig)
         }
 
         //* Tuner
-        if ((indexCmd == 3 && !rigGet.ptt && rigCom.fullPoll) || indexCmd == 0) rig_get_func(my_rig, RIG_VFO_CURR, RIG_FUNC_TUNER, &rigGet.tuner);
+        if ((indexCmd == 3 && !rigGet.ptt && fullPoll) || indexCmd == 0) rig_get_func(my_rig, RIG_VFO_CURR, RIG_FUNC_TUNER, &rigGet.tuner);
 
         //* Antenna
-        if ((indexCmd == 4 && !rigGet.ptt && rigCom.fullPoll) || indexCmd == 0)
+        if ((indexCmd == 4 && !rigGet.ptt && fullPoll) || indexCmd == 0)
         {
             if (rig_has_get_func(my_rig, RIG_FUNCTION_GET_ANT)) rig_get_ant(my_rig, RIG_VFO_CURR, RIG_ANT_CURR, &retvalue, &rigGet.ant, &rigGet.antTx, &rigGet.antRx);
         }
 
         //* AGC
-        if ((indexCmd == 5 && !rigGet.ptt && rigCom.fullPoll) || indexCmd == 0)
+        if ((indexCmd == 5 && !rigGet.ptt && fullPoll) || indexCmd == 0)
         {
             if (rig_has_get_level(my_rig, RIG_LEVEL_AGC))
             {
@@ -701,7 +742,7 @@ void RigDaemon::rigUpdate(RIG *my_rig)
         }
 
         //* Attenuator
-        if ((indexCmd == 6 && !rigGet.ptt && rigCom.fullPoll) || indexCmd == 0)
+        if ((indexCmd == 6 && !rigGet.ptt && fullPoll) || indexCmd == 0)
         {
             if (rig_has_get_level(my_rig, RIG_LEVEL_ATT))
             {
@@ -711,7 +752,7 @@ void RigDaemon::rigUpdate(RIG *my_rig)
         }
 
         //* Preamp
-        if ((indexCmd == 7 && !rigGet.ptt && rigCom.fullPoll) || indexCmd == 0)
+        if ((indexCmd == 7 && !rigGet.ptt && fullPoll) || indexCmd == 0)
         {
             if (rig_has_get_level(my_rig, RIG_LEVEL_PREAMP))
             {
@@ -721,7 +762,7 @@ void RigDaemon::rigUpdate(RIG *my_rig)
         }
 
         //* RF power
-        if ((indexCmd == 8 && !rigGet.ptt && rigCom.fullPoll) || indexCmd == 0)
+        if ((indexCmd == 8 && !rigGet.ptt && fullPoll) || indexCmd == 0)
         {
             if (rig_has_get_level(my_rig, RIG_LEVEL_RFPOWER))
             {
@@ -731,7 +772,7 @@ void RigDaemon::rigUpdate(RIG *my_rig)
         }
 
         //* RF gain
-        if ((indexCmd == 9 && !rigGet.ptt && rigCom.fullPoll) || indexCmd == 0)
+        if ((indexCmd == 9 && !rigGet.ptt && fullPoll) || indexCmd == 0)
         {
             if (rig_has_get_level(my_rig, RIG_LEVEL_RF))
             {
@@ -741,7 +782,7 @@ void RigDaemon::rigUpdate(RIG *my_rig)
         }
 
         //* AF gain
-        if ((indexCmd == 10 && !rigGet.ptt && rigCom.fullPoll) || indexCmd == 0)
+        if ((indexCmd == 10 && !rigGet.ptt && fullPoll) || indexCmd == 0)
         {
             if (rig_has_get_level(my_rig, RIG_LEVEL_AF))
             {
@@ -751,7 +792,7 @@ void RigDaemon::rigUpdate(RIG *my_rig)
         }
 
         //* Squelch
-        if ((indexCmd == 11 && !rigGet.ptt && rigCom.fullPoll) || indexCmd == 0)
+        if ((indexCmd == 11 && !rigGet.ptt && fullPoll) || indexCmd == 0)
         {
             if (rig_has_get_level(my_rig, RIG_LEVEL_SQL))
             {
@@ -761,7 +802,7 @@ void RigDaemon::rigUpdate(RIG *my_rig)
         }
 
         //* MIC
-        if ((indexCmd == 12 && !rigGet.ptt && rigCom.fullPoll) || indexCmd == 0)
+        if ((indexCmd == 12 && !rigGet.ptt && fullPoll) || indexCmd == 0)
         {
             if (rig_has_get_level(my_rig, RIG_LEVEL_MICGAIN))
             {
@@ -777,7 +818,7 @@ void RigDaemon::rigUpdate(RIG *my_rig)
         }
 
         //* Monitor
-        if ((indexCmd == 13 && !rigGet.ptt && rigCom.fullPoll) || indexCmd == 0)
+        if ((indexCmd == 13 && !rigGet.ptt && fullPoll) || indexCmd == 0)
         {
             if (rig_has_get_func(my_rig, RIG_FUNC_MON)) rig_get_func(my_rig, RIG_VFO_CURR, RIG_FUNC_MON, &rigGet.micMon);
             if (rig_has_get_level(my_rig, RIG_LEVEL_MONITOR_GAIN))
@@ -788,14 +829,14 @@ void RigDaemon::rigUpdate(RIG *my_rig)
         }
 
         //* NB noise blanker
-        if ((indexCmd == 14 && !rigGet.ptt && rigCom.fullPoll) || indexCmd == 0)
+        if ((indexCmd == 14 && !rigGet.ptt && fullPoll) || indexCmd == 0)
         {
             if (rig_has_get_func(my_rig, RIG_FUNC_NB)) rig_get_func(my_rig, RIG_VFO_CURR, RIG_FUNC_NB, &rigGet.noiseBlanker);
             if (rig_has_get_func(my_rig, RIG_FUNC_NB2)) rig_get_func(my_rig, RIG_VFO_CURR, RIG_FUNC_NB2, &rigGet.noiseBlanker2);
         }
 
         //* NR noise reduction
-        if ((indexCmd == 15 && !rigGet.ptt && rigCom.fullPoll) || indexCmd == 0)
+        if ((indexCmd == 15 && !rigGet.ptt && fullPoll) || indexCmd == 0)
         {
             if (rig_has_get_func(my_rig, RIG_FUNC_NR)) rig_get_func(my_rig, RIG_VFO_CURR, RIG_FUNC_NR, &rigGet.noiseReduction);
             if (rig_has_get_level(my_rig, RIG_LEVEL_NR))
@@ -806,13 +847,13 @@ void RigDaemon::rigUpdate(RIG *my_rig)
         }
 
         //* NF notch filter
-        if ((indexCmd == 16 && !rigGet.ptt && rigCom.fullPoll) || indexCmd == 0)
+        if ((indexCmd == 16 && !rigGet.ptt && fullPoll) || indexCmd == 0)
         {
             if (rig_has_get_func(my_rig, RIG_FUNC_ANF)) rig_get_func(my_rig, RIG_VFO_CURR, RIG_FUNC_ANF, &rigGet.notchFilter);
         }
 
         //* IF Shift
-        if ((indexCmd == 17 && !rigGet.ptt && rigCom.fullPoll) || indexCmd == 0)
+        if ((indexCmd == 17 && !rigGet.ptt && fullPoll) || indexCmd == 0)
         {
             if (rig_has_get_level(my_rig, RIG_LEVEL_IF))
             {
@@ -822,7 +863,7 @@ void RigDaemon::rigUpdate(RIG *my_rig)
         }
 
         //* Clarifier
-        if ((indexCmd == 18 && !rigGet.ptt && rigCom.fullPoll) || indexCmd == 0)
+        if ((indexCmd == 18 && !rigGet.ptt && fullPoll) || indexCmd == 0)
         {
             if (rig_has_get_func(my_rig, RIG_FUNC_RIT)) rig_get_func(my_rig, RIG_VFO_CURR, RIG_FUNC_RIT, &rigGet.rit);  //RIT
             if (rig_has_get_func(my_rig, RIG_FUNC_XIT)) rig_get_func(my_rig, RIG_VFO_CURR, RIG_FUNC_XIT, &rigGet.xit);  //XIT
@@ -834,7 +875,7 @@ void RigDaemon::rigUpdate(RIG *my_rig)
         }
 
         //* CW
-        if ((indexCmd == 19 && !rigGet.ptt && rigCom.fullPoll && (rigGet.mode == RIG_MODE_CW || rigGet.mode == RIG_MODE_CWN || rigGet.mode == RIG_MODE_CWR)) || indexCmd == 0)
+        if ((indexCmd == 19 && !rigGet.ptt && fullPoll && (rigGet.mode == RIG_MODE_CW || rigGet.mode == RIG_MODE_CWN || rigGet.mode == RIG_MODE_CWR)) || indexCmd == 0)
         {
             if (rig_has_get_func(my_rig, RIG_FUNC_FBKIN)) rig_get_func(my_rig, RIG_VFO_CURR, RIG_FUNC_FBKIN, &rigGet.bkin);   //Break-in
             if (rig_has_get_func(my_rig, RIG_FUNC_APF)) rig_get_func(my_rig, RIG_VFO_CURR, RIG_FUNC_APF, &rigGet.apf);      //Audio Peak Filter
@@ -843,7 +884,7 @@ void RigDaemon::rigUpdate(RIG *my_rig)
         }
 
         //* FM
-        if ((indexCmd == 20 && !rigGet.ptt && rigCom.fullPoll && (rigGet.mode == RIG_MODE_FM || rigGet.mode == RIG_MODE_WFM || rigGet.mode == RIG_MODE_FMN)) || indexCmd == 0)
+        if ((indexCmd == 20 && !rigGet.ptt && fullPoll && (rigGet.mode == RIG_MODE_FM || rigGet.mode == RIG_MODE_WFM || rigGet.mode == RIG_MODE_FMN)) || indexCmd == 0)
         {
             rig_get_rptr_shift(my_rig, RIG_VFO_CURR, &rigGet.rptShift);     //Repeater Shift
             rig_get_rptr_offs(my_rig, RIG_VFO_CURR, &rigGet.rptOffset);     //Repeater Offset
