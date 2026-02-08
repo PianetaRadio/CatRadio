@@ -61,9 +61,9 @@ void netRigCtl::setRigctldArguments(unsigned rigModel, QString rigPort, unsigned
 {
     rigctldArguments.clear();   //removes all previous elements
 #ifdef Q_OS_WIN
-    if (debugMode) rigctldArguments << "/c" << "start" << "cmd.exe" << "/k" << "rigctld.exe";
+    if (debugMode) rigctldArguments << "/c" << "start" << "cmd.exe" << "/k" << "rigctld.exe" << "-vvvv";
 #endif
-    rigctldArguments << "-m" << QString::number(rigModel) << "-t" << QString::number(rigctldPort) << "-o" <<  "-vvvv";
+    rigctldArguments << "-m" << QString::number(rigModel) << "-t" << QString::number(rigctldPort) << "-o";
     if (rigPort!="")
     {
         rigctldArguments.append("-r " + rigPort);

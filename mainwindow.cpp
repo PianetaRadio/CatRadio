@@ -1044,7 +1044,11 @@ void MainWindow::on_pushButton_Connect_toggled(bool checked)
     {
         int retcode;
 
-        if (netrigctl->isOpen) my_rig = rigDaemon->rigConnect(2, "127.0.0.1:4532", rigCom.autoPowerOn, &retcode);
+        if (netrigctl->isOpen)
+        {
+            QString rigPort = "127.0.0.1:" + QString::number(guiConf.rigctldPort);   //127.0.0.1:rigctldPort
+            my_rig = rigDaemon->rigConnect(2, rigPort, rigCom.autoPowerOn, &retcode);
+        }
         else my_rig = rigDaemon->rigConnect(rigCom.rigModel, rigCom.rigPort, rigCom.serialSpeed, rigCom.serialDataBits, rigCom.serialParity, rigCom.serialStopBits, rigCom.serialHandshake, rigCom.civAddr, rigCom.autoPowerOn, &retcode);   //Open Rig connection
 
         if (retcode != RIG_OK)   //Connection error

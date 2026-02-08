@@ -20,6 +20,8 @@
 #include "dialognetrigctl.h"
 #include "ui_dialognetrigctl.h"
 
+#include <QSettings>
+
 #include "rigdata.h"
 #include "guidata.h"
 #include "netrigctl.h"
@@ -35,7 +37,7 @@ DialogNetRigctl::DialogNetRigctl(netRigCtl *netrigctlPtr, QWidget *parent)
     , netrigctl(netrigctlPtr)
 {
     ui->setupUi(this);
-    ui->lineEdit_portNumber->setText(QString::number(guiConf.rigctldPort));
+    ui->spinBox_portNumber->setValue(guiConf.rigctldPort);
     ui->lineEdit_arguments->setText(argumentsString);
     ui->checkBox_startup->setChecked(guiConf.autoRigctld);
 }
@@ -66,10 +68,22 @@ void DialogNetRigctl::on_pushButton_start_toggled(bool checked)
 }
 
 
-void DialogNetRigctl::on_lineEdit_portNumber_editingFinished()
+void DialogNetRigctl::on_spinBox_portNumber_editingFinished()
 {
-    guiConf.rigctldPort = ui->lineEdit_portNumber->text().toInt();
+    guiConf.rigctldPort = ui->spinBox_portNumber->value();
     netrigctl->setRigctldArguments(rigCom.rigModel, rigCom.rigPort, rigCom.serialSpeed, rigCom.civAddr, guiConf.rigctldPort);
     setArguments(netrigctl->rigctldArguments.join(" "));
+}
+
+
+void DialogNetRigctl::on_buttonBox_accepted()
+{
+    guiConf.autoRigctld = ui->checkBox_startup->isChecked();
+    guiConf.rigctldPort = ui->spinBox_portNumber->value();
+
+    //* Save settings in catradio.ini
+    QSettings configFile(QString("catradio.ini"), QSettings::IniFormat);
+    configFile.setValue("autoRigctld", guiConf.autoRigctld);
+    configFile.setValue("rigctldPort", guiConf.rigctldPort);
 }
 

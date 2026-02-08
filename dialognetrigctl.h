@@ -40,8 +40,8 @@ public:
 
 private slots:
     void on_pushButton_start_toggled(bool checked);
-
-    void on_lineEdit_portNumber_editingFinished();
+    void on_buttonBox_accepted();
+    void on_spinBox_portNumber_editingFinished();
 
 private:
     Ui::DialogNetRigctl *ui;

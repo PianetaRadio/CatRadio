@@ -45,23 +45,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
          <string>Port Number</string>
         </property>
         <property name="buddy">
-         <cstring>lineEdit_portNumber</cstring>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QLineEdit" name="lineEdit_portNumber">
-        <property name="toolTip">
-         <string>default 4532</string>
-        </property>
-        <property name="inputMask">
-         <string>99999</string>
-        </property>
-        <property name="text">
-         <string>4532</string>
-        </property>
-        <property name="placeholderText">
-         <string/>
+         <cstring>spinBox_portNumber</cstring>
         </property>
        </widget>
       </item>
@@ -76,6 +60,25 @@ li.checked::marker { content: &quot;\2612&quot;; }
        <widget class="QLineEdit" name="lineEdit_arguments">
         <property name="enabled">
          <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QSpinBox" name="spinBox_portNumber">
+        <property name="toolTip">
+         <string>default port 4532</string>
+        </property>
+        <property name="whatsThis">
+         <string/>
+        </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>10000</number>
+        </property>
+        <property name="value">
+         <number>4532</number>
         </property>
        </widget>
       </item>
@@ -122,7 +125,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
  </widget>
  <tabstops>
   <tabstop>textBrowser</tabstop>
-  <tabstop>lineEdit_portNumber</tabstop>
+  <tabstop>spinBox_portNumber</tabstop>
   <tabstop>lineEdit_arguments</tabstop>
   <tabstop>checkBox_startup</tabstop>
   <tabstop>pushButton_start</tabstop>
@@ -136,8 +139,8 @@ li.checked::marker { content: &quot;\2612&quot;; }
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>248</x>
-     <y>254</y>
+     <x>259</x>
+     <y>398</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
@@ -152,8 +155,8 @@ li.checked::marker { content: &quot;\2612&quot;; }
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>316</x>
-     <y>260</y>
+     <x>327</x>
+     <y>398</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>
