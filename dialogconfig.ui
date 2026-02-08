@@ -31,6 +31,9 @@
      </item>
      <item>
       <widget class="QCheckBox" name="checkBox_rigModelSort">
+       <property name="toolTip">
+        <string>sort</string>
+       </property>
        <property name="text">
         <string>abc...</string>
        </property>
@@ -377,6 +380,7 @@
  </widget>
  <tabstops>
   <tabstop>comboBox_rigModel</tabstop>
+  <tabstop>checkBox_rigModelSort</tabstop>
   <tabstop>tabWidget_Config</tabstop>
   <tabstop>comboBox_comPort</tabstop>
   <tabstop>comboBox_serialSpeed</tabstop>
@@ -396,6 +400,7 @@
   <tabstop>checkBox_autoConnect</tabstop>
   <tabstop>checkBox_autoPowerOn</tabstop>
   <tabstop>checkBox_netRigctl</tabstop>
+  <tabstop>lineEdit_ip</tabstop>
  </tabstops>
  <resources/>
  <connections>

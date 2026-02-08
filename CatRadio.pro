@@ -21,6 +21,7 @@ SOURCES += \
     guidata.cpp \
     main.cpp \
     mainwindow.cpp \
+    netrigctl.cpp \
     rigcommand.cpp \
     rigdaemon.cpp \
     rigdata.cpp \
@@ -40,6 +41,7 @@ HEADERS += \
     dialogvoicekeyer.h \
     guidata.h \
     mainwindow.h \
+    netrigctl.h \
     rigcommand.h \
     rigdaemon.h \
     rigdata.h \
