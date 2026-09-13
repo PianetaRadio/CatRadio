@@ -50,6 +50,7 @@ void netRigCtl::open()
         }
         else isOpen = false;
     }
+    else isOpen = false;
 }
 
 void netRigCtl::close()

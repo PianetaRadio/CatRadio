@@ -57,9 +57,10 @@ void DialogNetRigctl::setArguments(QString arguments)
 
 void DialogNetRigctl::on_pushButton_start_toggled(bool checked)
 {
-    if (checked)    //Start
+    if (checked && !netrigctl->isOpen)    //Start
     {
         netrigctl->open();
+        if (!netrigctl->isOpen) ui->pushButton_start->setChecked(false);
     }
     else    //Stop
     {
