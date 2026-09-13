@@ -25,6 +25,7 @@
 #include <QTextStream>
 #include <QSerialPortInfo>
 #include <QMessageBox>
+#include <QDebug>
 
 #include "rigdata.h"
 #include "guidata.h"

@@ -214,13 +214,14 @@ MainWindow::MainWindow(QWidget *parent)
         msgBox.exec();
     }
 
-    //Auto connect
-    if (rigCom.autoConnect) ui->pushButton_Connect->toggle();
-
     //netrigctl
     if (!netrigctl) netrigctl = new netRigCtl;
     netrigctl->debugMode = guiConf.debugMode;
     netrigctl->setRigctldArguments(rigCom.rigModel, rigCom.rigPort, rigCom.serialSpeed, rigCom.civAddr, guiConf.rigctldPort);
+    if (guiConf.autoRigctld && !netrigctl->isOpen) netrigctl->open();   //Run rigctld if Run on startup option
+
+    //Auto connect
+    if (rigCom.autoConnect) ui->pushButton_Connect->toggle();
 }
 
 MainWindow::~MainWindow()
@@ -1078,6 +1079,8 @@ void MainWindow::on_pushButton_Connect_toggled(bool checked)
                 else rigGet.onoff = RIG_POWER_OFF;
             }
 
+            ui->actionNET_rigctl->setEnabled(false);    //Disable Tools->NET rigctl menu
+
             if (guiConf.cwKeyerMode && cwKConf.autoConnect) //WinKeyer
             {
                 if (!winkeyer->init(cwKConf.comPort)) //Open serial port
@@ -1113,6 +1116,8 @@ void MainWindow::on_pushButton_Connect_toggled(bool checked)
                 ui->progressBar_Smeter->setValue(-54);
                 ui->progressBar_Smeter->resetPeakValue();
                 setSubMeter();
+
+                ui->actionNET_rigctl->setEnabled(true);    //Enable Tools->NET rigctl menu
             }
             else
             {
