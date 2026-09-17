@@ -1,6 +1,7 @@
 QT       += core gui
 QT       += serialport
 QT       += multimedia
+
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++11
@@ -65,15 +66,36 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-LIBS += -L$$PWD/hamlib/ -lhamlib
-INCLUDEPATH += $$PWD/hamlib
-
-QMAKE_LFLAGS += -Wl,-rpath,\\$\$ORIGIN/hamlib/ #Set runtime shared libraries path to use local hamlib library
-
-RESOURCES += qdarkstyle/dark/darkstyle.qrc  #Include darkstyle
-
 VERSION = 1.5.0
 
-RC_ICONS = catradio.ico
+# Windows
+win32 {
+    RC_ICONS = catradio.ico
+    QMAKE_TARGET_COPYRIGHT = IZ8EWD
+
+    equals(QMAKE_HOST.arch, x86) {      #Win32
+        message("Build Win32")
+        DESTDIR = $$PWD/release/win32/CatRadio/
+        LIBS += -L$$PWD/hamlib_w32/ -lhamlib
+        INCLUDEPATH += $$PWD/hamlib_w32
+    }
+
+    equals(QMAKE_HOST.arch, x86_64) {   #Win64
+        message("Build Win64")
+        DESTDIR = $$PWD/release/win64/CatRadio/
+        LIBS += -L$$PWD/hamlib/ -lhamlib
+        INCLUDEPATH += $$PWD/hamlib
+    }
+}
+
+# Linux
+unix:!macx {
+    message("Build Linux")
+    LIBS += -L$$PWD/hamlib/ -lhamlib
+    INCLUDEPATH += $$PWD/hamlib
+    QMAKE_LFLAGS += -Wl,-rpath,\\$\$ORIGIN/hamlib/ #Set runtime shared libraries path to use local hamlib library
+}
+
+RESOURCES += qdarkstyle/dark/darkstyle.qrc  #Include darkstyle
 
 QMAKE_LFLAGS += -no-pie #No Position Indipendent Executable
