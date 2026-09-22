@@ -171,6 +171,10 @@ private slots:
     void on_actionCW_Keyer_triggered();
     void on_action_AboutCatRadio_triggered();
 
+    void on_action_LoadConfig_triggered();
+
+    void on_action_SaveConfig_triggered();
+
 private:
     Ui::MainWindow *ui;
     QTimer *timer;

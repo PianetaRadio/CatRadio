@@ -45,6 +45,8 @@
 #include <QApplication>
 #include <QCoreApplication>
 #include <QDir>
+#include <QFileDialog>
+#include <QFile>
 
 #include <cwchar>   //c++ string library
 #include <rig.h>    //Hamlib
@@ -1080,6 +1082,7 @@ void MainWindow::on_pushButton_Connect_toggled(bool checked)
             }
 
             ui->actionNET_rigctl->setEnabled(false);    //Disable Tools->NET rigctl menu
+            ui->action_LoadConfig->setEnabled(false);   //Disable Config->Load
 
             if (guiConf.cwKeyerMode && cwKConf.autoConnect) //WinKeyer
             {
@@ -1118,6 +1121,7 @@ void MainWindow::on_pushButton_Connect_toggled(bool checked)
                 setSubMeter();
 
                 ui->actionNET_rigctl->setEnabled(true);    //Enable Tools->NET rigctl menu
+                ui->action_LoadConfig->setEnabled(true);   //Enable Config->Load
             }
             else
             {
@@ -2076,6 +2080,31 @@ void MainWindow::on_actionCW_Keyer_triggered()
     cwKeyer.exec();
 
     loadCwKeyerConfig("catradio.ini");
+}
+
+void MainWindow::on_action_LoadConfig_triggered()
+{
+    QFile loadFile;
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Load Config"), "./", tr("Config file (*.ini)"));
+    loadFile.setFileName(fileName);
+    if (loadFile.exists())
+    {
+        QFile::remove("./catradio.bak");
+        QFile::rename("./catradio.ini","./catradio.bak");
+        loadFile.copy("./catradio.ini");
+
+        //loadGuiConfig("catradio.ini");  //load GUI config
+        loadRigConfig("catradio.ini");  //load Rig config
+    }
+}
+
+void MainWindow::on_action_SaveConfig_triggered()
+{
+    QFile saveFile;
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Config"), "./", tr("Config file (*.ini)"));
+    saveFile.setFileName(fileName);
+    if (saveFile.exists()) saveFile.remove();
+    QFile::copy("./catradio.ini",fileName);
 }
 
 void MainWindow::on_action_RadioInfo_triggered()

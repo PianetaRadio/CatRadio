@@ -53,7 +53,7 @@
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>91</width>
+      <width>95</width>
       <height>401</height>
      </rect>
     </property>
@@ -308,7 +308,7 @@
       <rect>
        <x>10</x>
        <y>100</y>
-       <width>381</width>
+       <width>395</width>
        <height>31</height>
       </rect>
      </property>
@@ -2143,7 +2143,7 @@
      <x>0</x>
      <y>0</y>
      <width>615</width>
-     <height>25</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_Config">
@@ -2155,6 +2155,9 @@
     <addaction name="separator"/>
     <addaction name="action_Voice_Keyer"/>
     <addaction name="actionCW_Keyer"/>
+    <addaction name="separator"/>
+    <addaction name="action_LoadConfig"/>
+    <addaction name="action_SaveConfig"/>
    </widget>
    <widget class="QMenu" name="menu_Help">
     <property name="title">
@@ -2262,6 +2265,16 @@
    </property>
    <property name="text">
     <string>CW Keyer</string>
+   </property>
+  </action>
+  <action name="action_LoadConfig">
+   <property name="text">
+    <string>Load</string>
+   </property>
+  </action>
+  <action name="action_SaveConfig">
+   <property name="text">
+    <string>Save</string>
    </property>
   </action>
  </widget>
